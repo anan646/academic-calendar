@@ -17,7 +17,7 @@ function getSpreadsheet() {
 }
 
 function doGet(e) {
-  return HtmlService.createTemplateFromFile('Index')
+  return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
@@ -50,7 +50,7 @@ function getOrCreateSheets() {
   var eventSheet = ss.getSheetByName('Events');
   if (!eventSheet) {
     eventSheet = ss.insertSheet('Events');
-    eventSheet.appendRow(['id', 'title', 'departmentId', 'startDate', 'endDate', 'academicYear', 'semester', 'location', 'description', 'createdBy', 'createdAt', 'updatedAt']);
+    eventSheet.appendRow(['id', 'title', 'departmentId', 'startDate', 'endDate', 'academicYear', 'semester', 'location', 'description', 'createdBy', 'creatorName', 'creatorDept', 'createdAt', 'updatedAt']);
     
     // ใส่กิจกรรมตั้งต้น (วันหยุด พ.ศ. / ฮ.ศ.)
     var defaults = getDefaultEvents();
@@ -59,12 +59,20 @@ function getOrCreateSheets() {
       eventSheet.appendRow([
         d.id, d.title, d.departmentId, d.startDate, d.endDate,
         d.academicYear, d.semester, d.location || '', d.description || '',
-        'ระบบ', new Date().toISOString(), new Date().toISOString()
+        'ระบบ', 'ส่วนกลาง', 'ฝ่ายบริหารทั่วไปและแผนงาน', new Date().toISOString(), new Date().toISOString()
       ]);
     }
   }
 
-  // 3. ชีตการตั้งค่า (Settings)
+  // 3. ชีตผู้ใช้งานและสมาชิก (Users)
+  var userSheet = ss.getSheetByName('Users');
+  if (!userSheet) {
+    userSheet = ss.insertSheet('Users');
+    userSheet.appendRow(['id', 'name', 'department', 'email', 'phone', 'role', 'createdAt']);
+    userSheet.appendRow(['u_admin', 'ผู้ดูแลระบบกลาง', 'ฝ่ายบริหารทั่วไปและแผนงาน', 'admin@school.ac.th', '0812345678', 'admin', new Date().toISOString()]);
+  }
+
+  // 4. ชีตการตั้งค่า (Settings)
   var settingSheet = ss.getSheetByName('Settings');
   if (!settingSheet) {
     settingSheet = ss.insertSheet('Settings');
@@ -86,6 +94,7 @@ function getInitialData() {
       success: true,
       departments: getDepartments(),
       events: getEvents(),
+      users: getUsers(),
       settings: getSettings()
     };
   } catch (err) {
@@ -94,6 +103,7 @@ function getInitialData() {
       error: err.message,
       departments: getDefaultDepartments(),
       events: getDefaultEvents(),
+      users: [],
       settings: { adminPinSet: true, currentAcademicYear: '2568' }
     };
   }
@@ -120,7 +130,9 @@ function getDefaultEvents() {
       academicYear: '2567',
       semester: '2',
       location: '-',
-      description: 'วันหยุดราชการสากล'
+      description: 'วันหยุดราชการสากล',
+      creatorName: 'ระบบ',
+      creatorDept: 'ส่วนกลาง'
     },
     {
       id: 'h_eid_fitr_2568',
@@ -131,7 +143,9 @@ function getDefaultEvents() {
       academicYear: '2567',
       semester: '2',
       location: '-',
-      description: 'วันเฉลิมฉลองออกบวช วันสำคัญทางศาสนาอิสลาม (1 เชาวาล 1446)'
+      description: 'วันเฉลิมฉลองออกบวช วันสำคัญทางศาสนาอิสลาม (1 เชาวาล 1446)',
+      creatorName: 'ระบบ',
+      creatorDept: 'ส่วนกลาง'
     },
     {
       id: 'h_songkran_2025',
@@ -142,7 +156,9 @@ function getDefaultEvents() {
       academicYear: '2567',
       semester: 'ปิดภาคเรียน',
       location: '-',
-      description: 'วันหยุดราชการและวันขึ้นปีใหม่ไทย'
+      description: 'วันหยุดราชการและวันขึ้นปีใหม่ไทย',
+      creatorName: 'ระบบ',
+      creatorDept: 'ส่วนกลาง'
     },
     {
       id: 'h_eid_adha_2568',
@@ -153,7 +169,9 @@ function getDefaultEvents() {
       academicYear: '2568',
       semester: '1',
       location: '-',
-      description: 'วันฉลองเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ 1446)'
+      description: 'วันฉลองเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ 1446)',
+      creatorName: 'ระบบ',
+      creatorDept: 'ส่วนกลาง'
     },
     {
       id: 'h_hijri_newyear_1447',
@@ -164,9 +182,74 @@ function getDefaultEvents() {
       academicYear: '2568',
       semester: '1',
       location: '-',
-      description: '1 มุฮัรรอม ฮ.ศ. 1447'
+      description: '1 มุฮัรรอม ฮ.ศ. 1447',
+      creatorName: 'ระบบ',
+      creatorDept: 'ส่วนกลาง'
     }
   ];
+}
+
+// ------------------------------
+// API: Users (ระบบสมาชิกและสังกัดฝ่าย)
+// ------------------------------
+function getUsers() {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Users');
+  if (!sheet) return [];
+
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+
+  var results = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (row[0]) {
+      results.push({
+        id: String(row[0]),
+        name: String(row[1] || ''),
+        department: String(row[2] || ''),
+        email: String(row[3] || ''),
+        phone: String(row[4] || ''),
+        role: String(row[5] || 'staff')
+      });
+    }
+  }
+  return results;
+}
+
+function registerUser(userData) {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Users');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Users');
+  }
+
+  var id = userData.id || ('u_' + new Date().getTime());
+  var role = userData.role || 'staff';
+  var now = new Date().toISOString();
+
+  sheet.appendRow([
+    id,
+    userData.name || 'ไม่ระบุชื่อ',
+    userData.department || 'ไม่ระบุหน่วยงาน',
+    userData.email || '',
+    userData.phone || '',
+    role,
+    now
+  ]);
+
+  return {
+    success: true,
+    user: {
+      id: id,
+      name: userData.name,
+      department: userData.department,
+      email: userData.email,
+      phone: userData.phone,
+      role: role
+    }
+  };
 }
 
 // ------------------------------
@@ -195,10 +278,6 @@ function getDepartments() {
 }
 
 function saveDepartment(deptData, adminPin) {
-  if (adminPin && !verifyAdminPin(adminPin)) {
-    throw new Error('รหัสผ่านผู้ดูแลระบบ (Admin PIN) ไม่ถูกต้อง');
-  }
-
   var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Departments');
   var data = sheet.getDataRange().getValues();
@@ -261,7 +340,9 @@ function getEvents() {
         semester: String(row[6] || ''),
         location: String(row[7] || ''),
         description: String(row[8] || ''),
-        createdBy: String(row[9] || '')
+        createdBy: String(row[9] || ''),
+        creatorName: String(row[10] || ''),
+        creatorDept: String(row[11] || '')
       });
     }
   }
@@ -292,7 +373,9 @@ function saveEvent(eventData) {
     sheet.getRange(rowIndex, 7).setValue(eventData.semester);
     sheet.getRange(rowIndex, 8).setValue(eventData.location);
     sheet.getRange(rowIndex, 9).setValue(eventData.description);
-    sheet.getRange(rowIndex, 12).setValue(now);
+    sheet.getRange(rowIndex, 11).setValue(eventData.creatorName || '');
+    sheet.getRange(rowIndex, 12).setValue(eventData.creatorDept || '');
+    sheet.getRange(rowIndex, 14).setValue(now);
   } else {
     sheet.appendRow([
       id,
@@ -305,6 +388,8 @@ function saveEvent(eventData) {
       eventData.location || '',
       eventData.description || '',
       eventData.createdBy || 'ทั่วไป',
+      eventData.creatorName || 'ไม่ระบุชื่อ',
+      eventData.creatorDept || 'ไม่ระบุฝ่าย',
       now,
       now
     ]);

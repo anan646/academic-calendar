@@ -83,14 +83,22 @@
         </div>
       </div>
 
-      <!-- Action Buttons & Mode -->
+      <!-- Action Buttons & User Profile -->
       <div class="flex items-center space-x-2">
-        <button id="btnOpenAddEvent" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white text-emerald-800 text-sm font-semibold rounded-lg shadow-sm hover:bg-emerald-50 transition active:scale-95">
+        <button id="btnOpenAddEvent" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white text-emerald-800 text-xs sm:text-sm font-semibold rounded-lg shadow-sm hover:bg-emerald-50 transition active:scale-95">
           <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
           <span>ลงกิจกรรมใหม่</span>
         </button>
 
-        <button id="btnAdminToggle" class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-800/80 hover:bg-emerald-900 border border-emerald-500/40 text-xs sm:text-sm font-medium rounded-lg transition">
+        <!-- User Profile Pill / Login Button -->
+        <div id="userProfileSection" class="flex items-center">
+          <button id="btnUserAuthToggle" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 hover:bg-white/25 border border-white/30 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition">
+            <i data-lucide="user" class="w-4 h-4 text-emerald-200"></i>
+            <span id="userStatusText">เข้าสู่ระบบ / สมัคร</span>
+          </button>
+        </div>
+
+        <button id="btnAdminToggle" class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-900/60 hover:bg-emerald-900 border border-emerald-500/40 text-xs sm:text-sm font-medium rounded-lg transition">
           <i data-lucide="shield" class="w-4 h-4 text-emerald-300"></i>
           <span id="adminStatusText">โหมดแอดมิน</span>
         </button>
@@ -416,6 +424,20 @@
             class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
         </div>
 
+        <!-- Creator Tag / Auto-filled from Logged-in User -->
+        <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2 text-emerald-800">
+            <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+            <div>
+              <span class="font-semibold block" id="formCreatorNameLabel">ผู้บันทึก: ผู้ใช้ทั่วไป</span>
+              <span class="text-[11px] text-emerald-600" id="formCreatorDeptLabel">สังกัด: ยังไม่ได้เข้าสู่ระบบ</span>
+            </div>
+          </div>
+          <button type="button" id="btnSwitchUserFromForm" class="text-xs text-emerald-700 hover:text-emerald-900 font-semibold underline">
+            เปลี่ยนผู้ใช้
+          </button>
+        </div>
+
         <div class="flex items-center justify-between pt-3 border-t border-slate-200">
           <button type="button" id="btnDeleteEvent" class="hidden px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition">
             <i data-lucide="trash-2" class="w-4 h-4 inline-block mr-1"></i> ลบกิจกรรม
@@ -537,15 +559,97 @@
           <p id="viewEventDesc" class="whitespace-pre-line leading-relaxed">-</p>
         </div>
 
+        <!-- Creator Profile Info Row -->
+        <div class="flex items-center gap-2 p-2.5 bg-slate-50/80 rounded-xl border border-slate-100 text-xs text-slate-500">
+          <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+          <div>
+            <span class="font-semibold text-slate-700" id="viewEventCreatorName">ผู้บันทึก: ส่วนกลาง</span>
+            <span class="text-slate-400 mx-1">|</span>
+            <span class="text-slate-500" id="viewEventCreatorDept">หน่วยงาน: ฝ่ายบริหาร</span>
+          </div>
+        </div>
+
         <!-- Edit button if admin or owner -->
         <div class="pt-2 flex justify-end gap-2" id="viewAdminActions">
-          <button id="btnEditFromView" class="px-4 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 flex items-center gap-1">
+          <button id="btnEditFromView" class="px-4 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 flex items-center gap-1 transition">
             <i data-lucide="edit" class="w-3.5 h-3.5"></i> แก้ไขข้อมูล
           </button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- MODAL: USER AUTH & REGISTRATION (สมัครสมาชิก / เข้าสู่ระบบเพื่อระบุตัวตนและหน่วยงาน) -->
+  <div id="modalUserAuth" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-gradient-to-r from-emerald-600 to-teal-700 px-6 py-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-white/20 rounded-lg">
+            <i data-lucide="user-circle" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base leading-tight">ข้อมูลผู้ใช้งาน</h3>
+            <p class="text-[11px] text-emerald-100">ระบุชื่อและหน่วยงานสังกัด</p>
+          </div>
+        </div>
+        <button id="btnCloseModalUserAuth" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Current Logged In View -->
+      <div id="userLoggedInCard" class="p-6 space-y-4 hidden text-center">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold" id="userAvatarText">
+          ผ
+        </div>
+        <div>
+          <h4 class="font-bold text-slate-800 text-base" id="profileDisplayName">ชื่อผู้ใช้</h4>
+          <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200" id="profileDisplayDept">
+            สังกัดฝ่าย
+          </span>
+        </div>
+        <p class="text-xs text-slate-500">กิจกรรมที่คุณบันทึกจะระบุชื่อและหน่วยงานนี้โดยอัตโนมัติ</p>
+        <div class="pt-2 flex gap-2">
+          <button type="button" id="btnLogoutUser" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
+            ออกจากระบบ
+          </button>
+        </div>
+      </div>
+
+      <!-- Register / Switch Profile Form -->
+      <form id="formUserAuth" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อ - สกุล <span class="text-rose-500">*</span></label>
+          <input type="text" id="inputUserName" required placeholder="เช่น อ.สมชาย ใจดี, นางสาวอานิสา"
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">สังกัดฝ่าย / หน่วยงาน <span class="text-rose-500">*</span></label>
+          <select id="selectUserDept" required
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <!-- Populated dynamically from departments -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมลหรือเบอร์ติดต่อ (ถ้ามี)</label>
+          <input type="text" id="inputUserContact" placeholder="email@school.ac.th หรือ 081-xxx-xxxx"
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button type="button" id="btnCancelUserAuth" class="w-1/3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl">
+            ยกเลิก
+          </button>
+          <button type="submit" class="w-2/3 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md transition">
+            บันทึกเข้าใช้งาน
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 
   <!-- NOTIFICATION TOAST -->
   <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
@@ -565,6 +669,7 @@
       viewMode: 'month', // 'month' or 'list'
       isAdmin: false,
       adminPin: '1234',
+      currentUser: null, // { id, name, department, contact, role }
       departments: [],
       events: []
     };
@@ -880,15 +985,22 @@
     function loadLocalData() {
       const storedDepts = localStorage.getItem('school_cal_departments');
       const storedEvts = localStorage.getItem('school_cal_events');
+      const storedUser = localStorage.getItem('school_cal_current_user');
 
       state.departments = storedDepts ? JSON.parse(storedDepts) : DEFAULT_DEPARTMENTS;
       state.events = storedEvts ? JSON.parse(storedEvts) : DEFAULT_HOLIDAYS_AND_EVENTS;
+      state.currentUser = storedUser ? JSON.parse(storedUser) : null;
       renderUI();
     }
 
     function saveStateLocal() {
       localStorage.setItem('school_cal_departments', JSON.stringify(state.departments));
       localStorage.setItem('school_cal_events', JSON.stringify(state.events));
+      if (state.currentUser) {
+        localStorage.setItem('school_cal_current_user', JSON.stringify(state.currentUser));
+      } else {
+        localStorage.removeItem('school_cal_current_user');
+      }
     }
 
     // ==========================================
@@ -896,6 +1008,7 @@
     // ==========================================
     function renderUI() {
       renderHeaderDates();
+      renderUserProfileUI();
       renderDeptFilters();
       renderLegend();
       populateDeptSelects();
@@ -907,6 +1020,29 @@
         renderAdminDashboard();
       }
       lucide.createIcons();
+    }
+
+    function renderUserProfileUI() {
+      const statusText = document.getElementById('userStatusText');
+      const creatorNameLabel = document.getElementById('formCreatorNameLabel');
+      const creatorDeptLabel = document.getElementById('formCreatorDeptLabel');
+
+      if (state.currentUser) {
+        statusText.innerText = `${state.currentUser.name} (${state.currentUser.department})`;
+        if (creatorNameLabel) creatorNameLabel.innerText = `ผู้บันทึก: ${state.currentUser.name}`;
+        if (creatorDeptLabel) creatorDeptLabel.innerText = `สังกัด: ${state.currentUser.department}`;
+        
+        // Auto-select department in form if matched
+        const deptSelect = document.getElementById('eventFieldDept');
+        if (deptSelect) {
+          const matchDept = state.departments.find(d => d.name === state.currentUser.department);
+          if (matchDept) deptSelect.value = matchDept.id;
+        }
+      } else {
+        statusText.innerText = 'เข้าสู่ระบบ / สมัคร';
+        if (creatorNameLabel) creatorNameLabel.innerText = 'ผู้บันทึก: ผู้ใช้ทั่วไป';
+        if (creatorDeptLabel) creatorDeptLabel.innerText = 'สังกัด: ยังไม่ได้เข้าสู่ระบบ';
+      }
     }
 
     function renderHeaderDates() {
@@ -980,12 +1116,24 @@
 
     function populateDeptSelects() {
       const select = document.getElementById('eventFieldDept');
-      select.innerHTML = '';
+      const selectUserDept = document.getElementById('selectUserDept');
+      if (select) select.innerHTML = '';
+      if (selectUserDept) selectUserDept.innerHTML = '';
+
       state.departments.forEach(d => {
-        const opt = document.createElement('option');
-        opt.value = d.id;
-        opt.innerText = d.name;
-        select.appendChild(opt);
+        if (select) {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.innerText = d.name;
+          select.appendChild(opt);
+        }
+
+        if (selectUserDept && d.id !== 'dept_holiday') {
+          const optUser = document.createElement('option');
+          optUser.value = d.name;
+          optUser.innerText = d.name;
+          selectUserDept.appendChild(optUser);
+        }
       });
     }
 
@@ -1085,11 +1233,12 @@
         });
 
         dayEvents.forEach(evt => {
-          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#475569', name: 'ทั่วไป' };
           const evtBadge = document.createElement('div');
-          evtBadge.className = 'text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-medium text-white truncate cursor-pointer shadow-xs hover:opacity-90 transition';
+          evtBadge.className = 'text-[11px] px-2 py-1 rounded-md font-semibold text-white truncate cursor-pointer shadow-sm hover:brightness-110 active:scale-95 transition flex items-center gap-1 leading-tight';
           evtBadge.style.backgroundColor = dept.color;
-          evtBadge.innerText = evt.title;
+          evtBadge.title = `คลิกเพื่อดูรายละเอียด: ${evt.title} (${dept.name})`;
+          evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-white/80 shrink-0"></span><span class="truncate">${evt.title}</span>`;
           evtBadge.onclick = (e) => {
             e.stopPropagation();
             openViewEventModal(evt, cellDate, hijriInfo);
@@ -1248,6 +1397,10 @@
       }
 
       document.getElementById('viewEventDesc').innerText = evt.description || 'ไม่มีรายละเอียดเพิ่มเติม';
+      
+      // แสดงข้อมูลผู้บันทึกและฝ่าย
+      document.getElementById('viewEventCreatorName').innerText = `ผู้บันทึก: ${evt.creatorName || evt.createdBy || 'ส่วนกลาง'}`;
+      document.getElementById('viewEventCreatorDept').innerText = `หน่วยงาน: ${evt.creatorDept || dept.name || 'ไม่ระบุ'}`;
 
       // ปุ่มแก้ไข (เปิด Modal แก้ไข)
       const btnEdit = document.getElementById('btnEditFromView');
@@ -1262,6 +1415,9 @@
     document.getElementById('formEvent').addEventListener('submit', function(e) {
       e.preventDefault();
 
+      const creatorName = state.currentUser ? state.currentUser.name : 'ผู้ใช้ทั่วไป';
+      const creatorDept = state.currentUser ? state.currentUser.department : 'ทั่วไป';
+
       const eventData = {
         id: document.getElementById('eventFieldId').value || ('evt_' + Date.now()),
         title: document.getElementById('eventFieldTitle').value.trim(),
@@ -1271,7 +1427,10 @@
         startDate: document.getElementById('eventFieldStartDate').value,
         endDate: document.getElementById('eventFieldEndDate').value || document.getElementById('eventFieldStartDate').value,
         location: document.getElementById('eventFieldLocation').value.trim(),
-        description: document.getElementById('eventFieldDescription').value.trim()
+        description: document.getElementById('eventFieldDescription').value.trim(),
+        creatorName: creatorName,
+        creatorDept: creatorDept,
+        createdBy: creatorName
       };
 
       // บันทึกลง LocalState
@@ -1880,9 +2039,80 @@
       openModal('modalDepartment');
     };
     document.getElementById('btnCloseModalDept').onclick = () => closeModal('modalDepartment');
-    document.getElementById('btnFinishDept').onclick = () => closeModal('modalDepartment');
-
     document.getElementById('btnCloseEventView').onclick = () => closeModal('modalEventView');
+
+    // User Auth Modal Triggers & Form
+    document.getElementById('btnUserAuthToggle').onclick = () => {
+      openUserAuthModal();
+    };
+
+    document.getElementById('btnSwitchUserFromForm').onclick = () => {
+      openUserAuthModal();
+    };
+
+    document.getElementById('btnCloseModalUserAuth').onclick = () => closeModal('modalUserAuth');
+    document.getElementById('btnCancelUserAuth').onclick = () => closeModal('modalUserAuth');
+
+    function openUserAuthModal() {
+      const loggedInCard = document.getElementById('userLoggedInCard');
+      const authForm = document.getElementById('formUserAuth');
+
+      if (state.currentUser) {
+        loggedInCard.classList.remove('hidden');
+        authForm.classList.add('hidden');
+        document.getElementById('profileDisplayName').innerText = state.currentUser.name;
+        document.getElementById('profileDisplayDept').innerText = state.currentUser.department;
+        document.getElementById('userAvatarText').innerText = state.currentUser.name.charAt(0) || 'ผ';
+      } else {
+        loggedInCard.classList.add('hidden');
+        authForm.classList.remove('hidden');
+        document.getElementById('inputUserName').value = '';
+        document.getElementById('inputUserContact').value = '';
+      }
+
+      openModal('modalUserAuth');
+    }
+
+    document.getElementById('formUserAuth').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('inputUserName').value.trim();
+      const dept = document.getElementById('selectUserDept').value;
+      const contact = document.getElementById('inputUserContact').value.trim();
+
+      if (!name) {
+        alert('กรุณากรอกชื่อ-สกุล');
+        return;
+      }
+
+      const userData = {
+        id: 'u_' + Date.now(),
+        name: name,
+        department: dept,
+        contact: contact,
+        role: 'staff'
+      };
+
+      state.currentUser = userData;
+      saveStateLocal();
+
+      // Sync to Google Sheets if running on GAS
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.registerUser(userData);
+      }
+
+      closeModal('modalUserAuth');
+      renderUI();
+      showToast(`ยินดีต้อนรับคุณ ${name} (${dept})`);
+    });
+
+    document.getElementById('btnLogoutUser').onclick = function() {
+      state.currentUser = null;
+      saveStateLocal();
+      closeModal('modalUserAuth');
+      renderUI();
+      showToast('ออกจากระบบเรียบร้อย');
+    };
+
 
 
     // Launch
