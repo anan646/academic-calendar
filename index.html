@@ -65,31 +65,33 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-  <!-- TOP HEADER / NAVBAR -->
-  <header class="bg-gradient-to-r from-violet-900 via-purple-800 to-indigo-900 text-white shadow-md sticky top-0 z-30">
+  <!-- TOP HEADER / NAVBAR (VISIBLE ONLY IN CALENDAR / DASHBOARD WORKSPACE) -->
+  <header id="mainAppHeader" class="bg-gradient-to-r from-violet-900 via-purple-800 to-indigo-900 text-white shadow-md sticky top-0 z-30 hidden">
     <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-3">
-        <button id="btnNavHomeCalendar" class="p-2.5 bg-white/15 hover:bg-white/25 active:scale-95 rounded-xl backdrop-blur-sm border border-white/25 shadow-sm transition cursor-pointer group flex items-center justify-center" title="คลิกเพื่อกลับสู่หน้าปฏิทินเดือนปัจจุบัน">
-          <i data-lucide="calendar" class="w-6 h-6 text-purple-100 group-hover:text-white transition"></i>
+        <button id="btnNavHomeCalendar" class="p-1 bg-white rounded-xl shadow-sm transition cursor-pointer hover:opacity-95 flex items-center justify-center shrink-0" title="คลิกเพื่อกลับสู่หน้าปฏิทินเดือนปัจจุบัน">
+          <img src="ftu-edu-logo.jpg" alt="คณะศึกษาศาสตร์ ม.ฟาฏอนี" class="h-9 w-auto object-contain">
         </button>
         <div>
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
-            ปฏิทินกิจกรรมประจำปีการศึกษา
-            <span class="text-xs bg-purple-500/30 text-purple-100 px-2.5 py-0.5 rounded-full border border-purple-300/30 font-medium">
+          <h1 class="text-base sm:text-lg font-bold tracking-tight flex items-center gap-2">
+            <span>ปฏิทินกิจกรรม</span>
+            <span class="text-xs bg-purple-500/30 text-purple-100 px-2.5 py-0.5 rounded-full border border-purple-300/30 font-medium" id="navSubtitleBadge">
               พ.ศ. / ฮ.ศ.
             </span>
           </h1>
-          <p class="text-xs text-purple-200/80">ระบบลงงานและปฏิทินกลางสำหรับทุกฝ่ายและบุคลากร</p>
+          <p class="text-xs text-purple-200/80" id="navRoleDescription">คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี</p>
         </div>
       </div>
 
-      <!-- Action Buttons & User Profile -->
-      <div class="flex items-center space-x-2">
-        <button id="btnNavLanding" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition" title="กลับสู่หน้าแรกต้อนรับ">
-          <i data-lucide="home" class="w-4 h-4 text-purple-200"></i>
-          <span>หน้าแรก</span>
+      <!-- Action Buttons & User Profile (Dynamically adjusted per portal) -->
+      <div class="flex items-center space-x-2" id="navActionsContainer">
+        <!-- Back to Landing Button (always visible when inside calendar/dashboard) -->
+        <button id="btnNavLanding" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition" title="กลับสู่หน้าแรก">
+          <i data-lucide="arrow-left" class="w-4 h-4 text-purple-200"></i>
+          <span>กลับหน้าหลัก</span>
         </button>
 
+        <!-- Staff / Admin Action: Add Event -->
         <button id="btnOpenAddEvent" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white text-purple-900 text-xs sm:text-sm font-semibold rounded-lg shadow-sm hover:bg-purple-50 transition active:scale-95">
           <i data-lucide="plus-circle" class="w-4 h-4 text-purple-700"></i>
           <span>ลงกิจกรรมใหม่</span>
@@ -103,6 +105,7 @@
           </button>
         </div>
 
+        <!-- Admin Toggle Button -->
         <button id="btnAdminToggle" class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-950/60 hover:bg-purple-950 border border-purple-400/30 text-xs sm:text-sm font-medium rounded-lg transition">
           <i data-lucide="shield" class="w-4 h-4 text-purple-300"></i>
           <span id="adminStatusText">โหมดแอดมิน</span>
@@ -115,86 +118,117 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full flex flex-col gap-6">
 
     <!-- ==================== LANDING PAGE VIEW ==================== -->
-    <div id="landingPageView" class="space-y-8 animate-fadeIn">
-      <!-- HERO BANNER (SOOTHING PURPLE PALETTE) -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 text-white shadow-xl border border-white/10 p-6 sm:p-10">
-        <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -left-12 -top-12 w-64 h-64 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none"></div>
-
-        <div class="relative z-10 max-w-3xl space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs text-purple-100 font-medium">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
-            <span>ระบบปฏิทินกิจกรรมและการบริหารแผนงานสถานศึกษา</span>
+    <div id="landingPageView" class="space-y-8 animate-fadeIn py-2">
+      <!-- HERO BANNER (MINIMALIST, SOOTHING & FTU EDU IDENTITY) -->
+      <div class="relative overflow-hidden rounded-3xl bg-white border border-purple-100 shadow-sm p-6 sm:p-10 text-center space-y-4">
+        <div class="max-w-2xl mx-auto space-y-3">
+          <!-- LOGO (FTU Faculty of Education) -->
+          <div class="flex items-center justify-center">
+            <img src="ftu-edu-logo.jpg" alt="คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี" 
+              class="h-20 sm:h-24 w-auto object-contain hover:scale-105 transition-transform duration-300">
           </div>
-          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-            ปฏิทินกิจกรรมการศึกษาคู่ขนาน <br class="hidden sm:inline" />
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-amber-200">
-              พุทธศักราช (พ.ศ.) & ฮิจเราะห์ศักราช (ฮ.ศ.)
-            </span>
-          </h2>
-          <p class="text-sm sm:text-base text-purple-200/90 leading-relaxed font-normal">
-            ศูนย์กลางการติดตามวันสำคัญ กิจกรรมฝ่ายวิชาการ กิจการนักเรียน บริหารทั่วไป และวันหยุดราชการ 
-            สะดวก ชัดเจน สำหรับนักเรียน ผู้ปกครอง และครูบุคลากรทุกท่าน
+          
+          <!-- TITLE (ปรากฏแค่ ปฏิทินกิจกรรม ตามที่ผู้ใช้ระบุ) -->
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-purple-950 tracking-tight">
+            ปฏิทินกิจกรรม
+          </h1>
+          
+          <p class="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+            คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี | Faculty of Education, Fatoni University <br class="hidden sm:inline" />
+            <span class="text-purple-700 font-medium">ระบบปฏิทินกิจกรรมการศึกษาคู่ขนาน พุทธศักราช (พ.ศ.) & ฮิจเราะห์ศักราช (ฮ.ศ.)</span>
           </p>
+        </div>
 
-          <!-- 2 Main Portals Action Cards (ชัดเจน 2 กลุ่ม) -->
-          <div class="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Portal 1: ผู้ใช้ทั่วไป (Public View) -->
-            <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/20 transition group flex flex-col justify-between">
-              <div class="space-y-2">
-                <div class="w-10 h-10 rounded-xl bg-purple-500/30 flex items-center justify-center text-purple-200 border border-white/20">
-                  <i data-lucide="eye" class="w-5 h-5"></i>
-                </div>
-                <h3 class="font-bold text-base text-white flex items-center gap-1.5">
-                  สำหรับบุคคลทั่วไป / นักเรียน / ผู้ปกครอง
+        <!-- 3 DISTINCT PORTALS ACTION CARDS (แยก 3 ส่วนอย่างชัดเจน) -->
+        <div class="pt-6 grid grid-cols-1 md:grid-cols-3 gap-5 text-left max-w-5xl mx-auto">
+          
+          <!-- PORTAL 1: บุคคลทั่วไป (Public) -->
+          <div class="bg-gradient-to-b from-purple-50/50 to-white hover:from-purple-50 rounded-2xl p-5 border border-purple-100 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group">
+            <div class="space-y-3">
+              <div class="w-11 h-11 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-purple-600 uppercase tracking-wider block">ส่วนที่ 1</span>
+                <h3 class="font-bold text-base text-slate-900 group-hover:text-purple-900 transition">
+                  บุคคลทั่วไป / นักศึกษา
                 </h3>
-                <p class="text-xs text-purple-200/80 leading-relaxed">
-                  เข้าชมปฏิทินรายเดือน/รายปี ค้นหากิจกรรมของแต่ละฝ่าย ดูวันหยุดราชการไทยและวันสำคัญทางศาสนาอิสลามได้ทันที
-                </p>
               </div>
-              <div class="pt-4">
-                <button id="btnLandingGoCalendar" class="w-full py-2.5 px-4 bg-white hover:bg-purple-50 text-purple-900 rounded-xl text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
-                  <i data-lucide="calendar" class="w-4 h-4 text-purple-700"></i>
-                  <span>เข้าสู่หน้าปฏิทินกิจกรรม</span>
-                  <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
-                </button>
-              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                เข้าชมปฏิทินรายเดือน/รายปี ค้นหากำหนดการ วันสำคัญของชาติ และวันสำคัญทางศาสนาอิสลามได้ทันที (อ่านอย่างเดียว)
+              </p>
             </div>
-
-            <!-- Portal 2: ผู้ลงกิจกรรม / บุคลากร (Staff View) -->
-            <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/20 transition group flex flex-col justify-between">
-              <div class="space-y-2">
-                <div class="w-10 h-10 rounded-xl bg-violet-400/30 flex items-center justify-center text-purple-100 border border-white/20">
-                  <i data-lucide="edit-3" class="w-5 h-5"></i>
-                </div>
-                <h3 class="font-bold text-base text-white flex items-center gap-1.5">
-                  สำหรับผู้ลงกิจกรรม / ครูและบุคลากร
-                </h3>
-                <p class="text-xs text-purple-200/80 leading-relaxed">
-                  ลงทะเบียนผู้ใช้งาน ระบุชื่อและฝ่ายเพื่อรับสิทธิ์ลงกิจกรรมใหม่ในปฏิทิน พร้อมระบบป้องกันงานชนกันและบันทึกประวัติ
-                </p>
-              </div>
-              <div class="pt-4">
-                <button id="btnLandingGoStaffAuth" class="w-full py-2.5 px-4 bg-purple-500/80 hover:bg-purple-500 text-white border border-purple-300/40 rounded-xl text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
-                  <i data-lucide="user-check" class="w-4 h-4 text-purple-200"></i>
-                  <span id="landingAuthBtnText">ลงทะเบียน / เข้าสู่ระบบผู้ลงกิจกรรม</span>
-                  <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
-                </button>
-              </div>
+            <div class="pt-5">
+              <button id="btnLandingGoCalendar" class="w-full py-2.5 px-4 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span>เข้าชมปฏิทินกิจกรรม</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+              </button>
             </div>
           </div>
+
+          <!-- PORTAL 2: ผู้ลงกิจกรรม (Staff) -->
+          <div class="bg-gradient-to-b from-violet-50/60 to-white hover:from-violet-50 rounded-2xl p-5 border border-violet-100 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group">
+            <div class="space-y-3">
+              <div class="w-11 h-11 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center font-bold">
+                <i data-lucide="edit-3" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-violet-600 uppercase tracking-wider block">ส่วนที่ 2</span>
+                <h3 class="font-bold text-base text-slate-900 group-hover:text-violet-900 transition">
+                  ผู้ลงกิจกรรม / บุคลากร
+                </h3>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                ลงทะเบียนชื่อและฝ่ายเพื่อรับสิทธิ์บันทึกกิจกรรมประจำปีการศึกษา พร้อมระบบตรวจสอบกิจกรรมชนกัน
+              </p>
+            </div>
+            <div class="pt-5">
+              <button id="btnLandingGoStaffAuth" class="w-full py-2.5 px-4 bg-violet-700 hover:bg-violet-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="user-check" class="w-4 h-4"></i>
+                <span id="landingAuthBtnText">ลงทะเบียน / บันทึกกิจกรรม</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- PORTAL 3: ผู้ดูแลระบบ (Admin) -->
+          <div class="bg-gradient-to-b from-indigo-50/60 to-white hover:from-indigo-50 rounded-2xl p-5 border border-indigo-100 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group">
+            <div class="space-y-3">
+              <div class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                <i data-lucide="shield" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <span class="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider block">ส่วนที่ 3</span>
+                <h3 class="font-bold text-base text-slate-900 group-hover:text-indigo-900 transition">
+                  ผู้ดูแลระบบ (Admin)
+                </h3>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                แดชบอร์ดภาพรวม สถิติ กราฟวิเคราะห์ภาระงาน และระบบตรวจสอบ/จัดการลบผู้ลงทะเบียนในระบบ
+              </p>
+            </div>
+            <div class="pt-5">
+              <button id="btnLandingGoAdmin" class="w-full py-2.5 px-4 bg-slate-900 hover:bg-purple-950 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 text-purple-300"></i>
+                <span>เข้าสู่ระบบแอดมิน</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
 
       <!-- HIGHLIGHT SUMMARY CARDS (UPCOMING & STATS) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <!-- Card 1: กิจกรรมที่กำลังจะมาถึง -->
-        <div class="md:col-span-2 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 space-y-3">
-          <div class="flex items-center justify-between border-b pb-3">
+        <div class="md:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
               <i data-lucide="clock" class="w-4 h-4 text-purple-600"></i> กิจกรรมและวันสำคัญเร็วๆ นี้
             </h3>
-            <button id="btnLandingViewAllList" class="text-xs font-semibold text-purple-700 hover:text-purple-900 transition">
+            <button id="btnLandingViewAllList" class="text-xs font-semibold text-purple-700 hover:text-purple-900 transition flex items-center gap-1">
               ดูทั้งหมด →
             </button>
           </div>
@@ -204,17 +238,17 @@
         </div>
 
         <!-- Card 2: สรุปฝ่ายงานและจำนวนกิจกรรม -->
-        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 space-y-3 flex flex-col justify-between">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-3 flex flex-col justify-between">
           <div class="space-y-3">
-            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 border-b pb-3">
-              <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i> สรุปฝ่ายงานในระบบ
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="layers" class="w-4 h-4 text-violet-600"></i> สรุปฝ่ายงานในระบบ
             </h3>
-            <div id="landingDeptSummaryList" class="space-y-2 text-xs">
+            <div id="landingDeptSummaryList" class="space-y-1.5 text-xs">
               <!-- Dynamically populated departments -->
             </div>
           </div>
-          <div class="pt-3 border-t text-[11px] text-slate-400 flex items-center justify-between">
-            <span>ฐานข้อมูลกลางสถานศึกษา</span>
+          <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
+            <span>ฐานข้อมูลคณะศึกษาศาสตร์</span>
             <span id="landingTotalEventsCount" class="font-bold text-purple-700">0 กิจกรรม</span>
           </div>
         </div>
@@ -1722,6 +1756,10 @@
 
         // Click empty space in cell to add event for this date
         cell.onclick = () => {
+          if (state.currentPortal === 'public') {
+            showToast('เข้าสู่ระบบในฐานะผู้ลงกิจกรรมเพื่อบันทึกงานใหม่');
+            return;
+          }
           openAddEventModal(dateStr);
         };
 
@@ -1795,23 +1833,88 @@
     // ==========================================
     // 7.1 LANDING PAGE LOGIC & VIEW NAVIGATION
     // ==========================================
+    let pendingOpenAddEventAfterAuth = false;
+
+    function setPortalView(portal) {
+      state.currentPortal = portal || 'public';
+      const header = document.getElementById('mainAppHeader');
+      const btnLanding = document.getElementById('btnNavLanding');
+      const btnAdd = document.getElementById('btnOpenAddEvent');
+      const userSection = document.getElementById('userProfileSection');
+      const btnAdmin = document.getElementById('btnAdminToggle');
+      const navDesc = document.getElementById('navRoleDescription');
+      const navBadge = document.getElementById('navSubtitleBadge');
+      const viewDashBtn = document.getElementById('viewBtnDashboard');
+      const myEventsBtn = document.getElementById('btnFilterMyEvents');
+      const manageDeptBtn = document.getElementById('btnManageDept');
+
+      if (state.activePage === 'landing') {
+        if (header) header.classList.add('hidden');
+        return;
+      }
+
+      if (header) header.classList.remove('hidden');
+
+      if (state.currentPortal === 'public') {
+        // ส่วนของบุคคลทั่วไป: จะไม่ปรากฏแถบส่วนบนตามภาพแนบ 1 (ซ่อนปุ่มลงกิจกรรม, ซ่อนล็อกอิน, ซ่อนแอดมิน)
+        if (btnAdd) btnAdd.classList.add('hidden');
+        if (userSection) userSection.classList.add('hidden');
+        if (btnAdmin) btnAdmin.classList.add('hidden');
+        if (btnLanding) btnLanding.classList.remove('hidden');
+        if (viewDashBtn) viewDashBtn.classList.add('hidden');
+        if (myEventsBtn) myEventsBtn.classList.add('hidden');
+        if (manageDeptBtn) manageDeptBtn.classList.add('hidden');
+        if (navDesc) navDesc.innerText = 'สำหรับบุคคลทั่วไปและนักศึกษา (อ่านอย่างเดียว)';
+        if (navBadge) navBadge.innerText = 'บุคคลทั่วไป';
+      } else if (state.currentPortal === 'staff') {
+        // ส่วนผู้ลงกิจกรรม: แสดงปุ่มลงกิจกรรมใหม่ และข้อมูลผู้ลง
+        if (btnAdd) btnAdd.classList.remove('hidden');
+        if (userSection) userSection.classList.remove('hidden');
+        if (btnAdmin) btnAdmin.classList.add('hidden');
+        if (btnLanding) btnLanding.classList.remove('hidden');
+        if (viewDashBtn) viewDashBtn.classList.add('hidden');
+        if (myEventsBtn) myEventsBtn.classList.remove('hidden');
+        if (manageDeptBtn) manageDeptBtn.classList.add('hidden');
+        if (navDesc) navDesc.innerText = state.currentUser ? `ผู้ลงกิจกรรม: ${state.currentUser.name} (${state.currentUser.department})` : 'ระบบบันทึกกิจกรรมประจำฝ่าย';
+        if (navBadge) navBadge.innerText = 'ผู้ลงกิจกรรม';
+      } else if (state.currentPortal === 'admin') {
+        // ส่วนแอดมิน: แสดงปุ่มแอดมิน แดชบอร์ด และเครื่องมือจัดการ
+        if (btnAdd) btnAdd.classList.remove('hidden');
+        if (userSection) userSection.classList.add('hidden');
+        if (btnAdmin) btnAdmin.classList.remove('hidden');
+        if (btnLanding) btnLanding.classList.remove('hidden');
+        if (viewDashBtn) viewDashBtn.classList.remove('hidden');
+        if (myEventsBtn) myEventsBtn.classList.remove('hidden');
+        if (manageDeptBtn) manageDeptBtn.classList.remove('hidden');
+        if (navDesc) navDesc.innerText = 'ระบบจัดการสำหรับผู้ดูแลระบบ (Admin Dashboard)';
+        if (navBadge) navBadge.innerText = 'ผู้ดูแลระบบ';
+      }
+    }
+
     function showLandingPage() {
       state.activePage = 'landing';
       const landing = document.getElementById('landingPageView');
       const cal = document.getElementById('calendarAppContainer');
+      const header = document.getElementById('mainAppHeader');
       if (landing) landing.classList.remove('hidden');
       if (cal) cal.classList.add('hidden');
+      if (header) header.classList.add('hidden');
       renderLandingPage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function showCalendarPage(view) {
+    function showCalendarPage(view, portal) {
       state.activePage = 'calendar';
+      if (portal) state.currentPortal = portal;
+      if (!state.currentPortal) state.currentPortal = 'public';
       if (view) state.viewMode = view;
+
       const landing = document.getElementById('landingPageView');
       const cal = document.getElementById('calendarAppContainer');
       if (landing) landing.classList.add('hidden');
       if (cal) cal.classList.remove('hidden');
+
+      setPortalView(state.currentPortal);
 
       if (state.viewMode === 'month') {
         document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition';
@@ -1827,7 +1930,10 @@
         document.getElementById('calendarMonthView').classList.add('hidden');
         document.getElementById('calendarListView').classList.remove('hidden');
         document.getElementById('adminDashboardView').classList.add('hidden');
+      } else if (state.viewMode === 'dashboard') {
+        activateDashboardView();
       }
+
       renderUI();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1907,7 +2013,7 @@
           `;
           row.onclick = () => {
             state.selectedDept = dept.id;
-            showCalendarPage('month');
+            showCalendarPage('month', 'public');
           };
           deptList.appendChild(row);
         });
@@ -1917,6 +2023,16 @@
       const totalCount = document.getElementById('landingTotalEventsCount');
       if (totalCount) {
         totalCount.innerText = `${state.events.length} กิจกรรม`;
+      }
+
+      // 4. Update Landing Auth Button Text
+      const authBtnText = document.getElementById('landingAuthBtnText');
+      if (authBtnText) {
+        if (state.currentUser) {
+          authBtnText.innerText = `ลงกิจกรรมในชื่อ: ${state.currentUser.name}`;
+        } else {
+          authBtnText.innerText = 'ลงทะเบียน / บันทึกกิจกรรม';
+        }
       }
     }
 
@@ -2270,6 +2386,7 @@
         document.getElementById('adminStatusText').innerText = 'โหมดแอดมิน';
         document.getElementById('btnAdminToggle').classList.remove('bg-rose-700');
         showToast('ออกจากโหมดแอดมินแล้ว');
+        showLandingPage();
       } else {
         openModal('modalAdminAuth');
         document.getElementById('inputAdminPin').value = '';
@@ -2285,7 +2402,7 @@
         document.getElementById('adminStatusText').innerText = 'แอดมิน (เข้าสู่ระบบแล้ว)';
         document.getElementById('btnAdminToggle').classList.add('bg-rose-700');
         showToast('เข้าสู่ระบบแอดมินสำเร็จ');
-        activateDashboardView();
+        showCalendarPage('dashboard', 'admin');
       } else {
         alert('รหัส PIN ไม่ถูกต้อง (ค่าเริ่มต้นคือ 1234)');
       }
@@ -2370,7 +2487,7 @@
           btnFilterMine.className = 'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-purple-50 hover:text-purple-700 transition';
         }
 
-        showCalendarPage('month');
+        showCalendarPage('month', state.currentPortal || 'public');
         showToast('กลับสู่หน้าปฏิทินเดือนปัจจุบันแล้ว');
       };
     }
@@ -2983,6 +3100,15 @@
       renderUI();
       renderLandingPage();
       showToast(`ยินดีต้อนรับคุณ ${name} (${dept})`);
+
+      // ส่วนผู้ลงกิจกรรม: เมื่อลงทะเบียนเสร็จแล้ว เด้งไปยังหน้าปฏิทินและเปิดป็อปอัพลงกิจกรรมได้ทันที
+      if (pendingOpenAddEventAfterAuth) {
+        pendingOpenAddEventAfterAuth = false;
+        showCalendarPage('month', 'staff');
+        openAddEventModal();
+      } else {
+        showCalendarPage('month', 'staff');
+      }
     });
 
     document.getElementById('btnLogoutUser').onclick = function() {
@@ -2992,6 +3118,7 @@
       renderUI();
       renderLandingPage();
       showToast('ออกจากระบบเรียบร้อย');
+      showLandingPage();
     };
 
     // ==========================================
@@ -3004,24 +3131,38 @@
 
     const btnLandingGoCal = document.getElementById('btnLandingGoCalendar');
     if (btnLandingGoCal) {
-      btnLandingGoCal.onclick = () => showCalendarPage('month');
+      btnLandingGoCal.onclick = () => showCalendarPage('month', 'public');
     }
 
     const btnLandingGoAuth = document.getElementById('btnLandingGoStaffAuth');
     if (btnLandingGoAuth) {
       btnLandingGoAuth.onclick = () => {
         if (!state.currentUser) {
+          pendingOpenAddEventAfterAuth = true;
           openUserAuthModal();
         } else {
-          showCalendarPage('month');
+          showCalendarPage('month', 'staff');
           openAddEventModal();
+        }
+      };
+    }
+
+    const btnLandingGoAdmin = document.getElementById('btnLandingGoAdmin');
+    if (btnLandingGoAdmin) {
+      btnLandingGoAdmin.onclick = () => {
+        if (state.isAdmin) {
+          showCalendarPage('dashboard', 'admin');
+        } else {
+          openModal('modalAdminAuth');
+          document.getElementById('inputAdminPin').value = '';
+          document.getElementById('inputAdminPin').focus();
         }
       };
     }
 
     const btnLandingViewAll = document.getElementById('btnLandingViewAllList');
     if (btnLandingViewAll) {
-      btnLandingViewAll.onclick = () => showCalendarPage('list');
+      btnLandingViewAll.onclick = () => showCalendarPage('list', 'public');
     }
 
 
