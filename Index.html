@@ -1458,8 +1458,10 @@
       state.viewMode = 'month';
       document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-800 shadow-sm transition';
       document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
       document.getElementById('calendarMonthView').classList.remove('hidden');
       document.getElementById('calendarListView').classList.add('hidden');
+      document.getElementById('adminDashboardView').classList.add('hidden');
       renderUI();
     };
 
@@ -1467,8 +1469,10 @@
       state.viewMode = 'list';
       document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-800 shadow-sm transition';
       document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
       document.getElementById('calendarMonthView').classList.add('hidden');
       document.getElementById('calendarListView').classList.remove('hidden');
+      document.getElementById('adminDashboardView').classList.add('hidden');
       renderUI();
     };
 
