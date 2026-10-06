@@ -85,6 +85,11 @@
 
       <!-- Action Buttons & User Profile -->
       <div class="flex items-center space-x-2">
+        <button id="btnNavLanding" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition" title="กลับสู่หน้าแรกต้อนรับ">
+          <i data-lucide="home" class="w-4 h-4 text-purple-200"></i>
+          <span>หน้าแรก</span>
+        </button>
+
         <button id="btnOpenAddEvent" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white text-purple-900 text-xs sm:text-sm font-semibold rounded-lg shadow-sm hover:bg-purple-50 transition active:scale-95">
           <i data-lucide="plus-circle" class="w-4 h-4 text-purple-700"></i>
           <span>ลงกิจกรรมใหม่</span>
@@ -108,6 +113,116 @@
 
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full flex flex-col gap-6">
+
+    <!-- ==================== LANDING PAGE VIEW ==================== -->
+    <div id="landingPageView" class="space-y-8 animate-fadeIn">
+      <!-- HERO BANNER (SOOTHING PURPLE PALETTE) -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 text-white shadow-xl border border-white/10 p-6 sm:p-10">
+        <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-12 -top-12 w-64 h-64 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-3xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs text-purple-100 font-medium">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-yellow-300"></i>
+            <span>ระบบปฏิทินกิจกรรมและการบริหารแผนงานสถานศึกษา</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+            ปฏิทินกิจกรรมการศึกษาคู่ขนาน <br class="hidden sm:inline" />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-amber-200">
+              พุทธศักราช (พ.ศ.) & ฮิจเราะห์ศักราช (ฮ.ศ.)
+            </span>
+          </h2>
+          <p class="text-sm sm:text-base text-purple-200/90 leading-relaxed font-normal">
+            ศูนย์กลางการติดตามวันสำคัญ กิจกรรมฝ่ายวิชาการ กิจการนักเรียน บริหารทั่วไป และวันหยุดราชการ 
+            สะดวก ชัดเจน สำหรับนักเรียน ผู้ปกครอง และครูบุคลากรทุกท่าน
+          </p>
+
+          <!-- 2 Main Portals Action Cards (ชัดเจน 2 กลุ่ม) -->
+          <div class="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Portal 1: ผู้ใช้ทั่วไป (Public View) -->
+            <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/20 transition group flex flex-col justify-between">
+              <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/30 flex items-center justify-center text-purple-200 border border-white/20">
+                  <i data-lucide="eye" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-bold text-base text-white flex items-center gap-1.5">
+                  สำหรับบุคคลทั่วไป / นักเรียน / ผู้ปกครอง
+                </h3>
+                <p class="text-xs text-purple-200/80 leading-relaxed">
+                  เข้าชมปฏิทินรายเดือน/รายปี ค้นหากิจกรรมของแต่ละฝ่าย ดูวันหยุดราชการไทยและวันสำคัญทางศาสนาอิสลามได้ทันที
+                </p>
+              </div>
+              <div class="pt-4">
+                <button id="btnLandingGoCalendar" class="w-full py-2.5 px-4 bg-white hover:bg-purple-50 text-purple-900 rounded-xl text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                  <i data-lucide="calendar" class="w-4 h-4 text-purple-700"></i>
+                  <span>เข้าสู่หน้าปฏิทินกิจกรรม</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Portal 2: ผู้ลงกิจกรรม / บุคลากร (Staff View) -->
+            <div class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-5 border border-white/20 transition group flex flex-col justify-between">
+              <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-violet-400/30 flex items-center justify-center text-purple-100 border border-white/20">
+                  <i data-lucide="edit-3" class="w-5 h-5"></i>
+                </div>
+                <h3 class="font-bold text-base text-white flex items-center gap-1.5">
+                  สำหรับผู้ลงกิจกรรม / ครูและบุคลากร
+                </h3>
+                <p class="text-xs text-purple-200/80 leading-relaxed">
+                  ลงทะเบียนผู้ใช้งาน ระบุชื่อและฝ่ายเพื่อรับสิทธิ์ลงกิจกรรมใหม่ในปฏิทิน พร้อมระบบป้องกันงานชนกันและบันทึกประวัติ
+                </p>
+              </div>
+              <div class="pt-4">
+                <button id="btnLandingGoStaffAuth" class="w-full py-2.5 px-4 bg-purple-500/80 hover:bg-purple-500 text-white border border-purple-300/40 rounded-xl text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                  <i data-lucide="user-check" class="w-4 h-4 text-purple-200"></i>
+                  <span id="landingAuthBtnText">ลงทะเบียน / เข้าสู่ระบบผู้ลงกิจกรรม</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HIGHLIGHT SUMMARY CARDS (UPCOMING & STATS) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Card 1: กิจกรรมที่กำลังจะมาถึง -->
+        <div class="md:col-span-2 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 space-y-3">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-purple-600"></i> กิจกรรมและวันสำคัญเร็วๆ นี้
+            </h3>
+            <button id="btnLandingViewAllList" class="text-xs font-semibold text-purple-700 hover:text-purple-900 transition">
+              ดูทั้งหมด →
+            </button>
+          </div>
+          <div id="landingUpcomingList" class="space-y-2.5">
+            <!-- Dynamically populated upcoming events -->
+          </div>
+        </div>
+
+        <!-- Card 2: สรุปฝ่ายงานและจำนวนกิจกรรม -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 space-y-3 flex flex-col justify-between">
+          <div class="space-y-3">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 border-b pb-3">
+              <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i> สรุปฝ่ายงานในระบบ
+            </h3>
+            <div id="landingDeptSummaryList" class="space-y-2 text-xs">
+              <!-- Dynamically populated departments -->
+            </div>
+          </div>
+          <div class="pt-3 border-t text-[11px] text-slate-400 flex items-center justify-between">
+            <span>ฐานข้อมูลกลางสถานศึกษา</span>
+            <span id="landingTotalEventsCount" class="font-bold text-purple-700">0 กิจกรรม</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CALENDAR APP WORKSPACE (CONTROLS & VIEWS) ==================== -->
+    <div id="calendarAppContainer" class="space-y-6 hidden">
 
     <!-- CONTROLS & FILTER BAR -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -351,6 +466,40 @@
           </table>
         </div>
       </div>
+
+      <!-- User Management Table in Admin Dashboard -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-purple-600"></i> จัดการรายชื่อผู้ลงทะเบียนในระบบ
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">รายชื่อครูและบุคลากรที่มีสิทธิ์บันทึกและแก้ไขกิจกรรม (แอดมินสามารถตรวจสอบและลบได้)</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 font-semibold" id="dashTotalUsersBadge">
+              0 คน
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                <th class="p-2.5 font-semibold">ชื่อ - สกุล</th>
+                <th class="p-2.5 font-semibold">สังกัดฝ่าย</th>
+                <th class="p-2.5 font-semibold">ข้อมูลติดต่อ</th>
+                <th class="p-2.5 font-semibold">วันที่ลงทะเบียน</th>
+                <th class="p-2.5 font-semibold">สิทธิ์</th>
+                <th class="p-2.5 font-semibold text-right">การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="dashUsersTableBody" class="divide-y divide-slate-100">
+              <!-- Rows populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- CALENDAR LEGEND & FOOTER INFO -->
@@ -363,6 +512,8 @@
         <span>วันที่ในปฏิทินแสดงทั้ง วันที่สากล (ค.ศ.), พ.ศ. และวันที่ทางจันทรคติอิสลาม (ฮ.ศ.)</span>
       </div>
     </div>
+
+    </div> <!-- Close #calendarAppContainer -->
 
   </main>
 
@@ -707,6 +858,7 @@
     // 1. DATA STATE & CONFIG
     // ==========================================
     let state = {
+      activePage: 'landing', // 'landing' or 'calendar'
       currentDate: new Date(),
       selectedDept: 'all',
       selectedYear: '2568',
@@ -716,9 +868,17 @@
       isAdmin: false,
       adminPin: '1234',
       currentUser: null, // { id, name, department, contact, role }
+      users: [],
       departments: [],
       events: []
     };
+
+    const DEFAULT_USERS = [
+      { id: 'u_1', name: 'อ.สมชาย รักเรียน', department: 'ฝ่ายวิชาการ', contact: 'somchai@school.ac.th', registeredAt: '2568-01-10', role: 'staff' },
+      { id: 'u_2', name: 'อ.ฟาติมะห์ สมาน', department: 'ฝ่ายกิจกรรมและพัฒนาผู้เรียน', contact: 'fatimah@school.ac.th', registeredAt: '2568-01-15', role: 'staff' },
+      { id: 'u_3', name: 'นายอนุชา พงษ์ไพศาล', department: 'ฝ่ายบริหารทั่วไปและแผนงาน', contact: '089-123-4567', registeredAt: '2568-02-01', role: 'staff' },
+      { id: 'u_4', name: 'นางสาวมาลี นพคุณ', department: 'ฝ่ายงบประมาณและการเงิน', contact: 'malee@school.ac.th', registeredAt: '2568-02-12', role: 'staff' }
+    ];
 
     const THAI_MONTHS = [
       'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
@@ -1201,6 +1361,9 @@
             if (response && response.departments) {
               state.departments = response.departments;
               state.events = response.events;
+              if (response.users && Array.isArray(response.users) && response.users.length > 0) {
+                state.users = response.users;
+              }
               renderUI();
             }
           })
@@ -1219,6 +1382,7 @@
       const storedDepts = localStorage.getItem('school_cal_departments');
       const storedEvts = localStorage.getItem('school_cal_events');
       const storedUser = localStorage.getItem('school_cal_current_user');
+      const storedUsers = localStorage.getItem('school_cal_users');
 
       state.departments = storedDepts ? JSON.parse(storedDepts) : DEFAULT_DEPARTMENTS;
 
@@ -1246,12 +1410,24 @@
 
       state.events = loadedEvents;
       state.currentUser = storedUser ? JSON.parse(storedUser) : null;
+
+      if (storedUsers) {
+        try {
+          state.users = JSON.parse(storedUsers);
+        } catch (e) {
+          state.users = DEFAULT_USERS;
+        }
+      } else {
+        state.users = DEFAULT_USERS;
+      }
+
       renderUI();
     }
 
     function saveStateLocal() {
       localStorage.setItem('school_cal_departments', JSON.stringify(state.departments));
       localStorage.setItem('school_cal_events', JSON.stringify(state.events));
+      localStorage.setItem('school_cal_users', JSON.stringify(state.users));
       if (state.currentUser) {
         localStorage.setItem('school_cal_current_user', JSON.stringify(state.currentUser));
       } else {
@@ -1268,6 +1444,7 @@
       renderDeptFilters();
       renderLegend();
       populateDeptSelects();
+      renderLandingPage();
       if (state.viewMode === 'month') {
         renderMonthGrid();
       } else if (state.viewMode === 'list') {
@@ -1282,11 +1459,13 @@
       const statusText = document.getElementById('userStatusText');
       const creatorNameLabel = document.getElementById('formCreatorNameLabel');
       const creatorDeptLabel = document.getElementById('formCreatorDeptLabel');
+      const landingAuthBtnText = document.getElementById('landingAuthBtnText');
 
       if (state.currentUser) {
         statusText.innerText = `${state.currentUser.name} (${state.currentUser.department})`;
         if (creatorNameLabel) creatorNameLabel.innerText = `ผู้บันทึก: ${state.currentUser.name}`;
         if (creatorDeptLabel) creatorDeptLabel.innerText = `สังกัด: ${state.currentUser.department}`;
+        if (landingAuthBtnText) landingAuthBtnText.innerText = `ลงกิจกรรมในชื่อ: ${state.currentUser.name}`;
         
         // Auto-select department in form if matched
         const deptSelect = document.getElementById('eventFieldDept');
@@ -1298,6 +1477,7 @@
         statusText.innerText = 'เข้าสู่ระบบ / สมัคร';
         if (creatorNameLabel) creatorNameLabel.innerText = 'ผู้บันทึก: ผู้ใช้ทั่วไป';
         if (creatorDeptLabel) creatorDeptLabel.innerText = 'สังกัด: ยังไม่ได้เข้าสู่ระบบ';
+        if (landingAuthBtnText) landingAuthBtnText.innerText = 'ลงทะเบียน / เข้าสู่ระบบผู้ลงกิจกรรม';
       }
     }
 
@@ -1613,6 +1793,134 @@
     }
 
     // ==========================================
+    // 7.1 LANDING PAGE LOGIC & VIEW NAVIGATION
+    // ==========================================
+    function showLandingPage() {
+      state.activePage = 'landing';
+      const landing = document.getElementById('landingPageView');
+      const cal = document.getElementById('calendarAppContainer');
+      if (landing) landing.classList.remove('hidden');
+      if (cal) cal.classList.add('hidden');
+      renderLandingPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showCalendarPage(view) {
+      state.activePage = 'calendar';
+      if (view) state.viewMode = view;
+      const landing = document.getElementById('landingPageView');
+      const cal = document.getElementById('calendarAppContainer');
+      if (landing) landing.classList.add('hidden');
+      if (cal) cal.classList.remove('hidden');
+
+      if (state.viewMode === 'month') {
+        document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition';
+        document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
+        document.getElementById('calendarMonthView').classList.remove('hidden');
+        document.getElementById('calendarListView').classList.add('hidden');
+        document.getElementById('adminDashboardView').classList.add('hidden');
+      } else if (state.viewMode === 'list') {
+        document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition';
+        document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
+        document.getElementById('calendarMonthView').classList.add('hidden');
+        document.getElementById('calendarListView').classList.remove('hidden');
+        document.getElementById('adminDashboardView').classList.add('hidden');
+      }
+      renderUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderLandingPage() {
+      // 1. Upcoming list
+      const upcomingContainer = document.getElementById('landingUpcomingList');
+      if (upcomingContainer) {
+        upcomingContainer.innerHTML = '';
+        const todayStr = formatDateYMD(new Date());
+        let upcoming = state.events
+          .filter(e => (e.endDate || e.startDate) >= todayStr)
+          .sort((a, b) => a.startDate.localeCompare(b.startDate));
+        
+        if (upcoming.length === 0) {
+          upcoming = [...state.events].sort((a, b) => a.startDate.localeCompare(b.startDate));
+        }
+
+        const topEvents = upcoming.slice(0, 5);
+
+        if (topEvents.length === 0) {
+          upcomingContainer.innerHTML = '<div class="text-xs text-slate-400 py-3 text-center">ไม่มีกิจกรรมเร็วๆ นี้</div>';
+        } else {
+          topEvents.forEach(evt => {
+            const isHoliday = evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_');
+            const dept = state.departments.find(d => d.id === evt.departmentId) || { name: isHoliday ? 'วันสำคัญ/วันหยุด' : 'ทั่วไป', color: isHoliday ? '#dc2626' : '#6b21a8' };
+            const sDate = parseDateYMD(evt.startDate);
+            const hijri = getHijriDate(sDate);
+
+            const item = document.createElement('div');
+            item.className = 'p-3 rounded-xl border border-slate-100 hover:border-purple-200 bg-slate-50/70 hover:bg-purple-50/40 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2 group';
+            item.innerHTML = `
+              <div class="flex items-start gap-3">
+                <div class="px-2.5 py-1.5 rounded-lg text-center shrink-0 ${isHoliday ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-800'}">
+                  <div class="text-xs font-bold leading-none">${sDate.getDate()}</div>
+                  <div class="text-[10px] font-medium leading-none mt-0.5">${THAI_MONTHS[sDate.getMonth()].slice(0, 4)}</div>
+                </div>
+                <div>
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-purple-700 transition flex items-center gap-1.5">
+                    ${evt.title}
+                  </h4>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-1 flex-wrap">
+                    <span class="px-2 py-0.2 rounded text-white text-[10px] font-medium" style="background-color: ${dept.color}">${dept.name}</span>
+                    <span class="text-violet-700 font-medium">${hijri.formatted}</span>
+                    ${evt.location ? `<span class="text-slate-400">• ${evt.location}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-xs text-purple-700 font-semibold group-hover:underline flex items-center gap-1">
+                  ดูรายละเอียด <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </span>
+              </div>
+            `;
+            item.onclick = () => {
+              openViewEventModal(evt, sDate, hijri);
+            };
+            upcomingContainer.appendChild(item);
+          });
+        }
+      }
+
+      // 2. Dept summary list
+      const deptList = document.getElementById('landingDeptSummaryList');
+      if (deptList) {
+        deptList.innerHTML = '';
+        state.departments.forEach(dept => {
+          const count = state.events.filter(e => e.departmentId === dept.id).length;
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-purple-50/50 cursor-pointer transition';
+          row.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${dept.color}"></span>
+              <span class="text-slate-700 font-medium">${dept.name}</span>
+            </div>
+            <span class="text-xs font-bold text-slate-500 px-2 py-0.5 rounded-full bg-slate-100">${count}</span>
+          `;
+          row.onclick = () => {
+            state.selectedDept = dept.id;
+            showCalendarPage('month');
+          };
+          deptList.appendChild(row);
+        });
+      }
+
+      // 3. Total events count
+      const totalCount = document.getElementById('landingTotalEventsCount');
+      if (totalCount) {
+        totalCount.innerText = `${state.events.length} กิจกรรม`;
+      }
+    }
+
+    // ==========================================
     // 8. MODAL HANDLERS (EVENT ADD/EDIT/VIEW)
     // ==========================================
     let activeViewingEvent = null;
@@ -1646,6 +1954,16 @@
     }
 
     function openAddEventModal(defaultStartDate) {
+      if (!state.currentUser && !state.isAdmin) {
+        showToast('กรุณาลงทะเบียนหรือเข้าสู่ระบบผู้ลงกิจกรรมก่อน');
+        openUserAuthModal();
+        return;
+      }
+
+      if (state.activePage === 'landing') {
+        showCalendarPage('month');
+      }
+
       document.getElementById('modalEventTitle').innerText = 'ลงกิจกรรมใหม่';
       document.getElementById('formEvent').reset();
       document.getElementById('eventFieldId').value = '';
@@ -1667,6 +1985,16 @@
     }
 
     function openEditEventModal(evt) {
+      if (!state.currentUser && !state.isAdmin) {
+        showToast('กรุณาลงทะเบียนหรือเข้าสู่ระบบก่อนแก้ไขกิจกรรม');
+        openUserAuthModal();
+        return;
+      }
+
+      if (state.activePage === 'landing') {
+        showCalendarPage('month');
+      }
+
       document.getElementById('modalEventTitle').innerText = 'แก้ไขกิจกรรม';
       document.getElementById('eventFieldId').value = evt.id;
       document.getElementById('eventFieldTitle').value = evt.title;
@@ -2031,7 +2359,6 @@
         state.selectedDept = 'all';
         state.searchQuery = '';
         state.filterMyEvents = false;
-        state.viewMode = 'month';
 
         const searchInput = document.getElementById('inputSearchEvent');
         if (searchInput) searchInput.value = '';
@@ -2043,14 +2370,7 @@
           btnFilterMine.className = 'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-purple-50 hover:text-purple-700 transition';
         }
 
-        document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition';
-        document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
-        document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
-        document.getElementById('calendarMonthView').classList.remove('hidden');
-        document.getElementById('calendarListView').classList.add('hidden');
-        document.getElementById('adminDashboardView').classList.add('hidden');
-
-        renderUI();
+        showCalendarPage('month');
         showToast('กลับสู่หน้าปฏิทินเดือนปัจจุบันแล้ว');
       };
     }
@@ -2265,7 +2585,76 @@
 
         tbody.appendChild(tr);
       });
+
+      // 5. Dash Users Table Body (User Management)
+      renderAdminUsersTable();
+
       lucide.createIcons();
+    }
+
+    function renderAdminUsersTable() {
+      const tbody = document.getElementById('dashUsersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const totalBadge = document.getElementById('dashTotalUsersBadge');
+      if (totalBadge) totalBadge.innerText = `${state.users.length} คน`;
+
+      if (!state.users || state.users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">ยังไม่มีผู้ลงทะเบียนในระบบ</td></tr>`;
+        return;
+      }
+
+      state.users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        const isCurrent = state.currentUser && (state.currentUser.id === user.id || state.currentUser.name === user.name);
+
+        tr.innerHTML = `
+          <td class="p-2.5 font-bold text-slate-800 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold shrink-0">
+              ${(user.name || 'ผ').charAt(0)}
+            </div>
+            <div>
+              <div>${user.name}</div>
+              ${isCurrent ? '<span class="text-[10px] text-purple-600 font-normal">(เซสชันปัจจุบัน)</span>' : ''}
+            </div>
+          </td>
+          <td class="p-2.5 text-slate-700"><span class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200 text-[11px] font-medium">${user.department || '-'}</span></td>
+          <td class="p-2.5 text-slate-600">${user.contact || user.email || user.phone || '-'}</td>
+          <td class="p-2.5 text-slate-500">${user.registeredAt || user.createdAt ? (user.registeredAt || String(user.createdAt).slice(0, 10)) : '-'}</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">${user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ลงกิจกรรม'}</span></td>
+          <td class="p-2.5 text-right">
+            <button class="p-1.5 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="ลบผู้ใช้นี้" data-dash-del-user="${user.id}">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+
+        const delBtn = tr.querySelector(`[data-dash-del-user="${user.id}"]`);
+        if (delBtn) {
+          delBtn.onclick = () => {
+            if (confirm(`คุณต้องการลบผู้ใช้ "${user.name}" (${user.department}) ออกจากระบบใช่หรือไม่?\n(ผู้ใช้นี้จะไม่สามารถบันทึกหรือแก้ไขกิจกรรมได้จนกว่าจะลงทะเบียนใหม่)`)) {
+              state.users = state.users.filter(u => u.id !== user.id);
+              if (isCurrent) {
+                state.currentUser = null;
+              }
+              saveStateLocal();
+
+              if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run.deleteUser(user.id, state.adminPin);
+              }
+
+              renderAdminUsersTable();
+              renderUserProfileUI();
+              renderLandingPage();
+              showToast(`ลบผู้ใช้ "${user.name}" เรียบร้อยแล้ว`);
+            }
+          };
+        }
+
+        tbody.appendChild(tr);
+      });
     }
 
     // ==========================================
@@ -2568,10 +2957,21 @@
         name: name,
         department: dept,
         contact: contact,
+        registeredAt: formatDateYMD(new Date()),
         role: 'staff'
       };
 
       state.currentUser = userData;
+
+      // Add to users list if not present or update
+      if (!Array.isArray(state.users)) state.users = [];
+      const existingIdx = state.users.findIndex(u => u.id === userData.id || u.name === userData.name);
+      if (existingIdx > -1) {
+        state.users[existingIdx] = { ...state.users[existingIdx], ...userData };
+      } else {
+        state.users.push(userData);
+      }
+
       saveStateLocal();
 
       // Sync to Google Sheets if running on GAS
@@ -2581,6 +2981,7 @@
 
       closeModal('modalUserAuth');
       renderUI();
+      renderLandingPage();
       showToast(`ยินดีต้อนรับคุณ ${name} (${dept})`);
     });
 
@@ -2589,8 +2990,39 @@
       saveStateLocal();
       closeModal('modalUserAuth');
       renderUI();
+      renderLandingPage();
       showToast('ออกจากระบบเรียบร้อย');
     };
+
+    // ==========================================
+    // 14. LANDING PAGE & NAVBAR BUTTON LISTENERS
+    // ==========================================
+    const btnNavLanding = document.getElementById('btnNavLanding');
+    if (btnNavLanding) {
+      btnNavLanding.onclick = () => showLandingPage();
+    }
+
+    const btnLandingGoCal = document.getElementById('btnLandingGoCalendar');
+    if (btnLandingGoCal) {
+      btnLandingGoCal.onclick = () => showCalendarPage('month');
+    }
+
+    const btnLandingGoAuth = document.getElementById('btnLandingGoStaffAuth');
+    if (btnLandingGoAuth) {
+      btnLandingGoAuth.onclick = () => {
+        if (!state.currentUser) {
+          openUserAuthModal();
+        } else {
+          showCalendarPage('month');
+          openAddEventModal();
+        }
+      };
+    }
+
+    const btnLandingViewAll = document.getElementById('btnLandingViewAllList');
+    if (btnLandingViewAll) {
+      btnLandingViewAll.onclick = () => showCalendarPage('list');
+    }
 
 
 

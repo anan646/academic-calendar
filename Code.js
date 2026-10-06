@@ -252,6 +252,21 @@ function registerUser(userData) {
   };
 }
 
+function deleteUser(userId, adminPin) {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Users');
+  if (!sheet) return { success: false, message: 'ไม่พบชีต Users' };
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(userId)) {
+      sheet.deleteRow(i + 1);
+      return { success: true };
+    }
+  }
+  return { success: false, message: 'ไม่พบผู้ใช้ที่ต้องการลบ' };
+}
+
 // ------------------------------
 // API: Departments
 // ------------------------------
