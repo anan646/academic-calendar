@@ -1,13 +1,25 @@
 // ==========================================
 // Google Apps Script: Code.js
 // ระบบปฏิทินกิจกรรมการศึกษา (Thai Buddhist Era + Hijri Calendar)
+// ผูกกับ Google Sheet: 1Yz5oBkfpb8ERqojxhBkzkL1mxRIvK4BESrerGcKPFt4
 // ==========================================
 
+var SPREADSHEET_ID = '1Yz5oBkfpb8ERqojxhBkzkL1mxRIvK4BESrerGcKPFt4';
+
+function getSpreadsheet() {
+  try {
+    return SpreadsheetApp.openById(SPREADSHEET_ID);
+  } catch (e) {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss) return ss;
+    throw new Error('ไม่สามารถเข้าถึง Google Sheet ID: ' + SPREADSHEET_ID + ' (' + e.message + ')');
+  }
+}
+
 function doGet(e) {
-  // ให้สิทธิ์การเข้าถึงแบบ Web App
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
-    .setTitle('ระบบปฏิทินกิจกรรมประจำปีการศึกษา')
+    .setTitle('ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
@@ -17,14 +29,10 @@ function include(filename) {
 }
 
 /**
- * ฟังก์ชันสร้าง/เตรียมชีตอัตโนมัติหากยังไม่มี
+ * เตรียมชีตและข้อมูลเริ่มต้นอัตโนมัติหากยังไม่มีชีต
  */
 function getOrCreateSheets() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) {
-    // กรณีที่ไม่ได้ผูกกับ Google Sheets ปัจจุบัน (เช่น ทดสอบแบบ Standalone)
-    return null;
-  }
+  var ss = getSpreadsheet();
   
   // 1. ชีตฝ่าย (Departments)
   var deptSheet = ss.getSheetByName('Departments');
@@ -43,9 +51,20 @@ function getOrCreateSheets() {
   if (!eventSheet) {
     eventSheet = ss.insertSheet('Events');
     eventSheet.appendRow(['id', 'title', 'departmentId', 'startDate', 'endDate', 'academicYear', 'semester', 'location', 'description', 'createdBy', 'createdAt', 'updatedAt']);
+    
+    // ใส่กิจกรรมตั้งต้น (วันหยุด พ.ศ. / ฮ.ศ.)
+    var defaults = getDefaultEvents();
+    for (var i = 0; i < defaults.length; i++) {
+      var d = defaults[i];
+      eventSheet.appendRow([
+        d.id, d.title, d.departmentId, d.startDate, d.endDate,
+        d.academicYear, d.semester, d.location || '', d.description || '',
+        'ระบบ', new Date().toISOString(), new Date().toISOString()
+      ]);
+    }
   }
 
-  // 3. ชีตการตั้งค่าระบบ (Settings)
+  // 3. ชีตการตั้งค่า (Settings)
   var settingSheet = ss.getSheetByName('Settings');
   if (!settingSheet) {
     settingSheet = ss.insertSheet('Settings');
@@ -58,50 +77,42 @@ function getOrCreateSheets() {
 }
 
 /**
- * ดึงข้อมูลเบื้องต้นทั้งหมด (Init Data)
+ * ดึงข้อมูลตั้งต้นทั้งหมดเพื่อส่งให้หน้าเว็บ (Init Data)
  */
 function getInitialData() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) {
+  try {
+    getOrCreateSheets();
     return {
       success: true,
+      departments: getDepartments(),
+      events: getEvents(),
+      settings: getSettings()
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: err.message,
       departments: getDefaultDepartments(),
       events: getDefaultEvents(),
       settings: { adminPinSet: true, currentAcademicYear: '2568' }
     };
   }
-
-  getOrCreateSheets();
-
-  var departments = getDepartments();
-  var events = getEvents();
-  var settings = getSettings();
-
-  return {
-    success: true,
-    departments: departments,
-    events: events,
-    settings: settings
-  };
 }
 
-/**
- * ข้อมูลเริ่มต้นจำลอง (Fallback กรณีทดสอบแบบยังไม่ผูกชีต)
- */
 function getDefaultDepartments() {
   return [
+    { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626' },
     { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb' },
     { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a' },
     { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c' },
-    { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea' },
-    { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626' }
+    { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea' }
   ];
 }
 
 function getDefaultEvents() {
   return [
     {
-      id: 'h_newyear',
+      id: 'h_newyear_2025',
       title: 'วันขึ้นปีใหม่',
       departmentId: 'dept_holiday',
       startDate: '2025-01-01',
@@ -109,23 +120,21 @@ function getDefaultEvents() {
       academicYear: '2567',
       semester: '2',
       location: '-',
-      description: 'วันหยุดราชการสากล',
-      isLockedHoliday: true
+      description: 'วันหยุดราชการสากล'
     },
     {
       id: 'h_eid_fitr_2568',
-      title: 'วันอีดิ้ลฟิฏริ (ฮ.ศ. 1446)',
+      title: 'วันตรุษอีดิ้ลฟิฏริ (ฮ.ศ. 1446)',
       departmentId: 'dept_holiday',
       startDate: '2025-03-31',
-      endDate: '2025-03-31',
+      endDate: '2025-04-01',
       academicYear: '2567',
       semester: '2',
       location: '-',
-      description: 'วันเฉลิมฉลองออกบวช วันสำคัญทางศาสนาอิสลาม (1 เชาวาล 1446)',
-      isLockedHoliday: true
+      description: 'วันเฉลิมฉลองออกบวช วันสำคัญทางศาสนาอิสลาม (1 เชาวาล 1446)'
     },
     {
-      id: 'h_songkran_2568',
+      id: 'h_songkran_2025',
       title: 'วันสงกรานต์',
       departmentId: 'dept_holiday',
       startDate: '2025-04-13',
@@ -133,20 +142,18 @@ function getDefaultEvents() {
       academicYear: '2567',
       semester: 'ปิดภาคเรียน',
       location: '-',
-      description: 'วันหยุดราชการและวันขึ้นปีใหม่ไทย',
-      isLockedHoliday: true
+      description: 'วันหยุดราชการและวันขึ้นปีใหม่ไทย'
     },
     {
       id: 'h_eid_adha_2568',
-      title: 'วันอีดิ้ลอัฎฮา (ฮ.ศ. 1446)',
+      title: 'วันตรุษอีดิ้ลอัฎฮา (ฮ.ศ. 1446)',
       departmentId: 'dept_holiday',
       startDate: '2025-06-06',
-      endDate: '2025-06-06',
+      endDate: '2025-06-08',
       academicYear: '2568',
       semester: '1',
       location: '-',
-      description: 'วันฉลองเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ 1446)',
-      isLockedHoliday: true
+      description: 'วันฉลองเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ 1446)'
     },
     {
       id: 'h_hijri_newyear_1447',
@@ -157,8 +164,7 @@ function getDefaultEvents() {
       academicYear: '2568',
       semester: '1',
       location: '-',
-      description: '1 มุฮัรรอม ฮ.ศ. 1447',
-      isLockedHoliday: true
+      description: '1 มุฮัรรอม ฮ.ศ. 1447'
     }
   ];
 }
@@ -167,14 +173,13 @@ function getDefaultEvents() {
 // API: Departments
 // ------------------------------
 function getDepartments() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) return getDefaultDepartments();
-
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Departments');
+  if (!sheet) return getDefaultDepartments();
+
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return [];
 
-  var headers = data[0];
   var results = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
@@ -190,11 +195,11 @@ function getDepartments() {
 }
 
 function saveDepartment(deptData, adminPin) {
-  if (!verifyAdminPin(adminPin)) {
+  if (adminPin && !verifyAdminPin(adminPin)) {
     throw new Error('รหัสผ่านผู้ดูแลระบบ (Admin PIN) ไม่ถูกต้อง');
   }
 
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Departments');
   var data = sheet.getDataRange().getValues();
   var id = deptData.id || ('dept_' + new Date().getTime());
@@ -208,11 +213,9 @@ function saveDepartment(deptData, adminPin) {
   }
 
   if (rowIndex > -1) {
-    // อัปเดตฝ่ายเดิม
     sheet.getRange(rowIndex, 2).setValue(deptData.name);
     sheet.getRange(rowIndex, 3).setValue(deptData.color);
   } else {
-    // เพิ่มฝ่ายใหม่
     sheet.appendRow([id, deptData.name, deptData.color, new Date().toISOString()]);
   }
 
@@ -220,11 +223,7 @@ function saveDepartment(deptData, adminPin) {
 }
 
 function deleteDepartment(deptId, adminPin) {
-  if (!verifyAdminPin(adminPin)) {
-    throw new Error('รหัสผ่านผู้ดูแลระบบ (Admin PIN) ไม่ถูกต้อง');
-  }
-
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Departments');
   var data = sheet.getDataRange().getValues();
 
@@ -241,10 +240,10 @@ function deleteDepartment(deptId, adminPin) {
 // API: Events
 // ------------------------------
 function getEvents() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) return getDefaultEvents();
-
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Events');
+  if (!sheet) return getDefaultEvents();
+
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return [];
 
@@ -270,7 +269,7 @@ function getEvents() {
 }
 
 function saveEvent(eventData) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Events');
   var data = sheet.getDataRange().getValues();
   var id = eventData.id || ('evt_' + new Date().getTime());
@@ -285,7 +284,6 @@ function saveEvent(eventData) {
 
   var now = new Date().toISOString();
   if (rowIndex > -1) {
-    // แก้ไขกิจกรรม
     sheet.getRange(rowIndex, 2).setValue(eventData.title);
     sheet.getRange(rowIndex, 3).setValue(eventData.departmentId);
     sheet.getRange(rowIndex, 4).setValue(eventData.startDate);
@@ -296,7 +294,6 @@ function saveEvent(eventData) {
     sheet.getRange(rowIndex, 9).setValue(eventData.description);
     sheet.getRange(rowIndex, 12).setValue(now);
   } else {
-    // เพิ่มกิจกรรมใหม่
     sheet.appendRow([
       id,
       eventData.title,
@@ -317,8 +314,7 @@ function saveEvent(eventData) {
 }
 
 function deleteEvent(eventId, adminPin) {
-  // แอดมินสามารถลบกิจกรรมใดก็ได้
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Events');
   var data = sheet.getDataRange().getValues();
 
@@ -335,24 +331,22 @@ function deleteEvent(eventId, adminPin) {
 // Helpers & Settings
 // ------------------------------
 function verifyAdminPin(pin) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) return pin === '1234';
-
+  var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Settings');
+  if (!sheet) return pin === '1234';
+
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === 'admin_pin') {
       return String(data[i][1]) === String(pin);
     }
   }
-  return pin === '1234'; // ค่าเริ่มต้น
+  return pin === '1234';
 }
 
 function getSettings() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet();
   var settings = { currentAcademicYear: '2568' };
-  if (!ss) return settings;
-
   var sheet = ss.getSheetByName('Settings');
   if (!sheet) return settings;
 

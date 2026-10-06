@@ -1310,6 +1310,9 @@
         colorInput.addEventListener('change', (e) => {
           dept.color = e.target.value;
           saveStateLocal();
+          if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run.saveDepartment(dept, state.adminPin);
+          }
           renderUI();
           showToast(`เปลี่ยนสีฝ่าย ${dept.name} แล้ว`);
         });
@@ -1321,6 +1324,9 @@
             if (confirm(`ต้องการลบ "${dept.name}" ใช่หรือไม่?`)) {
               state.departments = state.departments.filter(d => d.id !== dept.id);
               saveStateLocal();
+              if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run.deleteDepartment(dept.id, state.adminPin);
+              }
               renderDeptManagementList();
               renderUI();
               showToast(`ลบฝ่ายเรียบร้อยแล้ว`);
@@ -1352,6 +1358,9 @@
 
       state.departments.push(newDept);
       saveStateLocal();
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.saveDepartment(newDept, state.adminPin);
+      }
       nameInput.value = '';
       renderDeptManagementList();
       renderUI();
