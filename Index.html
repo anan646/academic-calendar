@@ -9,16 +9,43 @@
   <!-- Export Libraries & Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --font-base: 'Prompt', 'Plus Jakarta Sans', 'Sarabun', sans-serif;
+    }
     body {
-      font-family: 'Prompt', 'Sarabun', sans-serif;
+      font-family: var(--font-base);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      selection-background-color: #10b981;
+      selection-color: #ffffff;
+    }
+    ::selection {
+      background-color: #047857;
+      color: #ffffff;
+    }
+    /* Custom Scrollbar for sleek UI */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
     .calendar-grid {
       display: grid;
@@ -27,6 +54,12 @@
     .badge-hijri {
       font-size: 0.65rem;
       line-height: 0.85rem;
+      font-feature-settings: "tnum";
+    }
+    /* Subtle focus ring */
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
     }
   </style>
 </head>
@@ -1108,30 +1141,29 @@
         const sHijri = getHijriDate(sDate);
 
         const item = document.createElement('div');
-        item.className = 'p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer';
-        item.style.borderLeftWidth = '4px';
-        item.style.borderLeftColor = dept.color;
+        item.className = 'p-4 rounded-xl border border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-sm transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer group';
 
         const dateLabel = formatThaiDateFull(sDate);
 
         item.innerHTML = `
-          <div class="space-y-1">
+          <div class="space-y-1.5">
             <div class="flex items-center gap-2">
-              <span class="text-xs px-2 py-0.5 rounded-md text-white font-medium" style="background-color: ${dept.color}">
+              <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-md font-medium text-slate-700 bg-slate-100 border border-slate-200">
+                <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${dept.color}"></span>
                 ${dept.name}
               </span>
-              <span class="text-xs text-slate-500">ปีการศึกษา ${evt.academicYear || '-'} (เทอม ${evt.semester || '-'})</span>
+              <span class="text-xs text-slate-500 font-medium">ปีการศึกษา ${evt.academicYear || '-'} (เทอม ${evt.semester || '-'})</span>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm sm:text-base">${evt.title}</h4>
-            <div class="flex items-center gap-3 text-xs text-slate-500">
-              <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${dateLabel}</span>
-              <span class="text-emerald-700 font-medium flex items-center gap-1"><i data-lucide="moon" class="w-3.5 h-3.5"></i> ${sHijri.formatted}</span>
+            <h4 class="font-bold text-slate-800 text-sm sm:text-base group-hover:text-emerald-800 transition">${evt.title}</h4>
+            <div class="flex items-center gap-4 text-xs text-slate-500">
+              <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${dateLabel}</span>
+              <span class="text-emerald-700 font-medium flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i> ${sHijri.formatted}</span>
             </div>
           </div>
           <div class="flex items-center gap-2 self-end sm:self-center">
-            <button class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+            <span class="p-2 text-slate-400 group-hover:text-emerald-700 group-hover:bg-emerald-50 rounded-lg transition">
               <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </button>
+            </span>
           </div>
         `;
 
