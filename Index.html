@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Export Libraries & Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+    .badge-hijri {
+      font-size: 0.65rem;
+      line-height: 0.85rem;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
+          <i data-lucide="calendar" class="w-6 h-6 text-emerald-200"></i>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
+            ปฏิทินกิจกรรมประจำปีการศึกษา
+            <span class="text-xs bg-emerald-500/40 text-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300/30">
+              พ.ศ. / ฮ.ศ.
+            </span>
+          </h1>
+          <p class="text-xs text-emerald-100/80">ระบบลงงานและปฏิทินกลางสำหรับทุกฝ่ายและบุคลากร</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons & Mode -->
+      <div class="flex items-center space-x-2">
+        <button id="btnOpenAddEvent" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white text-emerald-800 text-sm font-semibold rounded-lg shadow-sm hover:bg-emerald-50 transition active:scale-95">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
+          <span>ลงกิจกรรมใหม่</span>
+        </button>
+
+        <button id="btnAdminToggle" class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-800/80 hover:bg-emerald-900 border border-emerald-500/40 text-xs sm:text-sm font-medium rounded-lg transition">
+          <i data-lucide="shield" class="w-4 h-4 text-emerald-300"></i>
+          <span id="adminStatusText">โหมดแอดมิน</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full flex flex-col gap-6">
+
+    <!-- CONTROLS & FILTER BAR -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <!-- Month & Year Selector with Dual Calendars (CE / BE / AH) -->
+      <div class="flex items-center flex-wrap gap-2">
+        <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
+          <button id="btnPrevMonth" class="p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button id="btnToday" class="px-3 py-1 rounded-lg text-xs font-semibold hover:bg-white text-slate-700 transition">
+            วันนี้
+          </button>
+          <button id="btnNextMonth" class="p-1.5 rounded-lg hover:bg-white text-slate-600 hover:text-slate-900 transition">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-col ml-1">
+          <div class="flex items-center gap-2">
+            <span id="currentMonthYearBE" class="text-lg sm:text-xl font-bold text-slate-800">เดือน ปี พ.ศ.</span>
+            <span class="text-xs px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-medium border border-blue-200" id="currentSemesterBadge">
+              ปีการศึกษา 2568 (เทอม 1)
+            </span>
+          </div>
+          <span id="currentHijriMonthRange" class="text-xs font-medium text-emerald-700 flex items-center gap-1">
+            <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+            เดือนฮิจเราะห์ศักราช (ฮ.ศ.)
+          </span>
+        </div>
+      </div>
+
+      <!-- View & Filter Options -->
+      <div class="flex items-center flex-wrap gap-2.5">
+        <!-- Academic Year Filter -->
+        <div class="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
+          <span>ปีการศึกษา:</span>
+          <select id="selectAcademicYear" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
+            <option value="all">ทั้งหมด</option>
+            <option value="2567">2567</option>
+            <option value="2568" selected>2568</option>
+            <option value="2569">2569</option>
+            <option value="2570">2570</option>
+          </select>
+        </div>
+
+        <!-- View Switcher (Month / List / Admin Dashboard) -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button id="viewBtnMonth" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-800 shadow-sm transition">
+            ปฏิทินรายเดือน
+          </button>
+          <button id="viewBtnList" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+            รายการกิจกรรม
+          </button>
+          <button id="viewBtnDashboard" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1">
+            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+            <span>แดชบอร์ดแอดมิน</span>
+          </button>
+        </div>
+
+        <!-- Export Dropdown Button -->
+        <div class="relative">
+          <button id="btnExportMenuToggle" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>ส่งออกไฟล์</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-emerald-500"></i>
+          </button>
+          <div id="exportDropdown" class="hidden absolute right-0 mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-40 text-xs">
+            <button id="btnExportPDF" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-medium">
+              <i data-lucide="file-text" class="w-4 h-4 text-rose-500"></i> ส่งออกเป็น PDF (.pdf)
+            </button>
+            <button id="btnExportExcel" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-medium">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> ส่งออกเป็น Excel (.xlsx)
+            </button>
+            <button id="btnExportWord" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 font-medium">
+              <i data-lucide="file" class="w-4 h-4 text-blue-600"></i> ส่งออกเป็น Word (.doc)
+            </button>
+          </div>
+        </div>
+
+        <!-- Manage Departments Button (Admin Only or Quick Open) -->
+        <button id="btnManageDept" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl border border-slate-200 transition" title="จัดการฝ่ายและสี">
+          <i data-lucide="settings-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- DEPARTMENT FILTER PILLS (ฝ่ายต่างๆ & ป้ายสี) -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+      <span class="text-slate-500 font-medium whitespace-nowrap flex items-center gap-1">
+        <i data-lucide="filter" class="w-3.5 h-3.5"></i> ฝ่าย:
+      </span>
+      <div id="deptFilterContainer" class="flex items-center gap-1.5 flex-nowrap">
+        <!-- Department pill buttons injected dynamically -->
+      </div>
+    </div>
+
+    <!-- CALENDAR MONTH VIEW -->
+    <div id="calendarMonthView" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <!-- Days of Week Header -->
+      <div class="calendar-grid bg-slate-100/90 border-b border-slate-200 text-center text-xs font-semibold text-slate-600 py-2.5">
+        <div class="text-rose-600">อาทิตย์</div>
+        <div>จันทร์</div>
+        <div>อังคาร</div>
+        <div>พุธ</div>
+        <div>พฤหัสบดี</div>
+        <div class="text-emerald-700">ศุกร์ (ญุมอะฮ์)</div>
+        <div class="text-blue-700">เสาร์</div>
+      </div>
+
+      <!-- Days Grid (42 cells) -->
+      <div id="calendarDaysGrid" class="calendar-grid divide-x divide-y divide-slate-100 min-h-[620px]">
+        <!-- Days injected dynamically -->
+      </div>
+    </div>
+
+    <!-- CALENDAR LIST / AGENDA VIEW -->
+    <div id="calendarListView" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <div class="flex items-center justify-between mb-4 border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">รายการกิจกรรมและวันสำคัญ</h3>
+        <span class="text-xs text-slate-500" id="listSummaryText">แสดง 0 รายการ</span>
+      </div>
+      <div id="eventListContainer" class="space-y-3">
+        <!-- Event items injected dynamically -->
+      </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD VIEW (ภาพรวมสถิติและกราฟวิเคราะห์สำหรับผู้ดูแลระบบ) -->
+    <div id="adminDashboardView" class="hidden space-y-6">
+      <!-- KPI Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-medium text-slate-500 block">กิจกรรมทั้งหมดในปีนี้</span>
+            <span id="dashTotalEvents" class="text-2xl font-bold text-slate-800 mt-1 block">0</span>
+          </div>
+          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+            <i data-lucide="calendar" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-medium text-slate-500 block">จำนวนฝ่ายที่ลงงาน</span>
+            <span id="dashTotalDepts" class="text-2xl font-bold text-blue-600 mt-1 block">0</span>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-medium text-slate-500 block">วันหยุดราชการ / สำคัญ</span>
+            <span id="dashTotalHolidays" class="text-2xl font-bold text-rose-600 mt-1 block">0</span>
+          </div>
+          <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center">
+            <i data-lucide="flag" class="w-6 h-6"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-medium text-slate-500 block">กิจกรรมที่กำลังจะถึง (30 วัน)</span>
+            <span id="dashUpcomingEvents" class="text-2xl font-bold text-amber-600 mt-1 block">0</span>
+          </div>
+          <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+            <i data-lucide="clock" class="w-6 h-6"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart 1: สัดส่วนกิจกรรมแยกตามฝ่าย -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> สัดส่วนกิจกรรมแยกตามฝ่าย
+            </h4>
+            <span class="text-[11px] text-slate-400">ภาพรวมสถิติ</span>
+          </div>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="chartDeptShare"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: กิจกรรมแยกตามรายเดือนตลอดปี -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i> จำนวนกิจกรรมในแต่ละเดือน
+            </h4>
+            <span class="text-[11px] text-slate-400">แนวโน้มภาระงาน</span>
+          </div>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="chartMonthlyEvents"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Table in Dashboard -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <i data-lucide="table" class="w-4 h-4 text-indigo-600"></i> ตารางกิจกรรมประจำปีการศึกษา
+          </h4>
+          <span class="text-xs text-slate-500">สามารถคลิกเพื่อแก้ไขหรือลบในฐานะแอดมิน</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                <th class="p-2.5 font-semibold">วันที่เริ่มต้น</th>
+                <th class="p-2.5 font-semibold">กิจกรรม</th>
+                <th class="p-2.5 font-semibold">ฝ่าย</th>
+                <th class="p-2.5 font-semibold">เทอม</th>
+                <th class="p-2.5 font-semibold">สถานที่</th>
+                <th class="p-2.5 font-semibold text-right">การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="dashEventsTableBody" class="divide-y divide-slate-100">
+              <!-- Rows populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR LEGEND & FOOTER INFO -->
+    <div class="bg-slate-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+      <div class="flex items-center gap-4 flex-wrap" id="legendContainer">
+        <!-- Legend injected dynamically -->
+      </div>
+      <div class="flex items-center gap-2 text-slate-500">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <span>วันที่ในปฏิทินแสดงทั้ง วันที่สากล (ค.ศ.), พ.ศ. และวันที่ทางจันทรคติอิสลาม (ฮ.ศ.)</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL: ADD / EDIT EVENT -->
+  <div id="modalEvent" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transition-all scale-95 duration-200" id="modalEventCard">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg">
+            <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+          </div>
+          <h3 id="modalEventTitle" class="font-bold text-slate-800 text-base">บันทึกกิจกรรมประจำปีการศึกษา</h3>
+        </div>
+        <button id="btnCloseModalEvent" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formEvent" class="p-6 space-y-4">
+        <input type="hidden" id="eventFieldId">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่องาน / กิจกรรม <span class="text-rose-500">*</span></label>
+          <input type="text" id="eventFieldTitle" required placeholder="เช่น สอบกลางภาคเรียนที่ 1, วันกิจกรรมเปิดบ้านวิชาการ"
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ฝ่ายที่รับผิดชอบ <span class="text-rose-500">*</span></label>
+            <select id="eventFieldDept" required
+              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+              <!-- Options populated dynamically -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ปีการศึกษา / ภาคเรียน</label>
+            <div class="flex gap-2">
+              <input type="text" id="eventFieldYear" placeholder="2568" value="2568"
+                class="w-1/2 px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <select id="eventFieldSemester" class="w-1/2 px-2 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="1">เทอม 1</option>
+                <option value="2">เทอม 2</option>
+                <option value="ปิดภาคเรียน">ปิดภาคเรียน</option>
+                <option value="ทั้งปี">ทั้งปี</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">วันที่เริ่มต้น <span class="text-rose-500">*</span></label>
+            <input type="date" id="eventFieldStartDate" required
+              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">วันที่สิ้นสุด</label>
+            <input type="date" id="eventFieldEndDate"
+              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">สถานที่ / ผู้เข้าร่วม</label>
+          <input type="text" id="eventFieldLocation" placeholder="เช่น หอประชุมใหญ่, นักเรียนทุกระดับชั้น"
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">รายละเอียดเพิ่มเติม</label>
+          <textarea id="eventFieldDescription" rows="3" placeholder="ระบุวัตถุประสงค์ กำหนดการ หรือหมายเหตุ..."
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-200">
+          <button type="button" id="btnDeleteEvent" class="hidden px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition">
+            <i data-lucide="trash-2" class="w-4 h-4 inline-block mr-1"></i> ลบกิจกรรม
+          </button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" id="btnCancelEvent" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-xl transition font-medium">
+              ยกเลิก
+            </button>
+            <button type="submit" class="px-5 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md transition font-semibold">
+              บันทึกข้อมูล
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MANAGE DEPARTMENTS (เพิ่ม/ลด/เลือกสีฝ่าย) -->
+  <div id="modalDepartment" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-blue-100 text-blue-700 rounded-lg">
+            <i data-lucide="palette" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-bold text-slate-800 text-base">จัดการฝ่ายและสีกิจกรรม</h3>
+        </div>
+        <button id="btnCloseModalDept" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- Add New Department -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-bold text-slate-700 block">เพิ่มฝ่ายใหม่</span>
+          <div class="flex items-center gap-2">
+            <input type="text" id="newDeptName" placeholder="ชื่อฝ่าย เช่น ฝ่ายแนะแนว"
+              class="flex-1 px-3 py-1.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <input type="color" id="newDeptColor" value="#0284c7" class="w-9 h-9 p-0.5 rounded-lg border border-slate-300 cursor-pointer">
+            <button id="btnAddDeptSubmit" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold">
+              เพิ่ม
+            </button>
+          </div>
+        </div>
+
+        <!-- Department List -->
+        <div>
+          <span class="text-xs font-semibold text-slate-600 mb-2 block">ฝ่ายที่มีอยู่ในระบบ:</span>
+          <div id="deptManagementList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <!-- List injected dynamically -->
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
+        <button id="btnFinishDept" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN AUTH PIN -->
+  <div id="modalAdminAuth" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xs w-full shadow-2xl border border-slate-200 p-6 text-center space-y-4">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto">
+        <i data-lucide="key" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h4 class="font-bold text-slate-800 text-base">ยืนยันตัวตนแอดมิน</h4>
+        <p class="text-xs text-slate-500 mt-1">กรุณากรอกรหัส PIN สำหรับจัดการสิทธิ์ระบบ (ค่าเริ่มต้น: 1234)</p>
+      </div>
+      <input type="password" id="inputAdminPin" maxlength="6" placeholder="รหัส PIN"
+        class="w-full text-center tracking-widest text-lg font-bold py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+      <div class="flex gap-2">
+        <button id="btnCancelAdminAuth" class="w-1/2 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl">ยกเลิก</button>
+        <button id="btnConfirmAdminAuth" class="w-1/2 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EVENT DETAILS PREVIEW (สำหรับผู้ใช้ทั่วไปคลิกดู) -->
+  <div id="modalEventView" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div id="viewEventHeader" class="px-6 py-4 text-white flex items-center justify-between">
+        <div>
+          <span id="viewEventDeptBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-white/20 font-medium">ฝ่าย</span>
+          <h3 id="viewEventTitle" class="text-lg font-bold mt-1">ชื่องานกิจกรรม</h3>
+        </div>
+        <button id="btnCloseEventView" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-3.5 text-sm">
+        <div class="flex items-start gap-2.5 text-slate-600">
+          <i data-lucide="calendar" class="w-4 h-4 text-slate-400 mt-0.5"></i>
+          <div>
+            <span class="font-semibold text-slate-700">วันที่:</span>
+            <span id="viewEventDate" class="ml-1 text-slate-800">1 ม.ค. 2568</span>
+            <div id="viewEventHijriDate" class="text-xs text-emerald-700 font-medium mt-0.5">ตรงกับวันที่ ฮ.ศ.</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5 text-slate-600">
+          <i data-lucide="graduation-cap" class="w-4 h-4 text-slate-400"></i>
+          <div>
+            <span class="font-semibold text-slate-700">ปีการศึกษา:</span>
+            <span id="viewEventTerm" class="ml-1 text-slate-800">2568 (เทอม 1)</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5 text-slate-600" id="viewLocationRow">
+          <i data-lucide="map-pin" class="w-4 h-4 text-slate-400"></i>
+          <div>
+            <span class="font-semibold text-slate-700">สถานที่ / เป้าหมาย:</span>
+            <span id="viewEventLocation" class="ml-1 text-slate-800">-</span>
+          </div>
+        </div>
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-600">
+          <span class="font-semibold text-slate-700 block mb-1">รายละเอียดเพิ่มเติม:</span>
+          <p id="viewEventDesc" class="whitespace-pre-line leading-relaxed">-</p>
+        </div>
+
+        <!-- Edit button if admin or owner -->
+        <div class="pt-2 flex justify-end gap-2" id="viewAdminActions">
+          <button id="btnEditFromView" class="px-4 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 flex items-center gap-1">
+            <i data-lucide="edit" class="w-3.5 h-3.5"></i> แก้ไขข้อมูล
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMessage">บันทึกสำเร็จ</span>
+  </div>
+
+  <!-- SCRIPT LOGIC (APP DATA & HIJRI/THAI CALENDAR CALCULATOR) -->
+  <script>
+    // ==========================================
+    // 1. DATA STATE & CONFIG
+    // ==========================================
+    let state = {
+      currentDate: new Date(),
+      selectedDept: 'all',
+      selectedYear: '2568',
+      viewMode: 'month', // 'month' or 'list'
+      isAdmin: false,
+      adminPin: '1234',
+      departments: [],
+      events: []
+    };
+
+    const THAI_MONTHS = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    const HIJRI_MONTHS = [
+      'มุฮัรรอม', 'ศอฟัร', 'รอบีอุลเอาวัล', 'รอบีอุษษานี',
+      'ญุมาดัลอูลา', 'ญุมาดัษษานียะฮ์', 'เราะญับ', 'ชะอ์บาน',
+      'รอมฎอน', 'เชาวาล', 'ซุลเกาะอ์ดะฮ์', 'ซุลฮิจญะฮ์'
+    ];
+
+    // ==========================================
+    // 2. HIJRI CALENDAR CONVERTER (Umm al-Qura / Tabular Calculation)
+    // ==========================================
+    function getHijriDate(date) {
+      // ใช้ Intl.DateTimeFormat กับ islamic-umalqura ปฏิทินจันทรคติที่แม่นยำ
+      try {
+        const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric'
+        });
+        const parts = formatter.formatToParts(date);
+        let hDay = 1, hMonth = 1, hYear = 1446;
+        parts.forEach(p => {
+          if (p.type === 'day') hDay = parseInt(p.value, 10);
+          if (p.type === 'month') hMonth = parseInt(p.value, 10);
+          if (p.type === 'year') hYear = parseInt(p.value, 10);
+        });
+        return {
+          day: hDay,
+          month: hMonth,
+          monthName: HIJRI_MONTHS[hMonth - 1] || '',
+          year: hYear,
+          formatted: `${hDay} ${HIJRI_MONTHS[hMonth - 1]} ฮ.ศ. ${hYear}`
+        };
+      } catch (e) {
+        // Fallback Tabular calculation
+        return fallbackHijri(date);
+      }
+    }
+
+    function fallbackHijri(d) {
+      const jd = Math.floor((d.getTime() / 86400000) + 2440587.5);
+      const l = jd - 1948440 + 10632;
+      const n = Math.floor((l - 1) / 10631);
+      const l1 = l - 10631 * n + 354;
+      const j = (Math.floor((10985 - l1) / 5316)) * (Math.floor((50 * l1) / 17719)) + (Math.floor(l1 / 5670)) * (Math.floor((43 * l1) / 15238));
+      const l2 = l1 - (Math.floor((30 - j) / 15)) * (Math.floor((17719 * j) / 50)) - (Math.floor(j / 16)) * (Math.floor((15238 * j) / 43)) + 29;
+      const m = Math.floor((24 * l2) / 709);
+      const day = l2 - Math.floor((709 * m) / 24);
+      const year = 30 * n + j - 30;
+      return {
+        day: day,
+        month: m,
+        monthName: HIJRI_MONTHS[m - 1] || '',
+        year: year,
+        formatted: `${day} ${HIJRI_MONTHS[m - 1]} ฮ.ศ. ${year}`
+      };
+    }
+
+    // ==========================================
+    // 3. SEED DATA & HOLIDAYS (พ.ศ. & ฮ.ศ.)
+    // ==========================================
+    const DEFAULT_DEPARTMENTS = [
+      { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626' },
+      { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb' },
+      { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a' },
+      { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c' },
+      { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea' }
+    ];
+
+    const DEFAULT_HOLIDAYS_AND_EVENTS = [
+      // เทศกาลและวันสำคัญทางศาสนาอิสลาม (ฮ.ศ.)
+      {
+        id: 'h_ramadan_start_2568',
+        title: 'เริ่มต้นถือศีลอดเดือนรอมฎอน (1 รอมฎอน ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-03-01',
+        endDate: '2025-03-01',
+        academicYear: '2567',
+        semester: '2',
+        description: 'เข้าสู่เดือนรอมฎอนอันประเสริฐ'
+      },
+      {
+        id: 'h_eid_fitr_2568',
+        title: 'วันตรุษอีดิ้ลฟิฏริ (ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-03-31',
+        endDate: '2025-04-01',
+        academicYear: '2567',
+        semester: '2',
+        description: 'วันเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน (1 เชาวาล ฮ.ศ. 1446)'
+      },
+      {
+        id: 'h_eid_adha_2568',
+        title: 'วันตรุษอีดิ้ลอัฎฮา (ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-06-06',
+        endDate: '2025-06-08',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันเฉลิมฉลองการเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ ฮ.ศ. 1446)'
+      },
+      {
+        id: 'h_hijri_newyear_1447',
+        title: 'วันขึ้นปีใหม่ฮิจเราะห์ศักราช 1447',
+        departmentId: 'dept_holiday',
+        startDate: '2025-06-26',
+        endDate: '2025-06-26',
+        academicYear: '2568',
+        semester: '1',
+        description: '1 มุฮัรรอม ฮ.ศ. 1447'
+      },
+      {
+        id: 'h_ashura_1447',
+        title: 'วันอาชูรออ์ (10 มุฮัรรอม ฮ.ศ. 1447)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-07-05',
+        endDate: '2025-07-05',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันถือศีลอดอาชูรออ์'
+      },
+      {
+        id: 'h_mawlid_1447',
+        title: 'วันเมาลิดนบี (12 รอบีอุลเอาวัล ฮ.ศ. 1447)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-09-04',
+        endDate: '2025-09-04',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันคล้ายวันประสูติท่านศาสดามุฮัมมัด (ซ.ล.)'
+      },
+      // วันหยุดราชการไทย (พ.ศ.)
+      {
+        id: 'h_newyear_2025',
+        title: 'วันขึ้นปีใหม่',
+        departmentId: 'dept_holiday',
+        startDate: '2025-01-01',
+        endDate: '2025-01-01',
+        academicYear: '2567',
+        semester: '2',
+        description: 'วันหยุดราชการสากล'
+      },
+      {
+        id: 'h_songkran_2025',
+        title: 'วันสงกรานต์',
+        departmentId: 'dept_holiday',
+        startDate: '2025-04-13',
+        endDate: '2025-04-15',
+        academicYear: '2567',
+        semester: 'ปิดภาคเรียน',
+        description: 'วันหยุดราชการและประเพณีไทย'
+      },
+      {
+        id: 'h_labor_2025',
+        title: 'วันแรงงานแห่งชาติ',
+        departmentId: 'dept_holiday',
+        startDate: '2025-05-01',
+        endDate: '2025-05-01',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_coronation_2025',
+        title: 'วันฉัตรมงคล',
+        departmentId: 'dept_holiday',
+        startDate: '2025-05-05',
+        endDate: '2025-05-05',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_hm_queen_suthida_2025',
+        title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี',
+        departmentId: 'dept_holiday',
+        startDate: '2025-06-03',
+        endDate: '2025-06-03',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_hm_king_rama10_2025',
+        title: 'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว',
+        departmentId: 'dept_holiday',
+        startDate: '2025-07-28',
+        endDate: '2025-07-28',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_mother_day_2025',
+        title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระพันปีหลวง / วันแม่แห่งชาติ',
+        departmentId: 'dept_holiday',
+        startDate: '2025-08-12',
+        endDate: '2025-08-12',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_chulalongkorn_2025',
+        title: 'วันปิยมหาราช',
+        departmentId: 'dept_holiday',
+        startDate: '2025-10-23',
+        endDate: '2025-10-23',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_father_day_2025',
+        title: 'วันคล้ายวันพระบรมราชสมภพ ร.9 / วันพ่อแห่งชาติ',
+        departmentId: 'dept_holiday',
+        startDate: '2025-12-05',
+        endDate: '2025-12-05',
+        academicYear: '2568',
+        semester: '2',
+        description: 'วันหยุดราชการ'
+      },
+      {
+        id: 'h_constitution_2025',
+        title: 'วันรัฐธรรมนูญ',
+        departmentId: 'dept_holiday',
+        startDate: '2025-12-10',
+        endDate: '2025-12-10',
+        academicYear: '2568',
+        semester: '2',
+        description: 'วันหยุดราชการ'
+      },
+      // ตัวอย่างกิจกรรมของแต่ละฝ่าย
+      {
+        id: 'sample_evt_1',
+        title: 'เปิดภาคเรียนที่ 1 ปีการศึกษา 2568',
+        departmentId: 'dept_acad',
+        startDate: '2025-05-16',
+        endDate: '2025-05-16',
+        academicYear: '2568',
+        semester: '1',
+        location: 'สถานศึกษา',
+        description: 'นักเรียนทุกระดับชั้นเข้าเรียนวันแรก'
+      },
+      {
+        id: 'sample_evt_2',
+        title: 'สอบกลางภาคเรียนที่ 1',
+        departmentId: 'dept_acad',
+        startDate: '2025-07-21',
+        endDate: '2025-07-25',
+        academicYear: '2568',
+        semester: '1',
+        location: 'ห้องสอบประจำชั้น',
+        description: 'การประเมินผลกลางภาคเรียน'
+      },
+      {
+        id: 'sample_evt_3',
+        title: 'กิจกรรมปฐมนิเทศนักเรียนใหม่ & ประชุมผู้ปกครอง',
+        departmentId: 'dept_student',
+        startDate: '2025-05-10',
+        endDate: '2025-05-10',
+        academicYear: '2568',
+        semester: '1',
+        location: 'หอประชุมใหญ่',
+        description: 'สร้างความเข้าใจแนวทางการจัดการศึกษา'
+      },
+      {
+        id: 'sample_evt_4',
+        title: 'การจัดทำแผนปฏิบัติการประจำปีการศึกษา 2568',
+        departmentId: 'dept_admin',
+        startDate: '2025-04-25',
+        endDate: '2025-04-28',
+        academicYear: '2568',
+        semester: 'ปิดภาคเรียน',
+        location: 'ห้องประชุมวิทยบริการ',
+        description: 'ทบทวนและจัดทำแผนยุทธศาสตร์สถานศึกษา'
+      }
+    ];
+
+    // ==========================================
+    // 4. STORAGE & INITIALIZATION
+    // ==========================================
+    function initData() {
+      // ตรวจสอบว่ารันอยู่บน Google Apps Script หรือ Local Test
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        // ดึงจาก Google Apps Script Backend
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response && response.departments) {
+              state.departments = response.departments;
+              state.events = response.events;
+              renderUI();
+            }
+          })
+          .withFailureHandler(function(err) {
+            console.error('GAS Error, fallback to Local:', err);
+            loadLocalData();
+          })
+          .getInitialData();
+      } else {
+        // ทำงานใน LocalStorage (เปิดดูในเบราว์เซอร์ได้ทันที)
+        loadLocalData();
+      }
+    }
+
+    function loadLocalData() {
+      const storedDepts = localStorage.getItem('school_cal_departments');
+      const storedEvts = localStorage.getItem('school_cal_events');
+
+      state.departments = storedDepts ? JSON.parse(storedDepts) : DEFAULT_DEPARTMENTS;
+      state.events = storedEvts ? JSON.parse(storedEvts) : DEFAULT_HOLIDAYS_AND_EVENTS;
+      renderUI();
+    }
+
+    function saveStateLocal() {
+      localStorage.setItem('school_cal_departments', JSON.stringify(state.departments));
+      localStorage.setItem('school_cal_events', JSON.stringify(state.events));
+    }
+
+    // ==========================================
+    // 5. RENDERING FUNCTIONS
+    // ==========================================
+    function renderUI() {
+      renderHeaderDates();
+      renderDeptFilters();
+      renderLegend();
+      populateDeptSelects();
+      if (state.viewMode === 'month') {
+        renderMonthGrid();
+      } else if (state.viewMode === 'list') {
+        renderListView();
+      } else if (state.viewMode === 'dashboard') {
+        renderAdminDashboard();
+      }
+      lucide.createIcons();
+    }
+
+    function renderHeaderDates() {
+      const year = state.currentDate.getFullYear();
+      const month = state.currentDate.getMonth();
+      const beYear = year + 543;
+      
+      document.getElementById('currentMonthYearBE').innerText = `${THAI_MONTHS[month]} พ.ศ. ${beYear} (ค.ศ. ${year})`;
+      
+      // คำนวณช่วงเดือนฮิจเราะห์ในเดือนนี้ (วันแรก และ วันสิ้นเดือน)
+      const firstDayDate = new Date(year, month, 1);
+      const lastDayDate = new Date(year, month + 1, 0);
+      const hFirst = getHijriDate(firstDayDate);
+      const hLast = getHijriDate(lastDayDate);
+
+      let hijriText = '';
+      if (hFirst.month === hLast.month) {
+        hijriText = `${hFirst.monthName} ฮ.ศ. ${hFirst.year}`;
+      } else {
+        hijriText = `${hFirst.monthName} - ${hLast.monthName} ฮ.ศ. ${hFirst.year === hLast.year ? hFirst.year : `${hFirst.year}/${hLast.year}`}`;
+      }
+      document.getElementById('currentHijriMonthRange').innerHTML = `<i data-lucide="moon" class="w-3.5 h-3.5"></i> ตรงกับ ${hijriText}`;
+      
+      // อัปเดตปีการศึกษา Badge
+      document.getElementById('currentSemesterBadge').innerText = `ปีการศึกษา ${state.selectedYear}`;
+    }
+
+    function renderDeptFilters() {
+      const container = document.getElementById('deptFilterContainer');
+      container.innerHTML = '';
+
+      // All button
+      const allActive = state.selectedDept === 'all';
+      const allBtn = document.createElement('button');
+      allBtn.className = `px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+        allActive ? 'bg-slate-800 text-white shadow-sm' : 'bg-slate-200/80 text-slate-700 hover:bg-slate-300'
+      }`;
+      allBtn.innerText = 'ทุกฝ่ายทั้งหมด';
+      allBtn.onclick = () => { state.selectedDept = 'all'; renderUI(); };
+      container.appendChild(allBtn);
+
+      // Each Department
+      state.departments.forEach(dept => {
+        const isActive = state.selectedDept === dept.id;
+        const btn = document.createElement('button');
+        btn.className = `px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 border ${
+          isActive ? 'ring-2 ring-offset-1 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50'
+        }`;
+        btn.style.borderColor = dept.color;
+        if (isActive) {
+          btn.style.backgroundColor = dept.color;
+          btn.style.ringColor = dept.color;
+        }
+
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full inline-block" style="background-color: ${dept.color}"></span>${dept.name}`;
+        btn.onclick = () => { state.selectedDept = dept.id; renderUI(); };
+        container.appendChild(btn);
+      });
+    }
+
+    function renderLegend() {
+      const container = document.getElementById('legendContainer');
+      container.innerHTML = '';
+      state.departments.forEach(dept => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center gap-1.5';
+        item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${dept.color}"></span><span>${dept.name}</span>`;
+        container.appendChild(item);
+      });
+    }
+
+    function populateDeptSelects() {
+      const select = document.getElementById('eventFieldDept');
+      select.innerHTML = '';
+      state.departments.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.innerText = d.name;
+        select.appendChild(opt);
+      });
+    }
+
+    // ==========================================
+    // 6. CALENDAR GRID (MONTH VIEW)
+    // ==========================================
+    function renderMonthGrid() {
+      const grid = document.getElementById('calendarDaysGrid');
+      grid.innerHTML = '';
+
+      const year = state.currentDate.getFullYear();
+      const month = state.currentDate.getMonth();
+
+      const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Sunday
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const prevMonthDays = new Date(year, month, 0).getDate();
+
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+      // Filter events by selected Department & Academic Year
+      const filteredEvents = state.events.filter(e => {
+        const matchDept = state.selectedDept === 'all' || e.departmentId === state.selectedDept;
+        const matchYear = state.selectedYear === 'all' || !e.academicYear || e.academicYear === state.selectedYear;
+        return matchDept && matchYear;
+      });
+
+      // Total slots = 42 (6 weeks) or 35
+      const totalSlots = (firstDayIndex + totalDays > 35) ? 42 : 35;
+
+      for (let i = 0; i < totalSlots; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'min-h-[105px] sm:min-h-[120px] p-1.5 sm:p-2 bg-white flex flex-col justify-between transition hover:bg-slate-50/80 relative';
+
+        let cellDate;
+        let isOtherMonth = false;
+
+        if (i < firstDayIndex) {
+          // วันของเดือนก่อนหน้า
+          const dayNum = prevMonthDays - firstDayIndex + i + 1;
+          cellDate = new Date(year, month - 1, dayNum);
+          isOtherMonth = true;
+          cell.classList.add('bg-slate-50/50', 'text-slate-400');
+        } else if (i >= firstDayIndex + totalDays) {
+          // วันของเดือนถัดไป
+          const dayNum = i - (firstDayIndex + totalDays) + 1;
+          cellDate = new Date(year, month + 1, dayNum);
+          isOtherMonth = true;
+          cell.classList.add('bg-slate-50/50', 'text-slate-400');
+        } else {
+          // วันในเดือนปัจจุบัน
+          const dayNum = i - firstDayIndex + 1;
+          cellDate = new Date(year, month, dayNum);
+        }
+
+        const dateStr = formatDateYMD(cellDate);
+        const hijriInfo = getHijriDate(cellDate);
+
+        const isToday = isCurrentMonth && !isOtherMonth && today.getDate() === cellDate.getDate();
+        const isFriday = cellDate.getDay() === 5;
+        const isSunday = cellDate.getDay() === 0;
+
+        // Date Header inside Cell (CE day + Hijri day)
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'flex items-center justify-between mb-1';
+
+        // Hijri badge
+        const hijriBadge = document.createElement('span');
+        hijriBadge.className = `badge-hijri font-medium px-1 py-0.5 rounded ${
+          isOtherMonth ? 'text-slate-400' : 'text-emerald-700 bg-emerald-50'
+        }`;
+        hijriBadge.title = hijriInfo.formatted;
+        hijriBadge.innerText = `${hijriInfo.day} ${hijriInfo.monthName.slice(0, 5)}..`;
+
+        // Solar Day Number
+        const dayNumSpan = document.createElement('span');
+        dayNumSpan.className = `text-xs sm:text-sm font-semibold w-6 h-6 flex items-center justify-center rounded-full ${
+          isToday ? 'bg-emerald-600 text-white shadow-sm' :
+          isSunday ? 'text-rose-600' :
+          isFriday ? 'text-emerald-800' : 'text-slate-700'
+        }`;
+        dayNumSpan.innerText = cellDate.getDate();
+
+        headerDiv.appendChild(dayNumSpan);
+        headerDiv.appendChild(hijriBadge);
+        cell.appendChild(headerDiv);
+
+        // Events list container in this day
+        const eventsContainer = document.createElement('div');
+        eventsContainer.className = 'space-y-1 overflow-y-auto max-h-[80px] no-scrollbar flex-1';
+
+        // ค้นหากิจกรรมที่ตรงกับวันปัจจุบัน (นับรวมช่วง startDate ถึง endDate)
+        const dayEvents = filteredEvents.filter(evt => {
+          const s = evt.startDate;
+          const e = evt.endDate || evt.startDate;
+          return dateStr >= s && dateStr <= e;
+        });
+
+        dayEvents.forEach(evt => {
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
+          const evtBadge = document.createElement('div');
+          evtBadge.className = 'text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-medium text-white truncate cursor-pointer shadow-xs hover:opacity-90 transition';
+          evtBadge.style.backgroundColor = dept.color;
+          evtBadge.innerText = evt.title;
+          evtBadge.onclick = (e) => {
+            e.stopPropagation();
+            openViewEventModal(evt, cellDate, hijriInfo);
+          };
+          eventsContainer.appendChild(evtBadge);
+        });
+
+        cell.appendChild(eventsContainer);
+
+        // Click empty space in cell to add event for this date
+        cell.onclick = () => {
+          openAddEventModal(dateStr);
+        };
+
+        grid.appendChild(cell);
+      }
+    }
+
+    // ==========================================
+    // 7. LIST / AGENDA VIEW
+    // ==========================================
+    function renderListView() {
+      const container = document.getElementById('eventListContainer');
+      const summaryText = document.getElementById('listSummaryText');
+      container.innerHTML = '';
+
+      // กรองและเรียงลำดับตามวันที่
+      const filteredEvents = state.events.filter(e => {
+        const matchDept = state.selectedDept === 'all' || e.departmentId === state.selectedDept;
+        const matchYear = state.selectedYear === 'all' || !e.academicYear || e.academicYear === state.selectedYear;
+        return matchDept && matchYear;
+      }).sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+
+      summaryText.innerText = `แสดง ${filteredEvents.length} รายการ`;
+
+      if (filteredEvents.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400">
+            <i data-lucide="calendar-x" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+            <p>ไม่พบกิจกรรมตามเงื่อนไขที่เลือก</p>
+          </div>
+        `;
+        return;
+      }
+
+      filteredEvents.forEach(evt => {
+        const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
+        const sDate = parseDateYMD(evt.startDate);
+        const sHijri = getHijriDate(sDate);
+
+        const item = document.createElement('div');
+        item.className = 'p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer';
+        item.style.borderLeftWidth = '4px';
+        item.style.borderLeftColor = dept.color;
+
+        const dateLabel = formatThaiDateFull(sDate);
+
+        item.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2 py-0.5 rounded-md text-white font-medium" style="background-color: ${dept.color}">
+                ${dept.name}
+              </span>
+              <span class="text-xs text-slate-500">ปีการศึกษา ${evt.academicYear || '-'} (เทอม ${evt.semester || '-'})</span>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm sm:text-base">${evt.title}</h4>
+            <div class="flex items-center gap-3 text-xs text-slate-500">
+              <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${dateLabel}</span>
+              <span class="text-emerald-700 font-medium flex items-center gap-1"><i data-lucide="moon" class="w-3.5 h-3.5"></i> ${sHijri.formatted}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-center">
+            <button class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+
+        item.onclick = () => {
+          openViewEventModal(evt, sDate, sHijri);
+        };
+
+        container.appendChild(item);
+      });
+    }
+
+    // ==========================================
+    // 8. MODAL HANDLERS (EVENT ADD/EDIT/VIEW)
+    // ==========================================
+    function openAddEventModal(defaultStartDate) {
+      document.getElementById('modalEventTitle').innerText = 'ลงกิจกรรมใหม่';
+      document.getElementById('formEvent').reset();
+      document.getElementById('eventFieldId').value = '';
+      document.getElementById('btnDeleteEvent').classList.add('hidden');
+      document.getElementById('eventFieldYear').value = state.selectedYear === 'all' ? '2568' : state.selectedYear;
+
+      if (defaultStartDate) {
+        document.getElementById('eventFieldStartDate').value = defaultStartDate;
+        document.getElementById('eventFieldEndDate').value = defaultStartDate;
+      } else {
+        const todayStr = formatDateYMD(new Date());
+        document.getElementById('eventFieldStartDate').value = todayStr;
+        document.getElementById('eventFieldEndDate').value = todayStr;
+      }
+
+      openModal('modalEvent');
+    }
+
+    function openEditEventModal(evt) {
+      document.getElementById('modalEventTitle').innerText = 'แก้ไขกิจกรรม';
+      document.getElementById('eventFieldId').value = evt.id;
+      document.getElementById('eventFieldTitle').value = evt.title;
+      document.getElementById('eventFieldDept').value = evt.departmentId;
+      document.getElementById('eventFieldYear').value = evt.academicYear || '2568';
+      document.getElementById('eventFieldSemester').value = evt.semester || '1';
+      document.getElementById('eventFieldStartDate').value = evt.startDate;
+      document.getElementById('eventFieldEndDate').value = evt.endDate || evt.startDate;
+      document.getElementById('eventFieldLocation').value = evt.location || '';
+      document.getElementById('eventFieldDescription').value = evt.description || '';
+
+      // ลบได้เมื่อเป็นแอดมิน หรือไม่ใช่ระบบวันหยุดล็อก
+      const btnDel = document.getElementById('btnDeleteEvent');
+      if (state.isAdmin || evt.id.startsWith('evt_') || evt.id.startsWith('sample_')) {
+        btnDel.classList.remove('hidden');
+      } else {
+        btnDel.classList.add('hidden');
+      }
+
+      closeModal('modalEventView');
+      openModal('modalEvent');
+    }
+
+    function openViewEventModal(evt, dateObj, hijriInfo) {
+      const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
+      
+      const header = document.getElementById('viewEventHeader');
+      header.style.backgroundColor = dept.color;
+      document.getElementById('viewEventDeptBadge').innerText = dept.name;
+      document.getElementById('viewEventTitle').innerText = evt.title;
+      
+      const s = parseDateYMD(evt.startDate);
+      const e = evt.endDate ? parseDateYMD(evt.endDate) : s;
+      let dateString = formatThaiDateFull(s);
+      if (evt.startDate !== evt.endDate && evt.endDate) {
+        dateString += ` ถึง ${formatThaiDateFull(e)}`;
+      }
+      document.getElementById('viewEventDate').innerText = dateString;
+      document.getElementById('viewEventHijriDate').innerText = `ตรงกับ: ${hijriInfo.formatted}`;
+      document.getElementById('viewEventTerm').innerText = `${evt.academicYear || '-'} (เทอม ${evt.semester || '-'})`;
+      
+      const locRow = document.getElementById('viewLocationRow');
+      if (evt.location) {
+        locRow.classList.remove('hidden');
+        document.getElementById('viewEventLocation').innerText = evt.location;
+      } else {
+        locRow.classList.add('hidden');
+      }
+
+      document.getElementById('viewEventDesc').innerText = evt.description || 'ไม่มีรายละเอียดเพิ่มเติม';
+
+      // ปุ่มแก้ไข (เปิด Modal แก้ไข)
+      const btnEdit = document.getElementById('btnEditFromView');
+      btnEdit.onclick = () => openEditEventModal(evt);
+
+      openModal('modalEventView');
+    }
+
+    // ==========================================
+    // 9. FORM SUBMIT & ACTIONS
+    // ==========================================
+    document.getElementById('formEvent').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const eventData = {
+        id: document.getElementById('eventFieldId').value || ('evt_' + Date.now()),
+        title: document.getElementById('eventFieldTitle').value.trim(),
+        departmentId: document.getElementById('eventFieldDept').value,
+        academicYear: document.getElementById('eventFieldYear').value.trim(),
+        semester: document.getElementById('eventFieldSemester').value,
+        startDate: document.getElementById('eventFieldStartDate').value,
+        endDate: document.getElementById('eventFieldEndDate').value || document.getElementById('eventFieldStartDate').value,
+        location: document.getElementById('eventFieldLocation').value.trim(),
+        description: document.getElementById('eventFieldDescription').value.trim()
+      };
+
+      // บันทึกลง LocalState
+      const index = state.events.findIndex(x => x.id === eventData.id);
+      if (index > -1) {
+        state.events[index] = eventData;
+      } else {
+        state.events.push(eventData);
+      }
+      saveStateLocal();
+
+      // บันทึกลง Google Sheets หากเชื่อมต่อ
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(() => showToast('บันทึกลง Google Sheets แล้ว'))
+          .saveEvent(eventData);
+      }
+
+      closeModal('modalEvent');
+      renderUI();
+      showToast('บันทึกกิจกรรมเรียบร้อยแล้ว');
+    });
+
+    document.getElementById('btnDeleteEvent').onclick = function() {
+      const id = document.getElementById('eventFieldId').value;
+      if (!id) return;
+      if (confirm('คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?')) {
+        state.events = state.events.filter(x => x.id !== id);
+        saveStateLocal();
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.deleteEvent(id, state.adminPin);
+        }
+
+        closeModal('modalEvent');
+        renderUI();
+        showToast('ลบกิจกรรมเรียบร้อยแล้ว');
+      }
+    };
+
+    // ==========================================
+    // 10. DEPARTMENT MANAGEMENT (เพิ่ม/ลด/เปลี่ยนสี)
+    // ==========================================
+    function renderDeptManagementList() {
+      const container = document.getElementById('deptManagementList');
+      container.innerHTML = '';
+
+      state.departments.forEach((dept, index) => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs';
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2">
+            <input type="color" value="${dept.color}" class="w-6 h-6 rounded cursor-pointer border border-slate-300" data-dept-id="${dept.id}">
+            <span class="font-medium text-slate-800">${dept.name}</span>
+          </div>
+          <div>
+            ${dept.id === 'dept_holiday' ? '<span class="text-slate-400 text-[10px]">(วันหยุดระบบ)</span>' : `
+              <button class="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded" data-del-dept="${dept.id}">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            `}
+          </div>
+        `;
+
+        // Color change
+        const colorInput = item.querySelector(`input[data-dept-id="${dept.id}"]`);
+        colorInput.addEventListener('change', (e) => {
+          dept.color = e.target.value;
+          saveStateLocal();
+          renderUI();
+          showToast(`เปลี่ยนสีฝ่าย ${dept.name} แล้ว`);
+        });
+
+        // Delete button
+        const delBtn = item.querySelector(`button[data-del-dept="${dept.id}"]`);
+        if (delBtn) {
+          delBtn.addEventListener('click', () => {
+            if (confirm(`ต้องการลบ "${dept.name}" ใช่หรือไม่?`)) {
+              state.departments = state.departments.filter(d => d.id !== dept.id);
+              saveStateLocal();
+              renderDeptManagementList();
+              renderUI();
+              showToast(`ลบฝ่ายเรียบร้อยแล้ว`);
+            }
+          });
+        }
+
+        container.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('btnAddDeptSubmit').onclick = function() {
+      const nameInput = document.getElementById('newDeptName');
+      const colorInput = document.getElementById('newDeptColor');
+      const name = nameInput.value.trim();
+      const color = colorInput.value;
+
+      if (!name) {
+        alert('กรุณากรอกชื่อฝ่าย');
+        return;
+      }
+
+      const newDept = {
+        id: 'dept_' + Date.now(),
+        name: name,
+        color: color
+      };
+
+      state.departments.push(newDept);
+      saveStateLocal();
+      nameInput.value = '';
+      renderDeptManagementList();
+      renderUI();
+      showToast(`เพิ่ม "${name}" เรียบร้อย`);
+    };
+
+    // ==========================================
+    // 11. ADMIN AUTHENTICATION
+    // ==========================================
+    document.getElementById('btnAdminToggle').onclick = function() {
+      if (state.isAdmin) {
+        state.isAdmin = false;
+        document.getElementById('adminStatusText').innerText = 'โหมดแอดมิน';
+        document.getElementById('btnAdminToggle').classList.remove('bg-rose-700');
+        showToast('ออกจากโหมดแอดมินแล้ว');
+      } else {
+        openModal('modalAdminAuth');
+        document.getElementById('inputAdminPin').value = '';
+        document.getElementById('inputAdminPin').focus();
+      }
+    };
+
+    document.getElementById('btnConfirmAdminAuth').onclick = function() {
+      const pin = document.getElementById('inputAdminPin').value;
+      if (pin === '1234' || pin === state.adminPin) {
+        state.isAdmin = true;
+        closeModal('modalAdminAuth');
+        document.getElementById('adminStatusText').innerText = 'แอดมิน (เข้าสู่ระบบแล้ว)';
+        document.getElementById('btnAdminToggle').classList.add('bg-rose-700');
+        showToast('เข้าสู่ระบบแอดมินสำเร็จ');
+        activateDashboardView();
+      } else {
+        alert('รหัส PIN ไม่ถูกต้อง (ค่าเริ่มต้นคือ 1234)');
+      }
+    };
+
+    document.getElementById('btnCancelAdminAuth').onclick = () => closeModal('modalAdminAuth');
+
+    // ==========================================
+    // 12. UTILITIES & MODAL HELPERS
+    // ==========================================
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    function formatDateYMD(d) {
+      const y = d.getFullYear();
+      const m = ('0' + (d.getMonth() + 1)).slice(-2);
+      const day = ('0' + d.getDate()).slice(-2);
+      return `${y}-${m}-${day}`;
+    }
+
+    function parseDateYMD(str) {
+      const parts = str.split('-');
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+
+    function formatThaiDateFull(d) {
+      const day = d.getDate();
+      const m = THAI_MONTHS[d.getMonth()];
+      const y = d.getFullYear() + 543;
+      return `${day} ${m} ${y}`;
+    }
+
+    // ==========================================
+    // 13. UI EVENT LISTENERS
+    // ==========================================
+    document.getElementById('btnPrevMonth').onclick = () => {
+      state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+      renderUI();
+    };
+
+    document.getElementById('btnNextMonth').onclick = () => {
+      state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+      renderUI();
+    };
+
+    document.getElementById('btnToday').onclick = () => {
+      state.currentDate = new Date();
+      renderUI();
+    };
+
+    document.getElementById('selectAcademicYear').onchange = (e) => {
+      state.selectedYear = e.target.value;
+      renderUI();
+    };
+
+    // View Switcher
+    document.getElementById('viewBtnMonth').onclick = () => {
+      state.viewMode = 'month';
+      document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-800 shadow-sm transition';
+      document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('calendarMonthView').classList.remove('hidden');
+      document.getElementById('calendarListView').classList.add('hidden');
+      renderUI();
+    };
+
+    document.getElementById('viewBtnList').onclick = () => {
+      state.viewMode = 'list';
+      document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-800 shadow-sm transition';
+      document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('calendarMonthView').classList.add('hidden');
+      document.getElementById('calendarListView').classList.remove('hidden');
+      renderUI();
+    };
+
+    // ==========================================
+    // 8.1 ADMIN DASHBOARD LOGIC
+    // ==========================================
+    let chartDeptShareInstance = null;
+    let chartMonthlyEventsInstance = null;
+
+    function renderAdminDashboard() {
+      const yearEvents = state.events.filter(e => state.selectedYear === 'all' || !e.academicYear || e.academicYear === state.selectedYear);
+      
+      // 1. KPI Stats
+      document.getElementById('dashTotalEvents').innerText = yearEvents.length;
+      document.getElementById('dashTotalDepts').innerText = state.departments.length;
+      
+      const holidayCount = yearEvents.filter(e => e.departmentId === 'dept_holiday').length;
+      document.getElementById('dashTotalHolidays').innerText = holidayCount;
+
+      const now = new Date();
+      const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const upcomingCount = yearEvents.filter(e => {
+        const s = parseDateYMD(e.startDate);
+        return s >= now && s <= in30Days;
+      }).length;
+      document.getElementById('dashUpcomingEvents').innerText = upcomingCount;
+
+      // 2. Chart 1: สัดส่วนแยกตามฝ่าย
+      const deptLabels = [];
+      const deptCounts = [];
+      const deptColors = [];
+
+      state.departments.forEach(dept => {
+        const count = yearEvents.filter(e => e.departmentId === dept.id).length;
+        if (count > 0 || dept.id === 'dept_holiday') {
+          deptLabels.push(dept.name);
+          deptCounts.push(count);
+          deptColors.push(dept.color);
+        }
+      });
+
+      const ctxDept = document.getElementById('chartDeptShare').getContext('2d');
+      if (chartDeptShareInstance) chartDeptShareInstance.destroy();
+      chartDeptShareInstance = new Chart(ctxDept, {
+        type: 'doughnut',
+        data: {
+          labels: deptLabels,
+          datasets: [{
+            data: deptCounts,
+            backgroundColor: deptColors,
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11, family: 'Prompt' } } }
+          }
+        }
+      });
+
+      // 3. Chart 2: กิจกรรมแยกตามเดือน
+      const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+      const monthlyCounts = new Array(12).fill(0);
+      yearEvents.forEach(e => {
+        const d = parseDateYMD(e.startDate);
+        if (!isNaN(d.getMonth())) {
+          monthlyCounts[d.getMonth()]++;
+        }
+      });
+
+      const ctxMonth = document.getElementById('chartMonthlyEvents').getContext('2d');
+      if (chartMonthlyEventsInstance) chartMonthlyEventsInstance.destroy();
+      chartMonthlyEventsInstance = new Chart(ctxMonth, {
+        type: 'bar',
+        data: {
+          labels: monthNames,
+          datasets: [{
+            label: 'จำนวนกิจกรรม',
+            data: monthlyCounts,
+            backgroundColor: '#0284c7',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+
+      // 4. Dash Events Table Body
+      const tbody = document.getElementById('dashEventsTableBody');
+      tbody.innerHTML = '';
+      const sortedEvents = [...yearEvents].sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+      
+      sortedEvents.forEach(evt => {
+        const dept = state.departments.find(d => d.id === evt.departmentId) || { name: 'ทั่วไป', color: '#64748b' };
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="p-2.5 font-medium text-slate-700">${evt.startDate}</td>
+          <td class="p-2.5 font-bold text-slate-800">${evt.title}</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-white text-[10px] font-medium" style="background-color: ${dept.color}">${dept.name}</span></td>
+          <td class="p-2.5 text-slate-500">${evt.semester || '-'}</td>
+          <td class="p-2.5 text-slate-500">${evt.location || '-'}</td>
+          <td class="p-2.5 text-right space-x-1">
+            <button class="p-1 hover:bg-slate-200 text-slate-600 rounded" title="แก้ไข" data-dash-edit="${evt.id}">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button class="p-1 hover:bg-rose-100 text-rose-600 rounded" title="ลบ" data-dash-del="${evt.id}">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+
+        tr.querySelector(`[data-dash-edit="${evt.id}"]`).onclick = () => openEditEventModal(evt);
+        tr.querySelector(`[data-dash-del="${evt.id}"]`).onclick = () => {
+          if (confirm(`ลบกิจกรรม "${evt.title}" ใช่หรือไม่?`)) {
+            state.events = state.events.filter(x => x.id !== evt.id);
+            saveStateLocal();
+            renderAdminDashboard();
+            showToast('ลบกิจกรรมสำเร็จ');
+          }
+        };
+
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 8.2 EXPORT HANDLERS (PDF / EXCEL / WORD)
+    // ==========================================
+    function getExportData() {
+      return state.events
+        .filter(e => state.selectedYear === 'all' || !e.academicYear || e.academicYear === state.selectedYear)
+        .sort((a, b) => (a.startDate > b.startDate ? 1 : -1))
+        .map((evt, idx) => {
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { name: 'ทั่วไป' };
+          const sDate = parseDateYMD(evt.startDate);
+          const sHijri = getHijriDate(sDate);
+          return {
+            ลำดับ: idx + 1,
+            วันที่เริ่มต้น: evt.startDate,
+            วันที่สิ้นสุด: evt.endDate || evt.startDate,
+            วันที่ไทย: formatThaiDateFull(sDate),
+            วันที่ฮิจเราะห์: sHijri.formatted,
+            ชื่องานกิจกรรม: evt.title,
+            ฝ่ายที่รับผิดชอบ: dept.name,
+            ปีการศึกษา: evt.academicYear || '-',
+            ภาคเรียน: evt.semester || '-',
+            สถานที่: evt.location || '-',
+            รายละเอียด: evt.description || '-'
+          };
+        });
+    }
+
+    // 1. Export Excel (.xlsx)
+    function exportToExcel() {
+      const data = getExportData();
+      if (data.length === 0) {
+        alert('ไม่มีข้อมูลกิจกรรมที่จะส่งออก');
+        return;
+      }
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'ปฏิทินกิจกรรม');
+      XLSX.writeFile(wb, `ปฏิทินกิจกรรม_ปีการศึกษา_${state.selectedYear}.xlsx`);
+      showToast('ส่งออกไฟล์ Excel สำเร็จ');
+    }
+
+    // 2. Export Word (.doc HTML table format)
+    function exportToWord() {
+      const data = getExportData();
+      if (data.length === 0) {
+        alert('ไม่มีข้อมูลกิจกรรมที่จะส่งออก');
+        return;
+      }
+
+      let tableHtml = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset='utf-8'>
+          <title>ปฏิทินกิจกรรมประจำปีการศึกษา</title>
+          <style>
+            body { font-family: 'TH Sarabun New', 'Angsana New', sans-serif; }
+            h2, h3 { text-align: center; margin-bottom: 4px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #333; padding: 6px 8px; font-size: 13pt; }
+            th { background-color: #f2f2f2; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <h2>ปฏิทินกิจกรรมประจำปีการศึกษา ${state.selectedYear}</h2>
+          <h3>(คู่ขนานศักราชไทย พ.ศ. และฮิจเราะห์ศักราช ฮ.ศ.)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ลำดับ</th>
+                <th>วันที่ (พ.ศ.)</th>
+                <th>วันที่ (ฮ.ศ.)</th>
+                <th>ชื่องาน / กิจกรรม</th>
+                <th>ฝ่าย</th>
+                <th>เทอม</th>
+                <th>สถานที่</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      data.forEach(item => {
+        tableHtml += `
+          <tr>
+            <td style="text-align: center;">${item.ลำดับ}</td>
+            <td>${item.วันที่ไทย}</td>
+            <td>${item.วันที่ฮิจเราะห์}</td>
+            <td><strong>${item.ชื่องานกิจกรรม}</strong></td>
+            <td>${item.ฝ่ายที่รับผิดชอบ}</td>
+            <td style="text-align: center;">${item.ภาคเรียน}</td>
+            <td>${item.สถานที่}</td>
+          </tr>
+        `;
+      });
+
+      tableHtml += `
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff', tableHtml], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ปฏิทินกิจกรรม_ปีการศึกษา_${state.selectedYear}.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('ส่งออกไฟล์ Word สำเร็จ');
+    }
+
+    // 3. Export PDF (.pdf)
+    function exportToPDF() {
+      const data = getExportData();
+      if (data.length === 0) {
+        alert('ไม่มีข้อมูลกิจกรรมที่จะส่งออก');
+        return;
+      }
+
+      // สร้างหน้ากระดาษจำลองชั่วคราวสำหรับแปลงเป็น PDF
+      const container = document.createElement('div');
+      container.style.padding = '20px';
+      container.style.fontFamily = 'Prompt, Sarabun, sans-serif';
+      container.style.color = '#1e293b';
+
+      let html = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="font-size: 18px; font-weight: bold; margin: 0; color: #047857;">ปฏิทินกิจกรรมประจำปีการศึกษา ${state.selectedYear}</h2>
+          <p style="font-size: 12px; color: #64748b; margin: 4px 0;">คู่ขนานพุทธศักราช (พ.ศ.) และฮิจเราะห์ศักราช (ฮ.ศ.)</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1; text-align: left;">
+              <th style="padding: 8px; border: 1px solid #e2e8f0; width: 35px; text-align: center;">ที่</th>
+              <th style="padding: 8px; border: 1px solid #e2e8f0; width: 110px;">วันที่ (พ.ศ.)</th>
+              <th style="padding: 8px; border: 1px solid #e2e8f0; width: 120px;">วันที่ (ฮ.ศ.)</th>
+              <th style="padding: 8px; border: 1px solid #e2e8f0;">กิจกรรม</th>
+              <th style="padding: 8px; border: 1px solid #e2e8f0; width: 90px;">ฝ่าย</th>
+              <th style="padding: 8px; border: 1px solid #e2e8f0; width: 90px;">สถานที่</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(item => {
+        html += `
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${item.ลำดับ}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">${item.วันที่ไทย}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; color: #065f46;">${item.วันที่ฮิจเราะห์}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: bold;">${item.ชื่องานกิจกรรม}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">${item.ฝ่ายที่รับผิดชอบ}</td>
+            <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">${item.สถานที่}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = html;
+      document.body.appendChild(container);
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `ปฏิทินกิจกรรม_ปีการศึกษา_${state.selectedYear}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().set(opt).from(container).save().then(() => {
+        document.body.removeChild(container);
+        showToast('ส่งออกไฟล์ PDF สำเร็จ');
+      });
+    }
+
+    // Dropdown toggle
+    document.getElementById('btnExportMenuToggle').onclick = (e) => {
+      e.stopPropagation();
+      document.getElementById('exportDropdown').classList.toggle('hidden');
+    };
+    document.addEventListener('click', () => {
+      const dd = document.getElementById('exportDropdown');
+      if (dd) dd.classList.add('hidden');
+    });
+
+    document.getElementById('btnExportExcel').onclick = exportToExcel;
+    document.getElementById('btnExportWord').onclick = exportToWord;
+    document.getElementById('btnExportPDF').onclick = exportToPDF;
+
+    // View Switcher: Dashboard
+    document.getElementById('viewBtnDashboard').onclick = () => {
+      if (!state.isAdmin) {
+        // ให้ยืนยัน PIN แอดมินก่อน
+        openModal('modalAdminAuth');
+        document.getElementById('inputAdminPin').value = '';
+        document.getElementById('inputAdminPin').focus();
+        return;
+      }
+      activateDashboardView();
+    };
+
+    function activateDashboardView() {
+      state.viewMode = 'dashboard';
+      document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-emerald-800 shadow-sm transition flex items-center gap-1';
+      document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('calendarMonthView').classList.add('hidden');
+      document.getElementById('calendarListView').classList.add('hidden');
+      document.getElementById('adminDashboardView').classList.remove('hidden');
+      renderAdminDashboard();
+    }
+
+    // Modal Triggers
+    document.getElementById('btnOpenAddEvent').onclick = () => openAddEventModal();
+    document.getElementById('btnCloseModalEvent').onclick = () => closeModal('modalEvent');
+    document.getElementById('btnCancelEvent').onclick = () => closeModal('modalEvent');
+
+    document.getElementById('btnManageDept').onclick = () => {
+      renderDeptManagementList();
+      openModal('modalDepartment');
+    };
+    document.getElementById('btnCloseModalDept').onclick = () => closeModal('modalDepartment');
+    document.getElementById('btnFinishDept').onclick = () => closeModal('modalDepartment');
+
+    document.getElementById('btnCloseEventView').onclick = () => closeModal('modalEventView');
+
+
+    // Launch
+    window.addEventListener('DOMContentLoaded', () => {
+      initData();
+    });
+  </script>
+</body>
+</html>

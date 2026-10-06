@@ -1,0 +1,9 @@
+{
+  "name": "academic-calendar",
+  "version": "1.0.0",
+  "description": "ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
