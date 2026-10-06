@@ -69,9 +69,9 @@
   <header class="bg-gradient-to-r from-violet-900 via-purple-800 to-indigo-900 text-white shadow-md sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-3">
-        <div class="p-2 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20 shadow-inner">
-          <i data-lucide="calendar" class="w-6 h-6 text-purple-200"></i>
-        </div>
+        <button id="btnNavHomeCalendar" class="p-2.5 bg-white/15 hover:bg-white/25 active:scale-95 rounded-xl backdrop-blur-sm border border-white/25 shadow-sm transition cursor-pointer group flex items-center justify-center" title="คลิกเพื่อกลับสู่หน้าปฏิทินเดือนปัจจุบัน">
+          <i data-lucide="calendar" class="w-6 h-6 text-purple-100 group-hover:text-white transition"></i>
+        </button>
         <div>
           <h1 class="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
             ปฏิทินกิจกรรมประจำปีการศึกษา
@@ -546,6 +546,8 @@
         <button id="btnConfirmAdminAuth" class="w-1/2 py-2 text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white rounded-xl shadow-sm transition">ยืนยัน</button>
       </div>
     </div>
+  </div>
+
   <!-- MODAL: EVENT DETAILS PREVIEW (สำหรับผู้ใช้ทั่วไปคลิกดู พร้อมปุ่มส่งออกเข้าปฏิทินส่วนตัว) -->
   <div id="modalEventView" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
@@ -649,7 +651,10 @@
         </div>
         <p class="text-xs text-slate-500">กิจกรรมที่คุณบันทึกจะระบุชื่อและหน่วยงานนี้โดยอัตโนมัติ</p>
         <div class="pt-2 flex gap-2">
-          <button type="button" id="btnLogoutUser" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
+          <button type="button" id="btnSwitchProfileInCard" class="w-1/2 py-2 bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-semibold rounded-xl border border-purple-200 transition">
+            สลับ / แก้ไขโปรไฟล์
+          </button>
+          <button type="button" id="btnLogoutUser" class="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
             ออกจากระบบ
           </button>
         </div>
@@ -788,7 +793,132 @@
     ];
 
     const DEFAULT_HOLIDAYS_AND_EVENTS = [
-      // เทศกาลและวันสำคัญทางศาสนาอิสลาม (ฮ.ศ.)
+      // ==========================================
+      // วันสำคัญและเทศกาลทางศาสนาอิสลาม (ฮ.ศ.) 1445, 1446, 1447, 1448
+      // ==========================================
+      // ปี 2567 (ฮ.ศ. 1445 - 1446)
+      {
+        id: 'h_isra_miraj_1445',
+        title: 'วันอิสรออ์และมิอ์รอจญ์ (27 เราะญับ ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-02-08',
+        endDate: '2024-02-08',
+        academicYear: '2566',
+        semester: '2',
+        description: 'การเดินทางยามค่ำคืนและการเสด็จสู่ฟากฟ้าของท่านศาสดามุฮัมมัด (ซ.ล.)'
+      },
+      {
+        id: 'h_nisfu_shaban_1445',
+        title: 'ค่ำคืนนิศฟูชะอ์บาน (15 ชะอ์บาน ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-02-25',
+        endDate: '2024-02-25',
+        academicYear: '2566',
+        semester: '2',
+        description: 'ค่ำคืนกึ่งกลางเดือนชะอ์บาน'
+      },
+      {
+        id: 'h_ramadan_start_2567',
+        title: 'เริ่มต้นถือศีลอดเดือนรอมฎอน (1 รอมฎอน ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-03-12',
+        endDate: '2024-03-12',
+        academicYear: '2566',
+        semester: '2',
+        description: 'เข้าสู่เดือนรอมฎอนอันประเสริฐ'
+      },
+      {
+        id: 'h_nuzul_quran_1445',
+        title: 'วันนูซุลอัลกุรอาน (17 รอมฎอน ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-03-28',
+        endDate: '2024-03-28',
+        academicYear: '2566',
+        semester: '2',
+        description: 'วันรำลึกการประทานคัมภีร์อัลกุรอานครั้งแรก'
+      },
+      {
+        id: 'h_eid_fitr_2567',
+        title: 'วันตรุษอีดิ้ลฟิฏริ (ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-04-10',
+        endDate: '2024-04-11',
+        academicYear: '2566',
+        semester: 'ปิดภาคเรียน',
+        description: 'วันเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน (1 เชาวาล ฮ.ศ. 1445)'
+      },
+      {
+        id: 'h_day_of_arafah_1445',
+        title: 'วันอะเราะฟะฮ์ (9 ซุลฮิจญะฮ์ ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-06-16',
+        endDate: '2024-06-16',
+        academicYear: '2567',
+        semester: '1',
+        description: 'วันวุกูฟที่ทุ่งอะเราะฟะฮ์ แนะนำให้ถือศีลอด'
+      },
+      {
+        id: 'h_eid_adha_2567',
+        title: 'วันตรุษอีดิ้ลอัฎฮา (ฮ.ศ. 1445)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-06-17',
+        endDate: '2024-06-19',
+        academicYear: '2567',
+        semester: '1',
+        description: 'วันเฉลิมฉลองการเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ ฮ.ศ. 1445)'
+      },
+      {
+        id: 'h_hijri_newyear_1446',
+        title: 'วันขึ้นปีใหม่ฮิจเราะห์ศักราช 1446 (1 มุฮัรรอม)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-07-07',
+        endDate: '2024-07-07',
+        academicYear: '2567',
+        semester: '1',
+        description: 'เริ่มต้นปีฮิจเราะห์ศักราชใหม่ 1446'
+      },
+      {
+        id: 'h_ashura_1446',
+        title: 'วันอาชูรออ์ (10 มุฮัรรอม ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-07-16',
+        endDate: '2024-07-16',
+        academicYear: '2567',
+        semester: '1',
+        description: 'วันถือศีลอดอาชูรออ์'
+      },
+      {
+        id: 'h_mawlid_1446',
+        title: 'วันเมาลิดนบี (12 รอบีอุลเอาวัล ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2024-09-16',
+        endDate: '2024-09-16',
+        academicYear: '2567',
+        semester: '1',
+        description: 'วันคล้ายวันประสูติท่านศาสดามุฮัมมัด (ซ.ล.)'
+      },
+
+      // ปี 2568 (ฮ.ศ. 1446 - 1447)
+      {
+        id: 'h_isra_miraj_1446',
+        title: 'วันอิสรออ์และมิอ์รอจญ์ (27 เราะญับ ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-01-27',
+        endDate: '2025-01-27',
+        academicYear: '2567',
+        semester: '2',
+        description: 'การเดินทางยามค่ำคืนและการเสด็จสู่ฟากฟ้าของท่านนบี (ซ.ล.)'
+      },
+      {
+        id: 'h_nisfu_shaban_1446',
+        title: 'ค่ำคืนนิศฟูชะอ์บาน (15 ชะอ์บาน ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-02-14',
+        endDate: '2025-02-14',
+        academicYear: '2567',
+        semester: '2',
+        description: 'ค่ำคืนกึ่งกลางเดือนชะอ์บาน'
+      },
       {
         id: 'h_ramadan_start_2568',
         title: 'เริ่มต้นถือศีลอดเดือนรอมฎอน (1 รอมฎอน ฮ.ศ. 1446)',
@@ -800,6 +930,16 @@
         description: 'เข้าสู่เดือนรอมฎอนอันประเสริฐ'
       },
       {
+        id: 'h_nuzul_quran_1446',
+        title: 'วันนูซุลอัลกุรอาน (17 รอมฎอน ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-03-17',
+        endDate: '2025-03-17',
+        academicYear: '2567',
+        semester: '2',
+        description: 'วันรำลึกการประทานคัมภีร์อัลกุรอาน'
+      },
+      {
         id: 'h_eid_fitr_2568',
         title: 'วันตรุษอีดิ้ลฟิฏริ (ฮ.ศ. 1446)',
         departmentId: 'dept_holiday',
@@ -808,6 +948,16 @@
         academicYear: '2567',
         semester: '2',
         description: 'วันเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน (1 เชาวาล ฮ.ศ. 1446)'
+      },
+      {
+        id: 'h_day_of_arafah_1446',
+        title: 'วันอะเราะฟะฮ์ (9 ซุลฮิจญะฮ์ ฮ.ศ. 1446)',
+        departmentId: 'dept_holiday',
+        startDate: '2025-06-05',
+        endDate: '2025-06-05',
+        academicYear: '2568',
+        semester: '1',
+        description: 'วันวุกูฟที่ทุ่งอะเราะฟะฮ์'
       },
       {
         id: 'h_eid_adha_2568',
@@ -821,13 +971,13 @@
       },
       {
         id: 'h_hijri_newyear_1447',
-        title: 'วันขึ้นปีใหม่ฮิจเราะห์ศักราช 1447',
+        title: 'วันขึ้นปีใหม่ฮิจเราะห์ศักราช 1447 (1 มุฮัรรอม)',
         departmentId: 'dept_holiday',
         startDate: '2025-06-26',
         endDate: '2025-06-26',
         academicYear: '2568',
         semester: '1',
-        description: '1 มุฮัรรอม ฮ.ศ. 1447'
+        description: '1 มุฮัรรอม ฮ.ศ. 1447 วันเริ่มต้นปีใหม่ตามปฏิทินอิสลาม'
       },
       {
         id: 'h_ashura_1447',
@@ -849,108 +999,150 @@
         semester: '1',
         description: 'วันคล้ายวันประสูติท่านศาสดามุฮัมมัด (ซ.ล.)'
       },
-      // วันหยุดราชการไทย (พ.ศ.)
+
+      // ปี 2569 (ฮ.ศ. 1447 - 1448)
       {
-        id: 'h_newyear_2025',
-        title: 'วันขึ้นปีใหม่',
+        id: 'h_isra_miraj_1447',
+        title: 'วันอิสรออ์และมิอ์รอจญ์ (27 เราะญับ ฮ.ศ. 1447)',
         departmentId: 'dept_holiday',
-        startDate: '2025-01-01',
-        endDate: '2025-01-01',
-        academicYear: '2567',
-        semester: '2',
-        description: 'วันหยุดราชการสากล'
-      },
-      {
-        id: 'h_songkran_2025',
-        title: 'วันสงกรานต์',
-        departmentId: 'dept_holiday',
-        startDate: '2025-04-13',
-        endDate: '2025-04-15',
-        academicYear: '2567',
-        semester: 'ปิดภาคเรียน',
-        description: 'วันหยุดราชการและประเพณีไทย'
-      },
-      {
-        id: 'h_labor_2025',
-        title: 'วันแรงงานแห่งชาติ',
-        departmentId: 'dept_holiday',
-        startDate: '2025-05-01',
-        endDate: '2025-05-01',
-        academicYear: '2568',
-        semester: '1',
-        description: 'วันหยุดราชการ'
-      },
-      {
-        id: 'h_coronation_2025',
-        title: 'วันฉัตรมงคล',
-        departmentId: 'dept_holiday',
-        startDate: '2025-05-05',
-        endDate: '2025-05-05',
-        academicYear: '2568',
-        semester: '1',
-        description: 'วันหยุดราชการ'
-      },
-      {
-        id: 'h_hm_queen_suthida_2025',
-        title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี',
-        departmentId: 'dept_holiday',
-        startDate: '2025-06-03',
-        endDate: '2025-06-03',
-        academicYear: '2568',
-        semester: '1',
-        description: 'วันหยุดราชการ'
-      },
-      {
-        id: 'h_hm_king_rama10_2025',
-        title: 'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว',
-        departmentId: 'dept_holiday',
-        startDate: '2025-07-28',
-        endDate: '2025-07-28',
-        academicYear: '2568',
-        semester: '1',
-        description: 'วันหยุดราชการ'
-      },
-      {
-        id: 'h_mother_day_2025',
-        title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระพันปีหลวง / วันแม่แห่งชาติ',
-        departmentId: 'dept_holiday',
-        startDate: '2025-08-12',
-        endDate: '2025-08-12',
-        academicYear: '2568',
-        semester: '1',
-        description: 'วันหยุดราชการ'
-      },
-      {
-        id: 'h_chulalongkorn_2025',
-        title: 'วันปิยมหาราช',
-        departmentId: 'dept_holiday',
-        startDate: '2025-10-23',
-        endDate: '2025-10-23',
-        academicYear: '2568',
-        semester: '1',
-        description: 'วันหยุดราชการ'
-      },
-      {
-        id: 'h_father_day_2025',
-        title: 'วันคล้ายวันพระบรมราชสมภพ ร.9 / วันพ่อแห่งชาติ',
-        departmentId: 'dept_holiday',
-        startDate: '2025-12-05',
-        endDate: '2025-12-05',
+        startDate: '2026-01-16',
+        endDate: '2026-01-16',
         academicYear: '2568',
         semester: '2',
-        description: 'วันหยุดราชการ'
+        description: 'การเดินทางยามค่ำคืนและการเสด็จสู่ฟากฟ้าของท่านนบี (ซ.ล.)'
       },
       {
-        id: 'h_constitution_2025',
-        title: 'วันรัฐธรรมนูญ',
+        id: 'h_ramadan_start_2569',
+        title: 'เริ่มต้นถือศีลอดเดือนรอมฎอน (1 รอมฎอน ฮ.ศ. 1447)',
         departmentId: 'dept_holiday',
-        startDate: '2025-12-10',
-        endDate: '2025-12-10',
+        startDate: '2026-02-18',
+        endDate: '2026-02-18',
         academicYear: '2568',
         semester: '2',
-        description: 'วันหยุดราชการ'
+        description: 'เข้าสู่เดือนรอมฎอนอันประเสริฐ'
       },
-      // ตัวอย่างกิจกรรมของแต่ละฝ่าย
+      {
+        id: 'h_eid_fitr_2569',
+        title: 'วันตรุษอีดิ้ลฟิฏริ (ฮ.ศ. 1447)',
+        departmentId: 'dept_holiday',
+        startDate: '2026-03-20',
+        endDate: '2026-03-22',
+        academicYear: '2568',
+        semester: '2',
+        description: 'วันเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน (1 เชาวาล ฮ.ศ. 1447)'
+      },
+      {
+        id: 'h_day_of_arafah_1447',
+        title: 'วันอะเราะฟะฮ์ (9 ซุลฮิจญะฮ์ ฮ.ศ. 1447)',
+        departmentId: 'dept_holiday',
+        startDate: '2026-05-26',
+        endDate: '2026-05-26',
+        academicYear: '2569',
+        semester: '1',
+        description: 'วันวุกูฟที่ทุ่งอะเราะฟะฮ์'
+      },
+      {
+        id: 'h_eid_adha_2569',
+        title: 'วันตรุษอีดิ้ลอัฎฮา (ฮ.ศ. 1447)',
+        departmentId: 'dept_holiday',
+        startDate: '2026-05-27',
+        endDate: '2026-05-29',
+        academicYear: '2569',
+        semester: '1',
+        description: 'วันเฉลิมฉลองการเชือดสัตว์พลีทาน (10 ซุลฮิจญะฮ์ ฮ.ศ. 1447)'
+      },
+      {
+        id: 'h_hijri_newyear_1448',
+        title: 'วันขึ้นปีใหม่ฮิจเราะห์ศักราช 1448 (1 มุฮัรรอม)',
+        departmentId: 'dept_holiday',
+        startDate: '2026-06-16',
+        endDate: '2026-06-16',
+        academicYear: '2569',
+        semester: '1',
+        description: 'เริ่มต้นปีฮิจเราะห์ศักราชใหม่ 1448'
+      },
+      {
+        id: 'h_ashura_1448',
+        title: 'วันอาชูรออ์ (10 มุฮัรรอม ฮ.ศ. 1448)',
+        departmentId: 'dept_holiday',
+        startDate: '2026-06-25',
+        endDate: '2026-06-25',
+        academicYear: '2569',
+        semester: '1',
+        description: 'วันถือศีลอดอาชูรออ์'
+      },
+      {
+        id: 'h_mawlid_1448',
+        title: 'วันเมาลิดนบี (12 รอบีอุลเอาวัล ฮ.ศ. 1448)',
+        departmentId: 'dept_holiday',
+        startDate: '2026-08-25',
+        endDate: '2026-08-25',
+        academicYear: '2569',
+        semester: '1',
+        description: 'วันคล้ายวันประสูติท่านศาสดามุฮัมมัด (ซ.ล.)'
+      },
+
+      // ==========================================
+      // วันหยุดราชการและวันสำคัญทางการไทย (พ.ศ. 2567, 2568, 2569)
+      // ==========================================
+      // ปี 2567 (2024)
+      { id: 'th_ny_2567', title: 'วันขึ้นปีใหม่', departmentId: 'dept_holiday', startDate: '2024-01-01', endDate: '2024-01-01', academicYear: '2566', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_makha_2567', title: 'วันมาฆบูชา', departmentId: 'dept_holiday', startDate: '2024-02-24', endDate: '2024-02-26', academicYear: '2566', semester: '2', description: 'วันหยุดราชการ (รวมวันหยุดชดเชย)' },
+      { id: 'th_chakri_2567', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2024-04-06', endDate: '2024-04-08', academicYear: '2566', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการ (ชดเชย 8 เม.ย.)' },
+      { id: 'th_songkran_2567', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2024-04-13', endDate: '2024-04-16', academicYear: '2566', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'th_coronation_2567', title: 'วันฉัตรมงคล', departmentId: 'dept_holiday', startDate: '2024-05-04', endDate: '2024-05-06', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ (ชดเชย 6 พ.ค.)' },
+      { id: 'th_visakha_2567', title: 'วันวิสาขบูชา', departmentId: 'dept_holiday', startDate: '2024-05-22', endDate: '2024-05-22', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_queen_2567', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี', departmentId: 'dept_holiday', startDate: '2024-06-03', endDate: '2024-06-03', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_asalha_2567', title: 'วันอาสาฬหบูชาและวันเข้าพรรษา', departmentId: 'dept_holiday', startDate: '2024-07-20', endDate: '2024-07-22', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ (รวมชดเชย)' },
+      { id: 'th_king10_2567', title: 'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว', departmentId: 'dept_holiday', startDate: '2024-07-28', endDate: '2024-07-29', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ (ชดเชย 29 ก.ค.)' },
+      { id: 'th_mother_2567', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระพันปีหลวง / วันแม่แห่งชาติ', departmentId: 'dept_holiday', startDate: '2024-08-12', endDate: '2024-08-12', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_navamindra_2567', title: 'วันนวมินทรมหาราช (วันคล้ายวันสวรรคต ร.9)', departmentId: 'dept_holiday', startDate: '2024-10-13', endDate: '2024-10-14', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ (ชดเชย 14 ต.ค.)' },
+      { id: 'th_chulalongkorn_2567', title: 'วันปิยมหาราช', departmentId: 'dept_holiday', startDate: '2024-10-23', endDate: '2024-10-23', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_father_2567', title: 'วันคล้ายวันพระบรมราชสมภพ ร.9 / วันพ่อแห่งชาติ', departmentId: 'dept_holiday', startDate: '2024-12-05', endDate: '2024-12-05', academicYear: '2567', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_constitution_2567', title: 'วันรัฐธรรมนูญ', departmentId: 'dept_holiday', startDate: '2024-12-10', endDate: '2024-12-10', academicYear: '2567', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_yearend_2567', title: 'วันสิ้นปี', departmentId: 'dept_holiday', startDate: '2024-12-31', endDate: '2024-12-31', academicYear: '2567', semester: '2', description: 'วันหยุดราชการ' },
+
+      // ปี 2568 (2025)
+      { id: 'th_ny_2568', title: 'วันขึ้นปีใหม่', departmentId: 'dept_holiday', startDate: '2025-01-01', endDate: '2025-01-01', academicYear: '2567', semester: '2', description: 'วันหยุดราชการสากล' },
+      { id: 'th_makha_2568', title: 'วันมาฆบูชา', departmentId: 'dept_holiday', startDate: '2025-02-12', endDate: '2025-02-12', academicYear: '2567', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_chakri_2568', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2025-04-06', endDate: '2025-04-07', academicYear: '2567', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการ (ชดเชย 7 เม.ย.)' },
+      { id: 'th_songkran_2568', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2025-04-13', endDate: '2025-04-15', academicYear: '2567', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'th_labor_2568', title: 'วันแรงงานแห่งชาติ', departmentId: 'dept_holiday', startDate: '2025-05-01', endDate: '2025-05-01', academicYear: '2568', semester: '1', description: 'วันหยุดตามประเพณี' },
+      { id: 'th_coronation_2568', title: 'วันฉัตรมงคล', departmentId: 'dept_holiday', startDate: '2025-05-05', endDate: '2025-05-05', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_visakha_2568', title: 'วันวิสาขบูชา', departmentId: 'dept_holiday', startDate: '2025-05-11', endDate: '2025-05-12', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ (ชดเชย 12 พ.ค.)' },
+      { id: 'th_queen_2568', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี', departmentId: 'dept_holiday', startDate: '2025-06-03', endDate: '2025-06-03', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_asalha_2568', title: 'วันอาสาฬหบูชา', departmentId: 'dept_holiday', startDate: '2025-07-10', endDate: '2025-07-10', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_lent_2568', title: 'วันเข้าพรรษา', departmentId: 'dept_holiday', startDate: '2025-07-11', endDate: '2025-07-11', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_king10_2568', title: 'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว', departmentId: 'dept_holiday', startDate: '2025-07-28', endDate: '2025-07-28', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_mother_2568', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระพันปีหลวง / วันแม่แห่งชาติ', departmentId: 'dept_holiday', startDate: '2025-08-12', endDate: '2025-08-12', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_navamindra_2568', title: 'วันนวมินทรมหาราช (วันคล้ายวันสวรรคต ร.9)', departmentId: 'dept_holiday', startDate: '2025-10-13', endDate: '2025-10-13', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_chulalongkorn_2568', title: 'วันปิยมหาราช', departmentId: 'dept_holiday', startDate: '2025-10-23', endDate: '2025-10-23', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_father_2568', title: 'วันคล้ายวันพระบรมราชสมภพ ร.9 / วันพ่อแห่งชาติ', departmentId: 'dept_holiday', startDate: '2025-12-05', endDate: '2025-12-05', academicYear: '2568', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_constitution_2568', title: 'วันรัฐธรรมนูญ', departmentId: 'dept_holiday', startDate: '2025-12-10', endDate: '2025-12-10', academicYear: '2568', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_yearend_2568', title: 'วันสิ้นปี', departmentId: 'dept_holiday', startDate: '2025-12-31', endDate: '2025-12-31', academicYear: '2568', semester: '2', description: 'วันหยุดราชการ' },
+
+      // ปี 2569 (2026)
+      { id: 'th_ny_2569', title: 'วันขึ้นปีใหม่', departmentId: 'dept_holiday', startDate: '2026-01-01', endDate: '2026-01-01', academicYear: '2568', semester: '2', description: 'วันหยุดราชการสากล' },
+      { id: 'th_makha_2569', title: 'วันมาฆบูชา', departmentId: 'dept_holiday', startDate: '2026-03-03', endDate: '2026-03-03', academicYear: '2568', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_chakri_2569', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2026-04-06', endDate: '2026-04-06', academicYear: '2568', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการ' },
+      { id: 'th_songkran_2569', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2026-04-13', endDate: '2026-04-15', academicYear: '2568', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'th_labor_2569', title: 'วันแรงงานแห่งชาติ', departmentId: 'dept_holiday', startDate: '2026-05-01', endDate: '2026-05-01', academicYear: '2569', semester: '1', description: 'วันหยุดตามประเพณี' },
+      { id: 'th_coronation_2569', title: 'วันฉัตรมงคล', departmentId: 'dept_holiday', startDate: '2026-05-04', endDate: '2026-05-04', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_visakha_2569', title: 'วันวิสาขบูชา', departmentId: 'dept_holiday', startDate: '2026-05-31', endDate: '2026-06-01', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ (ชดเชย 1 มิ.ย.)' },
+      { id: 'th_queen_2569', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี', departmentId: 'dept_holiday', startDate: '2026-06-03', endDate: '2026-06-03', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_asalha_2569', title: 'วันอาสาฬหบูชา', departmentId: 'dept_holiday', startDate: '2026-07-29', endDate: '2026-07-29', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_lent_2569', title: 'วันเข้าพรรษา', departmentId: 'dept_holiday', startDate: '2026-07-30', endDate: '2026-07-30', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_king10_2569', title: 'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว', departmentId: 'dept_holiday', startDate: '2026-07-28', endDate: '2026-07-28', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_mother_2569', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระพันปีหลวง / วันแม่แห่งชาติ', departmentId: 'dept_holiday', startDate: '2026-08-12', endDate: '2026-08-12', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_navamindra_2569', title: 'วันนวมินทรมหาราช (วันคล้ายวันสวรรคต ร.9)', departmentId: 'dept_holiday', startDate: '2026-10-13', endDate: '2026-10-13', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_chulalongkorn_2569', title: 'วันปิยมหาราช', departmentId: 'dept_holiday', startDate: '2026-10-23', endDate: '2026-10-23', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
+      { id: 'th_father_2569', title: 'วันคล้ายวันพระบรมราชสมภพ ร.9 / วันพ่อแห่งชาติ', departmentId: 'dept_holiday', startDate: '2026-12-05', endDate: '2026-12-07', academicYear: '2569', semester: '2', description: 'วันหยุดราชการ (ชดเชย 7 ธ.ค.)' },
+      { id: 'th_constitution_2569', title: 'วันรัฐธรรมนูญ', departmentId: 'dept_holiday', startDate: '2026-12-10', endDate: '2026-12-10', academicYear: '2569', semester: '2', description: 'วันหยุดราชการ' },
+      { id: 'th_yearend_2569', title: 'วันสิ้นปี', departmentId: 'dept_holiday', startDate: '2026-12-31', endDate: '2026-12-31', academicYear: '2569', semester: '2', description: 'วันหยุดราชการ' },
+
+      // ==========================================
+      // ตัวอย่างกิจกรรมของแต่ละฝ่ายในสถานศึกษา
+      // ==========================================
       {
         id: 'sample_evt_1',
         title: 'เปิดภาคเรียนที่ 1 ปีการศึกษา 2568',
@@ -1029,7 +1221,30 @@
       const storedUser = localStorage.getItem('school_cal_current_user');
 
       state.departments = storedDepts ? JSON.parse(storedDepts) : DEFAULT_DEPARTMENTS;
-      state.events = storedEvts ? JSON.parse(storedEvts) : DEFAULT_HOLIDAYS_AND_EVENTS;
+
+      // Smart Merge: ดึงกิจกรรมที่ผู้ใช้บันทึกไว้ มารวมกับวันหยุดระบบล่าสุด
+      let loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS;
+      if (storedEvts) {
+        try {
+          const userStoredList = JSON.parse(storedEvts);
+          if (Array.isArray(userStoredList)) {
+            // เก็บ user-created events (ที่ไม่ได้เป็นวันหยุดระบบเดิม)
+            const userCustomEvents = userStoredList.filter(e => !e.id.startsWith('h_') && !e.id.startsWith('th_') && e.departmentId !== 'dept_holiday');
+            
+            // Map รวม DEFAULT_HOLIDAYS_AND_EVENTS กับ userCustomEvents
+            const eventMap = new Map();
+            DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => eventMap.set(e.id, e));
+            userCustomEvents.forEach(e => eventMap.set(e.id, e));
+            
+            loadedEvents = Array.from(eventMap.values());
+          }
+        } catch (e) {
+          console.error('Error merging local events:', e);
+          loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS;
+        }
+      }
+
+      state.events = loadedEvents;
       state.currentUser = storedUser ? JSON.parse(storedUser) : null;
       renderUI();
     }
@@ -1301,12 +1516,21 @@
         });
 
         dayEvents.forEach(evt => {
-          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#6b21a8', name: 'ทั่วไป' };
+          const isHoliday = evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_');
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#dc2626' : '#6b21a8', name: isHoliday ? 'วันสำคัญ/วันหยุด' : 'ทั่วไป' };
           const evtBadge = document.createElement('div');
-          evtBadge.className = 'text-[11px] px-2 py-1 rounded-md font-semibold text-white truncate cursor-pointer shadow-sm hover:brightness-110 active:scale-95 transition flex items-center gap-1 leading-tight';
-          evtBadge.style.backgroundColor = dept.color;
-          evtBadge.title = `คลิกเพื่อดูรายละเอียด: ${evt.title} (${dept.name})`;
-          evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-white/80 shrink-0"></span><span class="truncate">${evt.title}</span>`;
+          
+          if (isHoliday) {
+            evtBadge.className = 'text-[11px] px-2 py-0.5 rounded-md font-semibold truncate cursor-pointer shadow-xs hover:brightness-95 active:scale-95 transition flex items-center gap-1 leading-tight border border-rose-200/90 text-rose-800 bg-rose-50/90';
+            evtBadge.title = `วันสำคัญ/วันหยุด: ${evt.title}`;
+            evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span><span class="truncate font-bold">${evt.title}</span>`;
+          } else {
+            evtBadge.className = 'text-[11px] px-2 py-1 rounded-md font-semibold text-white truncate cursor-pointer shadow-sm hover:brightness-110 active:scale-95 transition flex items-center gap-1 leading-tight';
+            evtBadge.style.backgroundColor = dept.color;
+            evtBadge.title = `คลิกเพื่อดูรายละเอียด: ${evt.title} (${dept.name})`;
+            evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-white/80 shrink-0"></span><span class="truncate">${evt.title}</span>`;
+          }
+
           evtBadge.onclick = (e) => {
             e.stopPropagation();
             openViewEventModal(evt, cellDate, hijriInfo);
@@ -1799,6 +2023,38 @@
       renderUI();
     };
 
+    // Header Home Calendar Icon: กลับสู่หน้าปฏิทินเดือนปัจจุบันและรีเซ็ตมุมมอง
+    const btnNavHome = document.getElementById('btnNavHomeCalendar');
+    if (btnNavHome) {
+      btnNavHome.onclick = () => {
+        state.currentDate = new Date();
+        state.selectedDept = 'all';
+        state.searchQuery = '';
+        state.filterMyEvents = false;
+        state.viewMode = 'month';
+
+        const searchInput = document.getElementById('inputSearchEvent');
+        if (searchInput) searchInput.value = '';
+        const btnClear = document.getElementById('btnClearSearch');
+        if (btnClear) btnClear.classList.add('hidden');
+
+        const btnFilterMine = document.getElementById('btnFilterMyEvents');
+        if (btnFilterMine) {
+          btnFilterMine.className = 'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-purple-50 hover:text-purple-700 transition';
+        }
+
+        document.getElementById('viewBtnMonth').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition';
+        document.getElementById('viewBtnList').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        document.getElementById('viewBtnDashboard').className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
+        document.getElementById('calendarMonthView').classList.remove('hidden');
+        document.getElementById('calendarListView').classList.add('hidden');
+        document.getElementById('adminDashboardView').classList.add('hidden');
+
+        renderUI();
+        showToast('กลับสู่หน้าปฏิทินเดือนปัจจุบันแล้ว');
+      };
+    }
+
     document.getElementById('selectAcademicYear').onchange = (e) => {
       state.selectedYear = e.target.value;
       renderUI();
@@ -2255,6 +2511,9 @@
     document.getElementById('btnCancelUserAuth').onclick = () => closeModal('modalUserAuth');
 
     function openUserAuthModal() {
+      // ตรวจสอบให้แน่ใจว่าตัวเลือกฝ่ายพร้อมใช้งาน
+      populateDeptSelects();
+
       const loggedInCard = document.getElementById('userLoggedInCard');
       const authForm = document.getElementById('formUserAuth');
 
@@ -2263,7 +2522,7 @@
         authForm.classList.add('hidden');
         document.getElementById('profileDisplayName').innerText = state.currentUser.name;
         document.getElementById('profileDisplayDept').innerText = state.currentUser.department;
-        document.getElementById('userAvatarText').innerText = state.currentUser.name.charAt(0) || 'ผ';
+        document.getElementById('userAvatarText').innerText = (state.currentUser.name || 'ผ').charAt(0);
       } else {
         loggedInCard.classList.add('hidden');
         authForm.classList.remove('hidden');
@@ -2272,6 +2531,25 @@
       }
 
       openModal('modalUserAuth');
+    }
+
+    // สลับไปยังฟอร์มแก้ไขโปรไฟล์เมื่อล็อกอินอยู่
+    const btnSwitchCard = document.getElementById('btnSwitchProfileInCard');
+    if (btnSwitchCard) {
+      btnSwitchCard.onclick = () => {
+        const loggedInCard = document.getElementById('userLoggedInCard');
+        const authForm = document.getElementById('formUserAuth');
+        loggedInCard.classList.add('hidden');
+        authForm.classList.remove('hidden');
+
+        if (state.currentUser) {
+          document.getElementById('inputUserName').value = state.currentUser.name || '';
+          document.getElementById('inputUserContact').value = state.currentUser.contact || '';
+          if (state.currentUser.department) {
+            document.getElementById('selectUserDept').value = state.currentUser.department;
+          }
+        }
+      };
     }
 
     document.getElementById('formUserAuth').addEventListener('submit', function(e) {
@@ -2286,7 +2564,7 @@
       }
 
       const userData = {
-        id: 'u_' + Date.now(),
+        id: state.currentUser?.id || ('u_' + Date.now()),
         name: name,
         department: dept,
         contact: contact,
