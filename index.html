@@ -1670,7 +1670,8 @@
     // ==========================================
     // 4. STORAGE & CLOUD REAL-TIME SYNC
     // ==========================================
-    let gasApiUrl = localStorage.getItem('school_cal_gas_url') || '';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzUxpWd50A7Hc9TERrqX-MxeezIkzvjxt0f6ROkjl8KDSJY6HHs5Uud9_I4RLkCQnr76A/exec';
+    let gasApiUrl = localStorage.getItem('school_cal_gas_url') || DEFAULT_GAS_URL;
     let isSyncing = false;
     let autoSyncInterval = null;
 
