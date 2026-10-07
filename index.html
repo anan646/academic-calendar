@@ -71,6 +71,26 @@
       outline: none;
       box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.35);
     }
+    /* Soothing Event Badges */
+    .event-pill {
+      position: relative;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 7px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .event-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px -1px rgba(0, 0, 0, 0.08), 0 1px 3px -1px rgba(0, 0, 0, 0.06);
+    }
+    .event-pill:active {
+      transform: translateY(0);
+    }
+    /* Glass card backdrop */
+    .cal-glass-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -380,44 +400,44 @@
     </div>
 
     <!-- CALENDAR MONTH VIEW -->
-    <div id="calendarMonthView" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div id="calendarMonthView" class="bg-white rounded-3xl shadow-xs border border-purple-100/90 overflow-hidden">
       <!-- Horizontal Scroll Wrapper for mobile & small screens -->
       <div class="overflow-x-auto w-full">
         <div class="min-w-[580px] sm:min-w-full">
           <!-- Days of Week Header -->
-          <div class="calendar-grid bg-purple-50/60 border-b border-purple-100/80 text-center text-xs font-semibold text-slate-700 py-2 sm:py-2.5">
-            <div class="text-rose-600 font-bold">
+          <div class="calendar-grid bg-purple-50/50 border-b border-purple-100/70 text-center text-xs font-bold text-slate-700 py-2.5 sm:py-3">
+            <div class="text-rose-600">
               <span class="sm:hidden">อา.</span>
-              <span class="hidden sm:inline">อาทิตย์</span>
+              <span class="hidden sm:inline">วันอาทิตย์</span>
             </div>
-            <div>
+            <div class="text-slate-700">
               <span class="sm:hidden">จ.</span>
-              <span class="hidden sm:inline">จันทร์</span>
+              <span class="hidden sm:inline">วันจันทร์</span>
             </div>
-            <div>
+            <div class="text-slate-700">
               <span class="sm:hidden">อ.</span>
-              <span class="hidden sm:inline">อังคาร</span>
+              <span class="hidden sm:inline">วันอังคาร</span>
             </div>
-            <div>
+            <div class="text-slate-700">
               <span class="sm:hidden">พ.</span>
-              <span class="hidden sm:inline">พุธ</span>
+              <span class="hidden sm:inline">วันพุธ</span>
             </div>
-            <div>
+            <div class="text-slate-700">
               <span class="sm:hidden">พฤ.</span>
-              <span class="hidden sm:inline">พฤหัสบดี</span>
+              <span class="hidden sm:inline">วันพฤหัสบดี</span>
             </div>
-            <div class="text-violet-800 font-bold">
+            <div class="text-violet-800">
               <span class="sm:hidden">ศ. (ญุมอะฮ์)</span>
-              <span class="hidden sm:inline">ศุกร์ (ญุมอะฮ์)</span>
+              <span class="hidden sm:inline">วันศุกร์ (ญุมอะฮ์)</span>
             </div>
-            <div class="text-indigo-700 font-bold">
+            <div class="text-indigo-700">
               <span class="sm:hidden">ส.</span>
-              <span class="hidden sm:inline">เสาร์</span>
+              <span class="hidden sm:inline">วันเสาร์</span>
             </div>
           </div>
 
           <!-- Days Grid (42 cells) -->
-          <div id="calendarDaysGrid" class="calendar-grid divide-x divide-y divide-slate-100 min-h-[500px] sm:min-h-[620px]">
+          <div id="calendarDaysGrid" class="calendar-grid divide-x divide-y divide-purple-50/70 min-h-[520px] sm:min-h-[640px] bg-slate-100/30">
             <!-- Days injected dynamically -->
           </div>
         </div>
@@ -636,13 +656,13 @@
     </div>
 
     <!-- CALENDAR LEGEND & FOOTER INFO -->
-    <div class="bg-slate-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
-      <div class="flex items-center gap-4 flex-wrap" id="legendContainer">
+    <div class="bg-purple-50/50 rounded-2xl p-4 border border-purple-100/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+      <div class="flex items-center gap-2 flex-wrap" id="legendContainer">
         <!-- Legend injected dynamically -->
       </div>
-      <div class="flex items-center gap-2 text-slate-500">
-        <i data-lucide="info" class="w-4 h-4"></i>
-        <span>วันที่ในปฏิทินแสดงทั้ง วันที่สากล (ค.ศ.), พ.ศ. และวันที่ทางจันทรคติอิสลาม (ฮ.ศ.)</span>
+      <div class="flex items-center gap-2 text-purple-900/70 font-medium shrink-0">
+        <i data-lucide="info" class="w-4 h-4 text-purple-600"></i>
+        <span>ปฏิทินแสดงทั้ง วันสากล (ค.ศ.), พ.ศ. และวันทางจันทรคติอิสลาม (ฮ.ศ.)</span>
       </div>
     </div>
 
@@ -962,71 +982,76 @@
   </div>
 
   <!-- MODAL: EVENT DETAILS PREVIEW (สำหรับผู้ใช้ทั่วไปคลิกดู พร้อมปุ่มส่งออกเข้าปฏิทินส่วนตัว) -->
-  <div id="modalEventView" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-      <div id="viewEventHeader" class="px-6 py-4 text-white flex items-center justify-between">
-        <div>
-          <span id="viewEventDeptBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-white/20 font-medium">ฝ่าย</span>
-          <h3 id="viewEventTitle" class="text-lg font-bold mt-1">ชื่องานกิจกรรม</h3>
+  <div id="modalEventView" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-purple-100 overflow-hidden">
+      <div id="viewEventHeader" class="px-6 py-5 text-white flex items-center justify-between shadow-xs">
+        <div class="space-y-1">
+          <span id="viewEventDeptBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-white/20 font-medium tracking-wide">ฝ่าย</span>
+          <h3 id="viewEventTitle" class="text-lg font-bold leading-tight mt-1 text-white">ชื่องานกิจกรรม</h3>
         </div>
-        <button id="btnCloseEventView" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10">
+        <button id="btnCloseEventView" class="w-8 h-8 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/15 transition cursor-pointer" title="ปิดหน้าต่าง">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div class="p-6 space-y-3.5 text-sm">
-        <div class="flex items-start gap-2.5 text-slate-600">
-          <i data-lucide="calendar" class="w-4 h-4 text-purple-500 mt-0.5"></i>
-          <div>
-            <span class="font-semibold text-slate-700">วันที่:</span>
-            <span id="viewEventDate" class="ml-1 text-slate-800">1 ม.ค. 2568</span>
-            <div id="viewEventHijriDate" class="text-xs text-violet-700 font-medium mt-0.5">ตรงกับวันที่ ฮ.ศ.</div>
+      <div class="p-6 space-y-4 text-sm">
+        <div class="bg-purple-50/40 p-3.5 rounded-2xl border border-purple-100/70 space-y-2.5">
+          <div class="flex items-start gap-2.5 text-slate-700">
+            <i data-lucide="calendar" class="w-4 h-4 text-purple-600 mt-0.5 shrink-0"></i>
+            <div>
+              <span class="font-bold text-slate-800">วันที่:</span>
+              <span id="viewEventDate" class="ml-1 text-slate-900 font-medium">1 ม.ค. 2568</span>
+              <div id="viewEventHijriDate" class="text-xs text-violet-700 font-semibold mt-0.5">ตรงกับวันที่ ฮ.ศ.</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2.5 text-slate-700">
+            <i data-lucide="graduation-cap" class="w-4 h-4 text-purple-600 shrink-0"></i>
+            <div>
+              <span class="font-bold text-slate-800">ปีการศึกษา:</span>
+              <span id="viewEventTerm" class="ml-1 text-slate-900 font-medium">2568 (เทอม 1)</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2.5 text-slate-700" id="viewLocationRow">
+            <i data-lucide="map-pin" class="w-4 h-4 text-purple-600 shrink-0"></i>
+            <div>
+              <span class="font-bold text-slate-800">สถานที่ / กลุ่มเป้าหมาย:</span>
+              <span id="viewEventLocation" class="ml-1 text-slate-900 font-medium">-</span>
+            </div>
           </div>
         </div>
-        <div class="flex items-center gap-2.5 text-slate-600">
-          <i data-lucide="graduation-cap" class="w-4 h-4 text-purple-500"></i>
-          <div>
-            <span class="font-semibold text-slate-700">ปีการศึกษา:</span>
-            <span id="viewEventTerm" class="ml-1 text-slate-800">2568 (เทอม 1)</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-2.5 text-slate-600" id="viewLocationRow">
-          <i data-lucide="map-pin" class="w-4 h-4 text-purple-500"></i>
-          <div>
-            <span class="font-semibold text-slate-700">สถานที่ / เป้าหมาย:</span>
-            <span id="viewEventLocation" class="ml-1 text-slate-800">-</span>
-          </div>
-        </div>
-        <div class="bg-purple-50/50 p-3.5 rounded-xl border border-purple-100/80 text-xs text-slate-600">
-          <span class="font-semibold text-purple-900 block mb-1">รายละเอียดเพิ่มเติม:</span>
-          <p id="viewEventDesc" class="whitespace-pre-line leading-relaxed text-slate-700">-</p>
+
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-slate-700 space-y-1">
+          <span class="font-bold text-slate-800 block">รายละเอียดเพิ่มเติม:</span>
+          <p id="viewEventDesc" class="whitespace-pre-line leading-relaxed text-slate-600">-</p>
         </div>
 
         <!-- Creator Profile Info Row -->
-        <div class="flex items-center gap-2 p-2.5 bg-slate-50/80 rounded-xl border border-slate-100 text-xs text-slate-500">
-          <i data-lucide="user-check" class="w-4 h-4 text-purple-600"></i>
+        <div class="flex items-center gap-2.5 p-3 bg-purple-50/60 rounded-2xl border border-purple-100 text-xs text-slate-600">
+          <div class="w-7 h-7 rounded-lg bg-purple-200/70 text-purple-800 flex items-center justify-center font-bold shrink-0">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+          </div>
           <div>
-            <span class="font-semibold text-slate-700" id="viewEventCreatorName">ผู้บันทึก: ส่วนกลาง</span>
-            <span class="text-slate-400 mx-1">|</span>
-            <span class="text-slate-500" id="viewEventCreatorDept">หน่วยงาน: ฝ่ายบริหาร</span>
+            <span class="font-bold text-slate-800" id="viewEventCreatorName">ผู้บันทึก: ส่วนกลาง</span>
+            <span class="text-slate-300 mx-1.5">•</span>
+            <span class="text-purple-700 font-medium" id="viewEventCreatorDept">หน่วยงาน: ฝ่ายบริหาร</span>
           </div>
         </div>
 
         <!-- Add to Calendar Buttons (.ics / Google Calendar) -->
         <div class="pt-1 flex flex-wrap gap-2">
-          <button id="btnAddToGoogleCalendar" class="flex-1 py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-900 rounded-xl border border-purple-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+          <button id="btnAddToGoogleCalendar" class="flex-1 py-2 px-3 bg-purple-50 hover:bg-purple-100 text-purple-900 rounded-xl border border-purple-200 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer">
             <i data-lucide="calendar-plus" class="w-3.5 h-3.5 text-purple-700"></i>
             <span>Google Calendar</span>
           </button>
-          <button id="btnDownloadICS" class="flex-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+          <button id="btnDownloadICS" class="flex-1 py-2 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer">
             <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
             <span>iCal (.ics)</span>
           </button>
         </div>
 
         <!-- Edit button if admin or owner -->
-        <div class="pt-2 flex justify-end gap-2" id="viewAdminActions">
-          <button id="btnEditFromView" class="px-4 py-1.5 text-xs font-semibold text-purple-800 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 flex items-center gap-1 transition">
-            <i data-lucide="edit" class="w-3.5 h-3.5"></i> แก้ไขข้อมูล
+        <div class="pt-1 flex justify-end gap-2" id="viewAdminActions">
+          <button id="btnEditFromView" class="px-4 py-2 text-xs font-bold text-purple-800 bg-purple-100/80 hover:bg-purple-200 rounded-xl border border-purple-200 flex items-center gap-1.5 transition cursor-pointer">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> แก้ไขกิจกรรม
           </button>
         </div>
       </div>
@@ -2023,8 +2048,8 @@
       // All button
       const allActive = state.selectedDept === 'all';
       const allBtn = document.createElement('button');
-      allBtn.className = `px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${
-        allActive ? 'bg-slate-800 text-white shadow-sm' : 'bg-slate-200/80 text-slate-700 hover:bg-slate-300'
+      allBtn.className = `px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+        allActive ? 'bg-purple-900 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/80'
       }`;
       allBtn.innerText = 'ทุกฝ่ายทั้งหมด';
       allBtn.onclick = () => { state.selectedDept = 'all'; renderUI(); };
@@ -2034,16 +2059,21 @@
       state.departments.forEach(dept => {
         const isActive = state.selectedDept === dept.id;
         const btn = document.createElement('button');
-        btn.className = `px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 border ${
-          isActive ? 'ring-2 ring-offset-1 text-white shadow-sm' : 'bg-white text-slate-700 hover:bg-slate-50'
+        const baseColor = dept.color || '#7c3aed';
+
+        btn.className = `px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 border cursor-pointer ${
+          isActive 
+            ? 'shadow-xs font-semibold' 
+            : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
         }`;
-        btn.style.borderColor = dept.color;
+        
         if (isActive) {
-          btn.style.backgroundColor = dept.color;
-          btn.style.ringColor = dept.color;
+          btn.style.backgroundColor = `${baseColor}22`; // soft background
+          btn.style.borderColor = baseColor;
+          btn.style.color = baseColor;
         }
 
-        btn.innerHTML = `<span class="w-2 h-2 rounded-full inline-block" style="background-color: ${dept.color}"></span>${dept.name}`;
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: ${baseColor}"></span><span>${dept.name}</span>`;
         btn.onclick = () => { state.selectedDept = dept.id; renderUI(); };
         container.appendChild(btn);
       });
@@ -2053,9 +2083,13 @@
       const container = document.getElementById('legendContainer');
       container.innerHTML = '';
       state.departments.forEach(dept => {
+        const baseColor = dept.color || '#7c3aed';
         const item = document.createElement('div');
-        item.className = 'flex items-center gap-1.5';
-        item.innerHTML = `<span class="w-2.5 h-2.5 rounded-full" style="background-color: ${dept.color}"></span><span>${dept.name}</span>`;
+        item.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border';
+        item.style.backgroundColor = `${baseColor}12`;
+        item.style.borderColor = `${baseColor}25`;
+        item.style.color = baseColor;
+        item.innerHTML = `<span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: ${baseColor}"></span><span>${dept.name}</span>`;
         container.appendChild(item);
       });
     }
@@ -2202,7 +2236,7 @@
 
       for (let i = 0; i < totalSlots; i++) {
         const cell = document.createElement('div');
-        cell.className = 'min-h-[88px] sm:min-h-[115px] p-1 sm:p-2 bg-white flex flex-col justify-between transition hover:bg-purple-50/40 relative cursor-pointer';
+        cell.className = 'min-h-[92px] sm:min-h-[118px] p-1.5 sm:p-2 bg-white flex flex-col justify-between transition-colors hover:bg-purple-50/50 relative cursor-pointer group';
 
         let cellDate;
         let isOtherMonth = false;
@@ -2212,13 +2246,13 @@
           const dayNum = prevMonthDays - firstDayIndex + i + 1;
           cellDate = new Date(year, month - 1, dayNum);
           isOtherMonth = true;
-          cell.classList.add('bg-slate-50/50', 'text-slate-400');
+          cell.classList.add('bg-slate-50/70', 'text-slate-400');
         } else if (i >= firstDayIndex + totalDays) {
           // วันของเดือนถัดไป
           const dayNum = i - (firstDayIndex + totalDays) + 1;
           cellDate = new Date(year, month + 1, dayNum);
           isOtherMonth = true;
-          cell.classList.add('bg-slate-50/50', 'text-slate-400');
+          cell.classList.add('bg-slate-50/70', 'text-slate-400');
         } else {
           // วันในเดือนปัจจุบัน
           const dayNum = i - firstDayIndex + 1;
@@ -2238,17 +2272,17 @@
 
         // Solar Day Number
         const dayNumSpan = document.createElement('span');
-        dayNumSpan.className = `text-[11px] sm:text-xs md:text-sm font-semibold w-5 h-5 sm:w-6 sm:h-6 shrink-0 flex items-center justify-center rounded-full ${
-          isToday ? 'bg-purple-700 text-white shadow-sm ring-2 ring-purple-200' :
+        dayNumSpan.className = `text-[11px] sm:text-xs md:text-sm font-bold w-6 h-6 shrink-0 flex items-center justify-center rounded-xl transition ${
+          isToday ? 'bg-gradient-to-tr from-purple-700 to-indigo-700 text-white shadow-xs ring-2 ring-purple-200' :
           isSunday ? 'text-rose-600' :
-          isFriday ? 'text-violet-800 font-bold' : 'text-slate-700'
+          isFriday ? 'text-violet-900' : 'text-slate-700'
         }`;
         dayNumSpan.innerText = cellDate.getDate();
 
         // Hijri badge (Full name on sm/md, short day number on mobile)
         const hijriBadge = document.createElement('span');
-        hijriBadge.className = `badge-hijri font-medium px-1 py-0.5 rounded shrink-0 truncate max-w-[65px] sm:max-w-none ${
-          isOtherMonth ? 'text-slate-400' : 'text-violet-700 bg-purple-50'
+        hijriBadge.className = `badge-hijri font-medium px-1.5 py-0.5 rounded-md shrink-0 truncate max-w-[68px] sm:max-w-none ${
+          isOtherMonth ? 'text-slate-400' : 'text-violet-700 bg-purple-50/80 border border-purple-100/60'
         }`;
         hijriBadge.title = hijriInfo.formatted;
         hijriBadge.innerHTML = `
@@ -2273,18 +2307,24 @@
 
         dayEvents.forEach(evt => {
           const isHoliday = evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_');
-          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#dc2626' : '#6b21a8', name: isHoliday ? 'วันสำคัญ/วันหยุด' : 'ทั่วไป' };
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#e11d48' : '#7c3aed', name: isHoliday ? 'วันสำคัญ/วันหยุด' : 'ทั่วไป' };
           const evtBadge = document.createElement('div');
           
           if (isHoliday) {
-            evtBadge.className = 'text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded-md font-semibold truncate cursor-pointer shadow-2xs hover:brightness-95 active:scale-95 transition flex items-center gap-1 leading-tight border border-rose-200/90 text-rose-800 bg-rose-50/90';
+            evtBadge.className = 'event-pill text-[10px] sm:text-[11px] px-2 py-0.5 sm:py-1 rounded-lg font-medium truncate cursor-pointer flex items-center gap-1.5 leading-tight border border-rose-200/90 text-rose-800 bg-rose-50/90 hover:bg-rose-100/90';
             evtBadge.title = `วันสำคัญ/วันหยุด: ${evt.title}`;
-            evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span><span class="truncate font-bold">${evt.title}</span>`;
+            evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span><span class="truncate font-semibold">${evt.title}</span>`;
           } else {
-            evtBadge.className = 'text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md font-semibold text-white truncate cursor-pointer shadow-2xs hover:brightness-110 active:scale-95 transition flex items-center gap-1 leading-tight';
-            evtBadge.style.backgroundColor = dept.color;
+            // ปรับกิจกรรมของฝ่ายต่างๆ ให้เป็นสไตล์ Soft Badge สบายตา (สีพื้นหลังอ่อนพาสเทล + เส้นขอบ + ข้อความสีเข้มคมชัด)
+            const baseColor = dept.color || '#7c3aed';
+            evtBadge.className = 'event-pill text-[10px] sm:text-[11px] px-2 py-0.5 sm:py-1 rounded-lg font-medium truncate cursor-pointer flex items-center gap-1.5 leading-tight border transition';
+            
+            // ใช้สีพื้นหลังแบบโปร่งแสง 12% และเส้นขอบ 25% สบายตา ไม่ฉูดฉาด
+            evtBadge.style.backgroundColor = `${baseColor}18`; // ~10% opacity
+            evtBadge.style.borderColor = `${baseColor}40`; // ~25% opacity
+            evtBadge.style.color = baseColor;
             evtBadge.title = `คลิกเพื่อดูรายละเอียด: ${evt.title} (${dept.name})`;
-            evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-white/80 shrink-0"></span><span class="truncate">${evt.title}</span>`;
+            evtBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${baseColor}"></span><span class="truncate font-medium">${evt.title}</span>`;
           }
 
           evtBadge.onclick = (e) => {
@@ -2339,32 +2379,36 @@
       }
 
       filteredEvents.forEach(evt => {
-        const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
+        const isHoliday = evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_');
+        const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#e11d48' : '#7c3aed', name: isHoliday ? 'วันสำคัญ/วันหยุด' : 'ทั่วไป' };
         const sDate = parseDateYMD(evt.startDate);
         const sHijri = getHijriDate(sDate);
+        const baseColor = dept.color || '#7c3aed';
 
         const item = document.createElement('div');
-        item.className = 'p-4 rounded-xl border border-slate-200/80 bg-white hover:border-purple-200 hover:shadow-sm transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer group';
+        item.className = 'p-4 rounded-2xl border border-slate-200/90 bg-white hover:border-purple-200 hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer group';
 
         const dateLabel = formatThaiDateFull(sDate);
 
         item.innerHTML = `
-          <div class="space-y-1.5">
-            <div class="flex items-center gap-2">
-              <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-md font-medium text-slate-700 bg-purple-50 border border-purple-100">
-                <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${dept.color}"></span>
+          <div class="space-y-1.5 flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-lg font-medium border"
+                style="background-color: ${baseColor}15; border-color: ${baseColor}30; color: ${baseColor}">
+                <span class="w-1.5 h-1.5 rounded-full inline-block shrink-0" style="background-color: ${baseColor}"></span>
                 ${dept.name}
               </span>
               <span class="text-xs text-slate-500 font-medium">ปีการศึกษา ${evt.academicYear || '-'} (เทอม ${evt.semester || '-'})</span>
             </div>
-            <h4 class="font-bold text-slate-800 text-sm sm:text-base group-hover:text-purple-900 transition">${evt.title}</h4>
-            <div class="flex items-center gap-4 text-xs text-slate-500">
-              <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> ${dateLabel}</span>
-              <span class="text-violet-700 font-medium flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5"></i> ${sHijri.formatted}</span>
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base group-hover:text-purple-900 transition leading-snug">${evt.title}</h4>
+            <div class="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
+              <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-400"></i> ${dateLabel}</span>
+              <span class="text-violet-700 font-medium flex items-center gap-1.5"><i data-lucide="moon" class="w-3.5 h-3.5 text-violet-400"></i> ${sHijri.formatted}</span>
+              ${evt.location ? `<span class="flex items-center gap-1 text-slate-400"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> ${evt.location}</span>` : ''}
             </div>
           </div>
-          <div class="flex items-center gap-2 self-end sm:self-center">
-            <span class="p-2 text-slate-400 group-hover:text-purple-700 group-hover:bg-purple-50 rounded-lg transition">
+          <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <span class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-purple-700 group-hover:bg-purple-50 transition border border-transparent group-hover:border-purple-100">
               <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </span>
           </div>
@@ -2511,20 +2555,23 @@
             const sDate = parseDateYMD(evt.startDate);
             const hijri = getHijriDate(sDate);
 
+            const baseColor = dept.color || '#7c3aed';
+
             const item = document.createElement('div');
-            item.className = 'p-3 rounded-xl border border-slate-100 hover:border-purple-200 bg-slate-50/70 hover:bg-purple-50/40 transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2 group';
+            item.className = 'p-3 rounded-2xl border border-slate-100 hover:border-purple-200 bg-slate-50/60 hover:bg-white transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 group shadow-2xs';
             item.innerHTML = `
               <div class="flex items-start gap-3">
-                <div class="px-2.5 py-1.5 rounded-lg text-center shrink-0 ${isHoliday ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-800'}">
+                <div class="w-10 h-10 rounded-xl text-center shrink-0 flex flex-col items-center justify-center ${isHoliday ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-purple-50 text-purple-800 border border-purple-200'}">
                   <div class="text-xs font-bold leading-none">${sDate.getDate()}</div>
-                  <div class="text-[10px] font-medium leading-none mt-0.5">${THAI_MONTHS[sDate.getMonth()].slice(0, 4)}</div>
+                  <div class="text-[9px] font-semibold leading-none mt-0.5">${THAI_MONTHS[sDate.getMonth()].slice(0, 4)}</div>
                 </div>
                 <div>
-                  <h4 class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-purple-700 transition flex items-center gap-1.5">
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-purple-900 transition leading-snug">
                     ${evt.title}
                   </h4>
                   <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-1 flex-wrap">
-                    <span class="px-2 py-0.2 rounded text-white text-[10px] font-medium" style="background-color: ${dept.color}">${dept.name}</span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-medium border"
+                      style="background-color: ${baseColor}15; border-color: ${baseColor}30; color: ${baseColor}">${dept.name}</span>
                     <span class="text-violet-700 font-medium">${hijri.formatted}</span>
                     ${evt.location ? `<span class="text-slate-400">• ${evt.location}</span>` : ''}
                   </div>
