@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)</title>
+
+  <!-- PWA Meta Tags & Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#581c87">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ปฏิทินกิจกรรม">
+  <link rel="apple-touch-icon" href="ftu-edu-logo.jpg">
+  <link rel="icon" type="image/jpeg" href="ftu-edu-logo.jpg">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Export Libraries & Chart.js CDN -->
@@ -194,8 +204,12 @@
 
         </div>
 
-        <!-- SMALL ADMIN BUTTON AT THE BOTTOM (ปุ่มเล็กๆ สำหรับแอดมินด้านล่าง) -->
-        <div class="pt-5 text-center">
+        <!-- SMALL ADMIN & PWA INSTALL ACTIONS AT THE BOTTOM -->
+        <div class="pt-5 flex items-center justify-center gap-2.5 flex-wrap">
+          <button id="btnPWAInstall" class="hidden inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-700 border border-purple-200 transition shadow-2xs cursor-pointer">
+            <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+            <span>ติดตั้งแอปบนมือถือ / คอมพิวเตอร์</span>
+          </button>
           <button id="btnLandingGoAdmin" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-500 hover:text-purple-900 bg-slate-100/90 hover:bg-purple-100/80 border border-slate-200 hover:border-purple-200 transition shadow-2xs">
             <i data-lucide="shield" class="w-3.5 h-3.5 text-purple-600"></i>
             <span>เข้าสู่ระบบผู้ดูแลระบบ (Admin)</span>
@@ -1039,6 +1053,67 @@
     </div>
   </div>
 
+
+  <!-- PWA FLOATING PROMPT BANNER (แสดงเมื่อเบราว์เซอร์รองรับการติดตั้ง) -->
+  <div id="pwaFloatingBanner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-purple-200/80 p-4 z-40 hidden flex items-center justify-between gap-3 animate-slideUp">
+    <div class="flex items-center gap-3">
+      <img src="ftu-edu-logo.jpg" alt="Logo" class="w-10 h-10 rounded-xl object-contain border border-purple-100 bg-white p-0.5 shrink-0 shadow-2xs">
+      <div>
+        <h4 class="text-xs font-bold text-purple-950">ติดตั้งแอปปฏิทินกิจกรรม</h4>
+        <p class="text-[11px] text-slate-500 leading-tight">เพิ่มไปยังหน้าจอหลักเพื่อเปิดใช้งานได้เร็วและสะดวกยิ่งขึ้น</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="btnPwaBannerInstall" class="px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+        ติดตั้ง
+      </button>
+      <button id="btnPwaBannerClose" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer" title="ปิด">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: PWA IOS INSTALL INSTRUCTIONS (สำหรับ Safari บน iPhone/iPad) -->
+  <div id="modalPwaIos" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-800">วิธีติดตั้งบน iPhone / iPad</h3>
+        </div>
+        <button id="btnClosePwaIosModal" type="button" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-600">
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-800 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+          <p>เปิดเว็บไซต์นี้ในเบราว์เซอร์ <strong>Safari</strong></p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-800 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+          <p>แตะปุ่ม <strong>แชร์ (Share)</strong> <i data-lucide="share" class="w-3.5 h-3.5 inline text-blue-600"></i> ด้านล่างของจอ</p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-800 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+          <p>เลื่อนลงแล้วแตะ <strong>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</strong> <i data-lucide="plus-square" class="w-3.5 h-3.5 inline text-purple-700"></i></p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-800 font-bold flex items-center justify-center shrink-0 text-[11px]">4</span>
+          <p>แตะ <strong>"เพิ่ม" (Add)</strong> ที่มุมขวาบนเพื่อเสร็จสิ้น</p>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button id="btnGotItPwaIos" class="w-full py-2 text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white rounded-xl shadow-xs transition cursor-pointer">
+          เข้าใจแล้ว
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- NOTIFICATION TOAST -->
   <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
@@ -3916,7 +3991,99 @@
       btnLandingViewAll.onclick = () => showCalendarPage('list', 'public');
     }
 
+    // ==========================================
+    // 15. PROGRESSIVE WEB APP (PWA) SUPPORT
+    // ==========================================
+    let deferredPrompt = null;
+    const btnPWAInstall = document.getElementById('btnPWAInstall');
+    const pwaFloatingBanner = document.getElementById('pwaFloatingBanner');
+    const btnPwaBannerInstall = document.getElementById('btnPwaBannerInstall');
+    const btnPwaBannerClose = document.getElementById('btnPwaBannerClose');
+    const btnClosePwaIosModal = document.getElementById('btnClosePwaIosModal');
+    const btnGotItPwaIos = document.getElementById('btnGotItPwaIos');
 
+    // ตรวจสอบว่าเป็นอุปกรณ์ iOS หรือไม่
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => {
+            console.log('PWA Service Worker registered successfully:', reg.scope);
+          })
+          .catch((err) => {
+            console.log('PWA Service Worker registration failed:', err);
+          });
+      });
+    }
+
+    // Capture install prompt for Android/Chrome/Edge/Desktop
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      // แสดงปุ่มและแบนเนอร์ติดตั้ง
+      if (btnPWAInstall) btnPWAInstall.classList.remove('hidden');
+      if (pwaFloatingBanner && !sessionStorage.getItem('pwa_banner_dismissed')) {
+        pwaFloatingBanner.classList.remove('hidden');
+      }
+    });
+
+    // ตรวจสอบเมื่อติดตั้งแอปเรียบร้อยแล้ว
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      if (btnPWAInstall) btnPWAInstall.classList.add('hidden');
+      if (pwaFloatingBanner) pwaFloatingBanner.classList.add('hidden');
+      showToast('ติดตั้งแอปปฏิทินกิจกรรมสำเร็จแล้ว');
+    });
+
+    function triggerPWAInstallation() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the PWA install prompt');
+          }
+          deferredPrompt = null;
+          if (btnPWAInstall) btnPWAInstall.classList.add('hidden');
+          if (pwaFloatingBanner) pwaFloatingBanner.classList.add('hidden');
+        });
+      } else if (isIos && !isStandalone) {
+        // เปิดคำแนะนำการติดตั้งสำหรับ Safari บน iOS
+        openModal('modalPwaIos');
+      } else {
+        // กรณีอุปกรณ์/เบราว์เซอร์ติดตั้งผ่านเมนูบราวเซอร์
+        showToast('สามารถแตะ "เพิ่มลงในหน้าจอหลัก" (Add to Home Screen) ผ่านเมนูของเบราว์เซอร์ได้เลย');
+      }
+    }
+
+    if (btnPWAInstall) {
+      // หากเป็น iOS และยังไม่ได้เปิดจาก standalone ให้แสดงปุ่มได้
+      if (isIos && !isStandalone) {
+        btnPWAInstall.classList.remove('hidden');
+      }
+      btnPWAInstall.onclick = triggerPWAInstallation;
+    }
+
+    if (btnPwaBannerInstall) {
+      btnPwaBannerInstall.onclick = triggerPWAInstallation;
+    }
+
+    if (btnPwaBannerClose) {
+      btnPwaBannerClose.onclick = () => {
+        if (pwaFloatingBanner) pwaFloatingBanner.classList.add('hidden');
+        sessionStorage.setItem('pwa_banner_dismissed', 'true');
+      };
+    }
+
+    if (btnClosePwaIosModal) {
+      btnClosePwaIosModal.onclick = () => closeModal('modalPwaIos');
+    }
+    if (btnGotItPwaIos) {
+      btnGotItPwaIos.onclick = () => closeModal('modalPwaIos');
+    }
 
     // Launch
     window.addEventListener('DOMContentLoaded', () => {

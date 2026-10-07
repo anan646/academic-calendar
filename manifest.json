@@ -1,0 +1,25 @@
+{
+  "name": "ปฏิทินกิจกรรม คณะศึกษาศาสตร์ ม.ฟาฏอนี",
+  "short_name": "ปฏิทินกิจกรรม",
+  "description": "ระบบปฏิทินกิจกรรมการศึกษาคู่ขนาน พุทธศักราช (พ.ศ.) และฮิจเราะห์ศักราช (ฮ.ศ.) คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#581c87",
+  "icons": [
+    {
+      "src": "ftu-edu-logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "ftu-edu-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
