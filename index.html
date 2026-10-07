@@ -4008,12 +4008,18 @@
     });
 
     // Google Calendar & iCal Export Buttons Listener
-    document.getElementById('btnAddToGoogleCalendar').onclick = () => {
-      if (activeViewingEvent) addToGoogleCalendar(activeViewingEvent);
-    };
-    document.getElementById('btnDownloadICS').onclick = () => {
-      if (activeViewingEvent) downloadICSFile(activeViewingEvent);
-    };
+    const btnGoogleCal = document.getElementById('btnAddToGoogleCalendar');
+    if (btnGoogleCal) {
+      btnGoogleCal.onclick = () => {
+        if (activeViewingEvent) addToGoogleCalendar(activeViewingEvent);
+      };
+    }
+    const btnIcs = document.getElementById('btnDownloadICS');
+    if (btnIcs) {
+      btnIcs.onclick = () => {
+        if (activeViewingEvent) downloadICSFile(activeViewingEvent);
+      };
+    }
 
     // ==========================================
     // 8.1 ADMIN DASHBOARD LOGIC
