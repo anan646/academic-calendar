@@ -387,8 +387,10 @@
         </button>
 
         <!-- Manage Departments Button -->
-        <button id="btnManageDept" class="p-2 text-slate-600 hover:text-purple-900 hover:bg-purple-50 rounded-xl border border-slate-200 transition cursor-pointer" title="จัดการฝ่ายและสี">
-          <i data-lucide="settings-2" class="w-4 h-4"></i>
+        <button id="btnManageDept" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-purple-200/90 bg-purple-50/80 hover:bg-purple-100 text-purple-900 transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer shadow-2xs hover:shadow-xs active:scale-95" title="จัดการฝ่ายและกำหนดสี">
+          <i data-lucide="palette" class="w-3.5 h-3.5 text-purple-700"></i>
+          <span class="hidden sm:inline">จัดการฝ่ายและสี</span>
+          <span class="sm:hidden">ฝ่าย & สี</span>
         </button>
       </div>
     </div>
@@ -498,98 +500,214 @@
       </div>
     </div>
 
-    <!-- ADMIN DASHBOARD VIEW (ภาพรวมสถิติและกราฟวิเคราะห์สำหรับผู้ดูแลระบบ) -->
+    <!-- ADMIN DASHBOARD VIEW (ภาพรวมสถิติและศูนย์ควบคุมสำหรับผู้ดูแลระบบ) -->
     <div id="adminDashboardView" class="hidden space-y-6">
-      <!-- KPI Stats Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+      
+      <!-- 1. ADMIN HEADER BANNER (ส่วนหัวและแท็บเมนูหมวดหมู่) -->
+      <div class="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 rounded-3xl p-5 sm:p-6 text-white shadow-lg relative overflow-hidden border border-purple-800/80">
+        <div class="absolute -right-8 -bottom-8 w-56 h-56 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <span class="text-xs font-medium text-slate-500 block">กิจกรรมทั้งหมดในปีนี้</span>
-            <span id="dashTotalEvents" class="text-2xl font-bold text-slate-800 mt-1 block">0</span>
+            <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-lg bg-purple-500/25 text-purple-200 text-xs font-bold border border-purple-400/30">
+                Admin Control Center
+              </span>
+              <span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-400/30 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="dashAdminIdentityText">ผู้ดูแลระบบ</span>
+              </span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
+              <i data-lucide="shield-check" class="w-6 h-6 text-purple-300 shrink-0"></i>
+              <span>ศูนย์จัดการและวิเคราะห์ข้อมูลระบบ</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-purple-200/90 mt-1 max-w-2xl leading-relaxed">
+              จัดการกิจกรรม สถิติประจำปีการศึกษา ควบคุมสิทธิ์ฝ่ายงาน และตรวจสอบการเชื่อมต่อคลาวด์
+            </p>
           </div>
-          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-            <i data-lucide="calendar" class="w-6 h-6"></i>
+
+          <!-- Quick Actions in Header -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="btnAdminQuickAdd" type="button" class="px-3.5 py-2 rounded-xl bg-white hover:bg-purple-50 text-purple-950 text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-purple-700"></i>
+              <span>+ ลงกิจกรรมใหม่</span>
+            </button>
+            <button id="btnAdminQuickDept" type="button" class="px-3.5 py-2 rounded-xl bg-purple-800/80 hover:bg-purple-700 text-white text-xs font-semibold border border-purple-600/50 transition flex items-center gap-1.5 cursor-pointer active:scale-95">
+              <i data-lucide="palette" class="w-4 h-4 text-purple-200"></i>
+              <span>จัดการฝ่าย & สี</span>
+            </button>
+            <button id="btnAdminExit" type="button" class="px-3 py-2 rounded-xl bg-purple-950/70 hover:bg-rose-900/60 text-purple-200 hover:text-white text-xs font-medium border border-purple-700/50 hover:border-rose-500/50 transition flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+              <span>กลับสู่ปฏิทิน</span>
+            </button>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span class="text-xs font-medium text-slate-500 block">จำนวนฝ่ายที่ลงงาน</span>
-            <span id="dashTotalDepts" class="text-2xl font-bold text-blue-600 mt-1 block">0</span>
+        <!-- CATEGORY NAVIGATION TABS (แถบเลือกหมวดหมู่หน้าแอดมิน) -->
+        <div class="mt-5 pt-4 border-t border-purple-800/60 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar" id="adminCategoryTabsBar">
+          <button id="adminTabAll" type="button" class="admin-tab-pill active px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white text-purple-950 shadow-sm whitespace-nowrap cursor-pointer">
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+            <span>ทั้งหมด (All)</span>
+          </button>
+          <button id="adminTabStats" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
+            <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
+            <span>1. ภาพรวม & สถิติ</span>
+          </button>
+          <button id="adminTabEvents" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            <span>2. จัดการกิจกรรม</span>
+          </button>
+          <button id="adminTabDepts" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
+            <i data-lucide="palette" class="w-3.5 h-3.5"></i>
+            <span>3. จัดการฝ่าย & สี</span>
+          </button>
+          <button id="adminTabUsers" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span>4. ผู้ใช้ & แอดมิน</span>
+          </button>
+          <button id="adminTabSync" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
+            <i data-lucide="cloud-lightning" class="w-3.5 h-3.5"></i>
+            <span>5. เชื่อมต่อคลาวด์</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- หมวดที่ 1: ภาพรวมและสถิติ (KPI & CHARTS)   -->
+      <!-- ========================================== -->
+      <div id="adminSecStats" class="admin-section space-y-6">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-purple-600"></i> หมวดที่ 1: ภาพรวมสถิติและแนวโน้มกิจกรรม
+          </h3>
+          <span class="text-xs text-slate-500">คำนวณตามปีการศึกษาที่เลือก</span>
+        </div>
+
+        <!-- KPI Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-purple-200 transition">
+            <div>
+              <span class="text-xs font-medium text-slate-500 block">กิจกรรมทั้งหมดในปีนี้</span>
+              <span id="dashTotalEvents" class="text-2xl font-bold text-slate-800 mt-1 block">0</span>
+            </div>
+            <div class="w-12 h-12 bg-purple-50 text-purple-700 rounded-xl flex items-center justify-center border border-purple-100">
+              <i data-lucide="calendar" class="w-6 h-6"></i>
+            </div>
           </div>
-          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-            <i data-lucide="users" class="w-6 h-6"></i>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-blue-200 transition">
+            <div>
+              <span class="text-xs font-medium text-slate-500 block">จำนวนฝ่ายที่ลงงาน</span>
+              <span id="dashTotalDepts" class="text-2xl font-bold text-blue-600 mt-1 block">0</span>
+            </div>
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center border border-blue-100">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-rose-200 transition">
+            <div>
+              <span class="text-xs font-medium text-slate-500 block">วันหยุดราชการ / สำคัญ</span>
+              <span id="dashTotalHolidays" class="text-2xl font-bold text-rose-600 mt-1 block">0</span>
+            </div>
+            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center border border-rose-100">
+              <i data-lucide="flag" class="w-6 h-6"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between hover:border-amber-200 transition">
+            <div>
+              <span class="text-xs font-medium text-slate-500 block">กิจกรรมที่กำลังจะถึง (30 วัน)</span>
+              <span id="dashUpcomingEvents" class="text-2xl font-bold text-amber-600 mt-1 block">0</span>
+            </div>
+            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center border border-amber-100">
+              <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span class="text-xs font-medium text-slate-500 block">วันหยุดราชการ / สำคัญ</span>
-            <span id="dashTotalHolidays" class="text-2xl font-bold text-rose-600 mt-1 block">0</span>
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Chart 1: สัดส่วนกิจกรรมแยกตามฝ่าย -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> สัดส่วนกิจกรรมแยกตามฝ่าย
+              </h4>
+              <span class="text-[11px] text-slate-400">ภาพรวมสถิติ</span>
+            </div>
+            <div class="h-64 flex items-center justify-center">
+              <canvas id="chartDeptShare"></canvas>
+            </div>
           </div>
-          <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center">
-            <i data-lucide="flag" class="w-6 h-6"></i>
-          </div>
-        </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <span class="text-xs font-medium text-slate-500 block">กิจกรรมที่กำลังจะถึง (30 วัน)</span>
-            <span id="dashUpcomingEvents" class="text-2xl font-bold text-amber-600 mt-1 block">0</span>
-          </div>
-          <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
-            <i data-lucide="clock" class="w-6 h-6"></i>
+          <!-- Chart 2: กิจกรรมแยกตามรายเดือนตลอดปี -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i> จำนวนกิจกรรมในแต่ละเดือน
+              </h4>
+              <span class="text-[11px] text-slate-400">แนวโน้มภาระงาน</span>
+            </div>
+            <div class="h-64 flex items-center justify-center">
+              <canvas id="chartMonthlyEvents"></canvas>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Charts Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Chart 1: สัดส่วนกิจกรรมแยกตามฝ่าย -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> สัดส่วนกิจกรรมแยกตามฝ่าย
-            </h4>
-            <span class="text-[11px] text-slate-400">ภาพรวมสถิติ</span>
+      <!-- ========================================== -->
+      <!-- หมวดที่ 2: จัดการกิจกรรม (EVENTS TABLE)    -->
+      <!-- ========================================== -->
+      <div id="adminSecEvents" class="admin-section bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i data-lucide="table" class="w-4 h-4 text-indigo-600"></i> หมวดที่ 2: ตารางจัดการกิจกรรมประจำปีการศึกษา
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">ค้นหา ตรวจสอบ แก้ไข หรือลบกิจกรรมได้อย่างอิสระ</p>
           </div>
-          <div class="h-64 flex items-center justify-center">
-            <canvas id="chartDeptShare"></canvas>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 font-semibold" id="dashEventsCountBadge">
+              0 รายการ
+            </span>
           </div>
         </div>
 
-        <!-- Chart 2: กิจกรรมแยกตามรายเดือนตลอดปี -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i> จำนวนกิจกรรมในแต่ละเดือน
-            </h4>
-            <span class="text-[11px] text-slate-400">แนวโน้มภาระงาน</span>
+        <!-- Filter & Search Bar for Admin Events Table -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+          <div class="sm:col-span-6 relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3 pointer-events-none"></i>
+            <input type="text" id="dashEventsSearchInput" placeholder="ค้นหากิจกรรม, สถานที่ หรือฝ่าย..."
+              class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-400">
           </div>
-          <div class="h-64 flex items-center justify-center">
-            <canvas id="chartMonthlyEvents"></canvas>
+          <div class="sm:col-span-3">
+            <select id="dashEventsDeptFilter" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer">
+              <option value="all">ทุกฝ่ายงาน</option>
+              <!-- Injected dynamically -->
+            </select>
+          </div>
+          <div class="sm:col-span-3">
+            <select id="dashEventsTermFilter" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer">
+              <option value="all">ทุกภาคเรียน</option>
+              <option value="1">ภาคเรียนที่ 1</option>
+              <option value="2">ภาคเรียนที่ 2</option>
+              <option value="ปิดภาคเรียน">ปิดภาคเรียน</option>
+            </select>
           </div>
         </div>
-      </div>
 
-      <!-- Quick Action Table in Dashboard -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-            <i data-lucide="table" class="w-4 h-4 text-indigo-600"></i> ตารางกิจกรรมประจำปีการศึกษา
-          </h4>
-          <span class="text-xs text-slate-500">สามารถคลิกเพื่อแก้ไขหรือลบในฐานะแอดมิน</span>
-        </div>
-        <div class="overflow-x-auto">
+        <!-- Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-100">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
-                <th class="p-2.5 font-semibold">วันที่เริ่มต้น</th>
-                <th class="p-2.5 font-semibold">กิจกรรม</th>
-                <th class="p-2.5 font-semibold">ฝ่าย</th>
-                <th class="p-2.5 font-semibold">เทอม</th>
-                <th class="p-2.5 font-semibold">สถานที่</th>
-                <th class="p-2.5 font-semibold text-right">การจัดการ</th>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600">
+                <th class="p-3 font-semibold">วันที่เริ่มต้น</th>
+                <th class="p-3 font-semibold">ชื่องาน / กิจกรรม</th>
+                <th class="p-3 font-semibold">ฝ่ายที่รับผิดชอบ</th>
+                <th class="p-3 font-semibold">เทอม</th>
+                <th class="p-3 font-semibold">สถานที่</th>
+                <th class="p-3 font-semibold text-right">การจัดการ</th>
               </tr>
             </thead>
             <tbody id="dashEventsTableBody" class="divide-y divide-slate-100">
@@ -599,103 +717,182 @@
         </div>
       </div>
 
-      <!-- User Management Table in Admin Dashboard -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+      <!-- ========================================== -->
+      <!-- หมวดที่ 3: จัดการฝ่ายและสี (DEPTS & COLORS)-->
+      <!-- ========================================== -->
+      <div id="adminSecDepts" class="admin-section bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden p-5 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="users" class="w-4 h-4 text-purple-600"></i> จัดการรายชื่อผู้ลงทะเบียนในระบบ
-            </h4>
-            <p class="text-[11px] text-slate-500 mt-0.5">รายชื่อครูและบุคลากรที่มีสิทธิ์บันทึกและแก้ไขกิจกรรม (แอดมินสามารถตรวจสอบและลบได้)</p>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i data-lucide="palette" class="w-4 h-4 text-purple-600"></i> หมวดที่ 3: จัดการฝ่ายและกำหนดสีประจำฝ่าย
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">เพิ่มฝ่ายใหม่ กำหนดสี และตั้งรหัสผ่าน PIN สำหรับให้บุคลากรแต่ละฝ่ายใช้ลงกิจกรรม</p>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 font-semibold" id="dashTotalUsersBadge">
-              0 คน
-            </span>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 font-semibold" id="dashDeptsCountBadge">
+            0 ฝ่าย
+          </span>
+        </div>
+
+        <!-- Add Department Card inside Dashboard -->
+        <div class="bg-gradient-to-r from-purple-50/80 to-indigo-50/60 p-4 sm:p-5 rounded-2xl border border-purple-100/90 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-purple-950 flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-purple-700"></i> เพิ่มฝ่ายงานใหม่
+            </h4>
+            <span class="text-[11px] text-purple-600 font-medium">บันทึกแล้วใช้งานได้ทันที</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+            <div class="sm:col-span-5">
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">ชื่อฝ่าย:</label>
+              <input type="text" id="dashNewDeptName" placeholder="เช่น ฝ่ายแนะแนว, ฝ่ายงบประมาณ"
+                class="w-full px-3 py-2 text-xs rounded-xl border border-purple-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">รหัส PIN บันทึกงาน:</label>
+              <input type="text" id="dashNewDeptPin" maxlength="8" placeholder="เช่น 5555"
+                class="w-full px-3 py-2 text-xs rounded-xl border border-purple-200 bg-white font-mono font-semibold text-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">สีประจำฝ่าย:</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="dashNewDeptColor" value="#7c3aed" class="w-9 h-8 p-0.5 rounded-xl border border-purple-200 cursor-pointer bg-white" title="คลิกเลือกสี">
+                <span class="text-[11px] font-mono text-slate-500" id="dashNewDeptColorHex">#7c3aed</span>
+              </div>
+            </div>
+            <div class="sm:col-span-2 sm:self-end">
+              <button id="btnDashAddDeptSubmit" type="button" class="w-full py-2.5 px-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer flex items-center justify-center gap-1 active:scale-95">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>เพิ่มฝ่าย</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Preset Swatches -->
+          <div class="flex items-center gap-2 pt-1 flex-wrap">
+            <span class="text-[11px] text-slate-500 font-medium">สีแนะนำ:</span>
+            <div class="flex items-center gap-1.5 flex-wrap" id="dashDeptColorSwatches">
+              <!-- Swatches generated in JS -->
+            </div>
           </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
-                <th class="p-2.5 font-semibold">ชื่อ - สกุล</th>
-                <th class="p-2.5 font-semibold">สังกัดฝ่าย</th>
-                <th class="p-2.5 font-semibold">ข้อมูลติดต่อ</th>
-                <th class="p-2.5 font-semibold">วันที่ลงทะเบียน</th>
-                <th class="p-2.5 font-semibold">สิทธิ์</th>
-                <th class="p-2.5 font-semibold text-right">การจัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="dashUsersTableBody" class="divide-y divide-slate-100">
-              <!-- Rows populated dynamically -->
-            </tbody>
-          </table>
+
+        <!-- List of Departments in Dashboard -->
+        <div>
+          <h4 class="text-xs font-bold text-slate-700 mb-2.5">รายชื่อฝ่ายที่มีอยู่ในระบบ (แก้ไขสีและรหัส PIN ได้ทันที):</h4>
+          <div id="dashDeptManagementList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Populated dynamically via JS -->
+          </div>
         </div>
       </div>
 
-      <!-- Admin Accounts Management Table in Admin Dashboard -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="shield-check" class="w-4 h-4 text-purple-700"></i> จัดการผู้ดูแลระบบ (แอดมินหลัก & แอดมินรอง)
-            </h4>
-            <p class="text-[11px] text-slate-500 mt-0.5">แอดมินหลักสามารถเปลี่ยนรหัสผ่านของตนเอง และเพิ่มแอดมินรองพร้อมกำหนดรหัสผ่านให้ได้</p>
+      <!-- ========================================== -->
+      <!-- หมวดที่ 4: ผู้ใช้และแอดมิน (USERS & ADMINS) -->
+      <!-- ========================================== -->
+      <div id="adminSecUsers" class="admin-section space-y-6">
+        <!-- 4.1 User Management Table in Admin Dashboard -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-purple-600"></i> หมวดที่ 4.1: จัดการรายชื่อผู้ลงทะเบียน (Staff Users)
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">รายชื่อครูและบุคลากรที่มีสิทธิ์บันทึกกิจกรรมประจำฝ่าย (สามารถตรวจสอบและลบได้)</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 font-semibold" id="dashTotalUsersBadge">
+                0 คน
+              </span>
+            </div>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button id="btnOpenChangeMyPin" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition shadow-xs cursor-pointer">
-              <i data-lucide="key" class="w-3.5 h-3.5"></i>
-              <span>เปลี่ยนรหัสผ่าน</span>
-            </button>
-            <button id="btnOpenAddSubAdmin" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white transition shadow-sm cursor-pointer">
-              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-              <span>+ เพิ่มแอดมินรอง</span>
-            </button>
+          <div class="overflow-x-auto rounded-xl border border-slate-100">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600">
+                  <th class="p-3 font-semibold">ชื่อ - สกุล</th>
+                  <th class="p-3 font-semibold">สังกัดฝ่าย</th>
+                  <th class="p-3 font-semibold">ข้อมูลติดต่อ</th>
+                  <th class="p-3 font-semibold">วันที่ลงทะเบียน</th>
+                  <th class="p-3 font-semibold">สิทธิ์</th>
+                  <th class="p-3 font-semibold text-right">การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="dashUsersTableBody" class="divide-y divide-slate-100">
+                <!-- Rows populated dynamically -->
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
-                <th class="p-2.5 font-semibold">ชื่อผู้ดูแลระบบ</th>
-                <th class="p-2.5 font-semibold">ระดับสิทธิ์</th>
-                <th class="p-2.5 font-semibold">สังกัดฝ่าย</th>
-                <th class="p-2.5 font-semibold">รหัสผ่าน (PIN)</th>
-                <th class="p-2.5 font-semibold">วันที่สร้าง</th>
-                <th class="p-2.5 font-semibold text-right">การจัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="dashAdminsTableBody" class="divide-y divide-slate-100">
-              <!-- Rows populated dynamically -->
-            </tbody>
-          </table>
+
+        <!-- 4.2 Admin Accounts Management Table in Admin Dashboard -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-4 h-4 text-purple-700"></i> หมวดที่ 4.2: จัดการบัญชีผู้ดูแลระบบ (Admin Accounts)
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">แอดมินหลักสามารถเปลี่ยนรหัส PIN ของตนเอง และเพิ่มแอดมินรองพร้อมกำหนดสิทธิ์ได้</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button id="btnOpenChangeMyPin" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition shadow-xs cursor-pointer">
+                <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                <span>เปลี่ยนรหัสผ่านแอดมิน</span>
+              </button>
+              <button id="btnOpenAddSubAdmin" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white transition shadow-sm cursor-pointer active:scale-95">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                <span>+ เพิ่มแอดมินรอง</span>
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-slate-100">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600">
+                  <th class="p-3 font-semibold">ชื่อผู้ดูแลระบบ</th>
+                  <th class="p-3 font-semibold">ระดับสิทธิ์</th>
+                  <th class="p-3 font-semibold">สังกัดฝ่าย</th>
+                  <th class="p-3 font-semibold">รหัสผ่าน (PIN)</th>
+                  <th class="p-3 font-semibold">วันที่สร้าง</th>
+                  <th class="p-3 font-semibold text-right">การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="dashAdminsTableBody" class="divide-y divide-slate-100">
+                <!-- Rows populated dynamically -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Real-time Google Sheet Cloud Sync Configuration -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5 space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <!-- ========================================== -->
+      <!-- หมวดที่ 5: ตั้งค่าระบบและคลาวด์ (SETTINGS)  -->
+      <!-- ========================================== -->
+      <div id="adminSecSync" class="admin-section bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-              <i data-lucide="cloud-lightning" class="w-4 h-4 text-purple-700"></i> การเชื่อมต่อข้อมูลคลาวด์แบบเรียลไทม์ (Google Apps Script API)
-            </h4>
-            <p class="text-[11px] text-slate-500 mt-0.5">เชื่อมต่อกับ Web App URL ของ Google Apps Script เพื่อให้สมาร์ทโฟน แท็บเล็ต และคอมพิวเตอร์อัปเดตข้อมูลตรงกันแบบ Real-time ทันที</p>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i data-lucide="cloud-lightning" class="w-4 h-4 text-purple-700"></i> หมวดที่ 5: การเชื่อมต่อข้อมูลคลาวด์แบบเรียลไทม์ (Google Apps Script API)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">เชื่อมต่อกับ Web App URL ของ Google Apps Script เพื่อให้ทุกอุปกรณ์อัปเดตข้อมูลตรงกันแบบ Real-time ทันที</p>
           </div>
-          <span id="gasStatusBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-            พร้อมใช้งาน
+          <span id="gasStatusBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 self-start sm:self-auto">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> พร้อมใช้งาน
           </span>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <input type="url" id="inputGasApiUrl" placeholder="https://script.google.com/macros/s/.../exec"
-            class="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-300">
-          <button id="btnSaveGasApiUrl" type="button" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
-            <i data-lucide="save" class="w-3.5 h-3.5"></i> บันทึกและทดสอบเชื่อมต่อ
+            class="flex-1 px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <button id="btnSaveGasApiUrl" type="button" class="px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0 active:scale-95">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i>
+            <span>บันทึกและทดสอบเชื่อมต่อ</span>
           </button>
         </div>
         <p class="text-[11px] text-slate-400">
-          * ระบบมีระบบตรวจจับการเปลี่ยนแปลงอัตโนมัติ (Auto Polling ทุก 15 วินาที) และปุ่มกดรีเฟรชข้อมูล <i data-lucide="refresh-cw" class="w-3 h-3 inline text-purple-600"></i> ทันใจ
+          * ระบบมีระบบตรวจจับการเปลี่ยนแปลงอัตโนมัติ (Auto Polling ทุก 15 วินาที) และปุ่มกดรีเฟรชข้อมูล <i data-lucide="refresh-cw" class="w-3 h-3 inline text-purple-600"></i> เพื่อความรวดเร็วในการแสดงผล
         </p>
       </div>
+
+    </div>
     </div>
 
     <!-- CALENDAR LEGEND & FOOTER INFO -->
@@ -3310,142 +3507,156 @@
     // 10. DEPARTMENT MANAGEMENT (เพิ่ม/ลด/เปลี่ยนสี)
     // ==========================================
     function renderDeptManagementList() {
-      const container = document.getElementById('deptManagementList');
-      container.innerHTML = '';
+      const containers = [
+        document.getElementById('deptManagementList'),
+        document.getElementById('dashDeptManagementList')
+      ];
 
-      state.departments.forEach((dept, index) => {
-        const item = document.createElement('div');
-        item.className = 'p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2';
+      const countBadge = document.getElementById('dashDeptsCountBadge');
+      if (countBadge) countBadge.innerText = `${state.departments.length} ฝ่าย`;
 
-        const isHoliday = dept.id === 'dept_holiday';
-        const currentPin = dept.pin || '';
+      containers.forEach(container => {
+        if (!container) return;
+        container.innerHTML = '';
 
-        item.innerHTML = `
-          <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-1 min-w-0">
-              <input type="color" value="${dept.color}" class="w-7 h-7 rounded-lg cursor-pointer border border-slate-300 p-0.5 shrink-0 bg-white" data-dept-id="${dept.id}" title="เปลี่ยนสีฝ่าย">
-              <span class="font-bold text-slate-800 truncate">${dept.name}</span>
-            </div>
-            <div class="shrink-0 flex items-center gap-1">
-              ${isHoliday ? '<span class="text-slate-400 text-[10px] bg-slate-100 px-2 py-0.5 rounded-md">(วันหยุดระบบ)</span>' : `
-                <button class="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition cursor-pointer" data-del-dept="${dept.id}" title="ลบฝ่าย">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-              `}
-            </div>
-          </div>
-          ${!isHoliday ? `
-            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 text-[11px]">
-              <span class="text-slate-500 flex items-center gap-1">
-                <i data-lucide="key" class="w-3.5 h-3.5 text-purple-600"></i> รหัสผ่าน (PIN):
-              </span>
-              <div class="flex items-center gap-1.5">
-                <div class="relative">
-                  <input type="password" value="${currentPin}" maxlength="10" placeholder="ตั้งรหัส"
-                    class="w-24 px-2 py-1 text-center font-mono font-bold rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
-                    data-pin-input="${dept.id}">
-                  <button type="button" class="text-slate-400 hover:text-slate-600 p-0.5 align-middle cursor-pointer" data-toggle-pin="${dept.id}" title="ดู/ซ่อนรหัส">
-                    <i data-lucide="eye" class="w-3 h-3"></i>
-                  </button>
+        state.departments.forEach((dept) => {
+          const item = document.createElement('div');
+          item.className = 'p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200 text-xs space-y-2.5 hover:border-purple-200 transition shadow-2xs';
+
+          const isHoliday = dept.id === 'dept_holiday';
+          const currentPin = dept.pin || '';
+
+          item.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                <input type="color" value="${dept.color}" class="w-8 h-8 rounded-xl cursor-pointer border border-slate-300 p-0.5 shrink-0 bg-white shadow-2xs" data-dept-id="${dept.id}" title="เปลี่ยนสีฝ่าย">
+                <div class="min-w-0">
+                  <span class="font-bold text-slate-800 truncate block text-xs sm:text-sm">${dept.name}</span>
+                  <span class="text-[10px] text-slate-400 font-mono">${dept.color}</span>
                 </div>
-                <button type="button" class="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-lg font-bold text-[10px] transition cursor-pointer" data-save-pin="${dept.id}">
-                  บันทึก
-                </button>
+              </div>
+              <div class="shrink-0 flex items-center gap-1">
+                ${isHoliday ? '<span class="text-slate-400 text-[10px] bg-slate-100 px-2.5 py-1 rounded-lg font-medium border border-slate-200">(วันหยุดระบบ)</span>' : `
+                  <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1 text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition cursor-pointer font-medium text-xs border border-rose-200" data-del-dept="${dept.id}" title="ลบฝ่าย">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span>ลบ</span>
+                  </button>
+                `}
               </div>
             </div>
-          ` : ''}
-        `;
+            ${!isHoliday ? `
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 text-[11px]">
+                <span class="text-slate-500 flex items-center gap-1 font-medium">
+                  <i data-lucide="key" class="w-3.5 h-3.5 text-purple-600"></i> รหัสผ่าน (PIN):
+                </span>
+                <div class="flex items-center gap-1.5">
+                  <div class="relative flex items-center">
+                    <input type="password" value="${currentPin}" maxlength="10" placeholder="ตั้งรหัส"
+                      class="w-24 px-2 py-1 text-center font-mono font-bold rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
+                      data-pin-input="${dept.id}">
+                    <button type="button" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer" data-toggle-pin="${dept.id}" title="ดู/ซ่อนรหัส">
+                      <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                  <button type="button" class="px-2.5 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-lg font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95" data-save-pin="${dept.id}">
+                    บันทึก
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+          `;
 
-        // Color change
-        const colorInput = item.querySelector(`input[data-dept-id="${dept.id}"]`);
-        if (colorInput) {
-          colorInput.addEventListener('change', (e) => {
-            dept.color = e.target.value;
-            saveStateLocal();
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-              google.script.run.saveDepartment(dept, state.adminPin);
-            } else if (gasApiUrl) {
-              sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
-            }
-            renderUI();
-            showToast(`เปลี่ยนสีฝ่าย "${dept.name}" เรียบร้อยแล้ว`);
-          });
-        }
-
-        // Toggle PIN eye
-        const togglePinBtn = item.querySelector(`button[data-toggle-pin="${dept.id}"]`);
-        const pinInput = item.querySelector(`input[data-pin-input="${dept.id}"]`);
-        if (togglePinBtn && pinInput) {
-          togglePinBtn.addEventListener('click', () => {
-            if (pinInput.type === 'password') {
-              pinInput.type = 'text';
-              togglePinBtn.innerHTML = '<i data-lucide="eye-off" class="w-3 h-3"></i>';
-            } else {
-              pinInput.type = 'password';
-              togglePinBtn.innerHTML = '<i data-lucide="eye" class="w-3 h-3"></i>';
-            }
-            lucide.createIcons();
-          });
-        }
-
-        // Save PIN
-        const savePinBtn = item.querySelector(`button[data-save-pin="${dept.id}"]`);
-        if (savePinBtn && pinInput) {
-          savePinBtn.addEventListener('click', () => {
-            const newPin = pinInput.value.trim();
-            dept.pin = newPin;
-            saveStateLocal();
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-              google.script.run.saveDepartment(dept, state.adminPin);
-            } else if (gasApiUrl) {
-              sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
-            }
-            showToast(`บันทึกรหัสผ่านฝ่าย "${dept.name}" สำเร็จ`);
-          });
-        }
-
-        // Delete button
-        const delBtn = item.querySelector(`button[data-del-dept="${dept.id}"]`);
-        if (delBtn) {
-          delBtn.addEventListener('click', () => {
-            if (confirm(`ต้องการลบ "${dept.name}" ใช่หรือไม่?`)) {
-              state.departments = state.departments.filter(d => d.id !== dept.id);
+          // Color change
+          const colorInput = item.querySelector(`input[data-dept-id="${dept.id}"]`);
+          if (colorInput) {
+            colorInput.addEventListener('change', (e) => {
+              dept.color = e.target.value;
               saveStateLocal();
               if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.deleteDepartment(dept.id, state.adminPin);
+                google.script.run.saveDepartment(dept, state.adminPin);
               } else if (gasApiUrl) {
-                sendToCloudApi('deleteDepartment', { id: dept.id, adminPin: state.adminPin });
+                sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
               }
               renderDeptManagementList();
               renderUI();
-              showToast(`ลบฝ่ายเรียบร้อยแล้ว`);
-            }
-          });
-        }
+              showToast(`เปลี่ยนสีฝ่าย "${dept.name}" เรียบร้อยแล้ว`);
+            });
+          }
 
-        container.appendChild(item);
+          // Toggle PIN eye
+          const togglePinBtn = item.querySelector(`button[data-toggle-pin="${dept.id}"]`);
+          const pinInput = item.querySelector(`input[data-pin-input="${dept.id}"]`);
+          if (togglePinBtn && pinInput) {
+            togglePinBtn.addEventListener('click', () => {
+              if (pinInput.type === 'password') {
+                pinInput.type = 'text';
+                togglePinBtn.innerHTML = '<i data-lucide="eye-off" class="w-3.5 h-3.5"></i>';
+              } else {
+                pinInput.type = 'password';
+                togglePinBtn.innerHTML = '<i data-lucide="eye" class="w-3.5 h-3.5"></i>';
+              }
+              lucide.createIcons();
+            });
+          }
+
+          // Save PIN
+          const savePinBtn = item.querySelector(`button[data-save-pin="${dept.id}"]`);
+          if (savePinBtn && pinInput) {
+            savePinBtn.addEventListener('click', () => {
+              const newPin = pinInput.value.trim();
+              dept.pin = newPin;
+              saveStateLocal();
+              if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run.saveDepartment(dept, state.adminPin);
+              } else if (gasApiUrl) {
+                sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
+              }
+              renderDeptManagementList();
+              showToast(`บันทึกรหัสผ่านฝ่าย "${dept.name}" สำเร็จ`);
+            });
+          }
+
+          // Delete button
+          const delBtn = item.querySelector(`button[data-del-dept="${dept.id}"]`);
+          if (delBtn) {
+            delBtn.addEventListener('click', () => {
+              if (confirm(`ต้องการลบ "${dept.name}" ใช่หรือไม่?`)) {
+                state.departments = state.departments.filter(d => d.id !== dept.id);
+                saveStateLocal();
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                  google.script.run.deleteDepartment(dept.id, state.adminPin);
+                } else if (gasApiUrl) {
+                  sendToCloudApi('deleteDepartment', { id: dept.id, adminPin: state.adminPin });
+                }
+                renderDeptManagementList();
+                if (typeof populateDeptSelects === 'function') populateDeptSelects();
+                if (typeof populateDashEventsDeptFilter === 'function') populateDashEventsDeptFilter();
+                renderUI();
+                showToast(`ลบฝ่ายเรียบร้อยแล้ว`);
+              }
+            });
+          }
+
+          container.appendChild(item);
+        });
       });
+
       lucide.createIcons();
     }
 
-    document.getElementById('btnAddDeptSubmit').onclick = function() {
-      const nameInput = document.getElementById('newDeptName');
-      const pinInput = document.getElementById('newDeptPin');
-      const colorInput = document.getElementById('newDeptColor');
-      const name = nameInput.value.trim();
-      const pin = pinInput ? pinInput.value.trim() : '1234';
-      const color = colorInput.value;
-
+    function addNewDepartment(name, pin, color, onSuccess) {
+      name = (name || '').trim();
       if (!name) {
         alert('กรุณากรอกชื่อฝ่าย');
         return;
       }
+      pin = (pin || '').trim() || '1234';
+      color = color || '#7c3aed';
 
       const newDept = {
         id: 'dept_' + Date.now(),
         name: name,
         color: color,
-        pin: pin || '1234'
+        pin: pin
       };
 
       state.departments.push(newDept);
@@ -3455,12 +3666,28 @@
       } else if (gasApiUrl) {
         sendToCloudApi('saveDepartment', { deptData: newDept, adminPin: state.adminPin });
       }
-      nameInput.value = '';
-      if (pinInput) pinInput.value = '';
+
+      if (typeof onSuccess === 'function') onSuccess();
+
       renderDeptManagementList();
+      if (typeof populateDeptSelects === 'function') populateDeptSelects();
+      if (typeof populateDashEventsDeptFilter === 'function') populateDashEventsDeptFilter();
       renderUI();
       showToast(`เพิ่มฝ่าย "${name}" (PIN: ${newDept.pin}) เรียบร้อยแล้ว`);
-    };
+    }
+
+    const btnAddDeptModal = document.getElementById('btnAddDeptSubmit');
+    if (btnAddDeptModal) {
+      btnAddDeptModal.onclick = function() {
+        const nameInput = document.getElementById('newDeptName');
+        const pinInput = document.getElementById('newDeptPin');
+        const colorInput = document.getElementById('newDeptColor');
+        addNewDepartment(nameInput.value, pinInput ? pinInput.value : '', colorInput ? colorInput.value : '#7c3aed', () => {
+          nameInput.value = '';
+          if (pinInput) pinInput.value = '';
+        });
+      };
+    }
 
     // ==========================================
     // 11. ADMIN AUTHENTICATION & MANAGEMENT
@@ -4022,10 +4249,185 @@
     }
 
     // ==========================================
-    // 8.1 ADMIN DASHBOARD LOGIC
+    // 8.1 ADMIN DASHBOARD LOGIC (หมวดหมู่ & จัดการระบบ)
     // ==========================================
     let chartDeptShareInstance = null;
     let chartMonthlyEventsInstance = null;
+    let currentAdminTab = 'all';
+
+    function switchAdminTab(targetTab) {
+      currentAdminTab = targetTab || 'all';
+
+      const tabDefs = [
+        { id: 'adminTabAll', key: 'all' },
+        { id: 'adminTabStats', key: 'stats', sec: 'adminSecStats' },
+        { id: 'adminTabEvents', key: 'events', sec: 'adminSecEvents' },
+        { id: 'adminTabDepts', key: 'depts', sec: 'adminSecDepts' },
+        { id: 'adminTabUsers', key: 'users', sec: 'adminSecUsers' },
+        { id: 'adminTabSync', key: 'sync', sec: 'adminSecSync' }
+      ];
+
+      tabDefs.forEach(t => {
+        const btn = document.getElementById(t.id);
+        if (btn) {
+          const isActive = t.key === currentAdminTab;
+          if (isActive) {
+            btn.className = 'admin-tab-pill active px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white text-purple-950 shadow-sm whitespace-nowrap cursor-pointer';
+          } else {
+            btn.className = 'admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer';
+          }
+        }
+      });
+
+      const secIds = ['adminSecStats', 'adminSecEvents', 'adminSecDepts', 'adminSecUsers', 'adminSecSync'];
+      secIds.forEach(secId => {
+        const el = document.getElementById(secId);
+        if (el) {
+          if (currentAdminTab === 'all') {
+            el.classList.remove('hidden');
+          } else {
+            const matchedTab = tabDefs.find(t => t.key === currentAdminTab);
+            el.classList.toggle('hidden', !matchedTab || matchedTab.sec !== secId);
+          }
+        }
+      });
+
+      if (currentAdminTab === 'all' || currentAdminTab === 'stats') {
+        setTimeout(() => {
+          if (chartDeptShareInstance) chartDeptShareInstance.resize();
+          if (chartMonthlyEventsInstance) chartMonthlyEventsInstance.resize();
+        }, 50);
+      }
+    }
+
+    function populateDashEventsDeptFilter() {
+      const sel = document.getElementById('dashEventsDeptFilter');
+      if (!sel) return;
+      const current = sel.value;
+      sel.innerHTML = '<option value="all">ทุกฝ่ายงาน</option>';
+      state.departments.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = d.name;
+        sel.appendChild(opt);
+      });
+      if (current) sel.value = current;
+    }
+
+    function renderDashEventsTable() {
+      const tbody = document.getElementById('dashEventsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const yearEvents = state.events.filter(e => {
+        if (state.selectedYear === 'all') return true;
+        const eYear = e.academicYear || (e.startDate ? String(parseInt(e.startDate.slice(0, 4), 10) + 543) : null);
+        return !eYear || eYear === state.selectedYear;
+      });
+
+      const q = (document.getElementById('dashEventsSearchInput')?.value || '').toLowerCase().trim();
+      const deptVal = document.getElementById('dashEventsDeptFilter')?.value || 'all';
+      const termVal = document.getElementById('dashEventsTermFilter')?.value || 'all';
+
+      const filtered = yearEvents.filter(evt => {
+        if (deptVal !== 'all' && evt.departmentId !== deptVal) return false;
+        if (termVal !== 'all' && String(evt.semester) !== termVal) return false;
+        if (q) {
+          const d = state.departments.find(dept => dept.id === evt.departmentId);
+          const deptName = d ? d.name.toLowerCase() : '';
+          const titleMatch = (evt.title || '').toLowerCase().includes(q);
+          const locMatch = (evt.location || '').toLowerCase().includes(q);
+          const descMatch = (evt.description || '').toLowerCase().includes(q);
+          const dMatch = deptName.includes(q);
+          if (!titleMatch && !locMatch && !descMatch && !dMatch) return false;
+        }
+        return true;
+      });
+
+      const badge = document.getElementById('dashEventsCountBadge');
+      if (badge) badge.innerText = `${filtered.length} รายการ`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบกิจกรรมที่ตรงกับเงื่อนไขการค้นหา</td></tr>`;
+        return;
+      }
+
+      const sortedEvents = [...filtered].sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+
+      sortedEvents.forEach(evt => {
+        const dept = state.departments.find(d => d.id === evt.departmentId) || { name: 'ทั่วไป', color: '#64748b' };
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-purple-50/40 transition';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-700 whitespace-nowrap">${evt.startDate}</td>
+          <td class="p-3 font-bold text-slate-800">${evt.title}</td>
+          <td class="p-3 whitespace-nowrap"><span class="px-2.5 py-1 rounded-md text-white text-[11px] font-semibold shadow-2xs" style="background-color: ${dept.color}">${dept.name}</span></td>
+          <td class="p-3 text-slate-600 whitespace-nowrap">${evt.semester ? 'เทอม ' + evt.semester : '-'}</td>
+          <td class="p-3 text-slate-500">${evt.location || '-'}</td>
+          <td class="p-3 text-right whitespace-nowrap space-x-1.5">
+            <button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-purple-800 text-xs font-semibold transition cursor-pointer" title="แก้ไข" data-dash-edit="${evt.id}">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> <span>แก้ไข</span>
+            </button>
+            <button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-semibold transition cursor-pointer" title="ลบ" data-dash-del="${evt.id}">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span>ลบ</span>
+            </button>
+          </td>
+        `;
+
+        tr.querySelector(`[data-dash-edit="${evt.id}"]`).onclick = () => openEditEventModal(evt);
+        tr.querySelector(`[data-dash-del="${evt.id}"]`).onclick = () => {
+          if (confirm(`ลบกิจกรรม "${evt.title}" ใช่หรือไม่?`)) {
+            if (!Array.isArray(state.deletedEventIds)) state.deletedEventIds = [];
+            if (!state.deletedEventIds.includes(evt.id)) {
+              state.deletedEventIds.push(evt.id);
+            }
+
+            state.events = state.events.filter(x => x.id !== evt.id);
+            saveStateLocal();
+
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+              google.script.run.deleteEvent(evt.id, state.adminPin);
+            } else if (gasApiUrl) {
+              sendToCloudApi('deleteEvent', { id: evt.id, adminPin: state.adminPin });
+            }
+
+            renderAdminDashboard();
+            renderUI();
+            showToast('ลบกิจกรรมสำเร็จ');
+          }
+        };
+
+        tbody.appendChild(tr);
+      });
+
+      lucide.createIcons();
+    }
+
+    function setupDashDeptColorSwatches() {
+      const container = document.getElementById('dashDeptColorSwatches');
+      const colorInput = document.getElementById('dashNewDeptColor');
+      const hexLabel = document.getElementById('dashNewDeptColorHex');
+      if (!container || !colorInput) return;
+
+      const presetColors = ['#7c3aed', '#6366f1', '#2563eb', '#0284c7', '#059669', '#16a34a', '#d97706', '#ea580c', '#dc2626', '#db2777', '#4b5563'];
+      container.innerHTML = '';
+      presetColors.forEach(hex => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-5 h-5 rounded-full border-2 border-white shadow-2xs hover:scale-125 transition-transform cursor-pointer shrink-0';
+        btn.style.backgroundColor = hex;
+        btn.title = hex;
+        btn.onclick = () => {
+          colorInput.value = hex;
+          if (hexLabel) hexLabel.innerText = hex;
+        };
+        container.appendChild(btn);
+      });
+
+      colorInput.oninput = (e) => {
+        if (hexLabel) hexLabel.innerText = e.target.value;
+      };
+    }
 
     function renderAdminDashboard() {
       const yearEvents = state.events.filter(e => {
@@ -4034,7 +4436,17 @@
         return !eYear || eYear === state.selectedYear;
       });
       
-      // 1. KPI Stats
+      // อัปเดตชื่อผู้ดูแลระบบใน Banner หัวข้อ
+      const adminIdentity = document.getElementById('dashAdminIdentityText');
+      if (adminIdentity) {
+        if (state.currentAdmin) {
+          adminIdentity.innerText = `${state.currentAdmin.name} (${state.currentAdmin.role === 'primary' ? 'แอดมินหลัก' : 'แอดมินรอง'})`;
+        } else {
+          adminIdentity.innerText = 'ผู้ดูแลระบบ';
+        }
+      }
+
+      // 1. หมวดที่ 1: KPI Stats
       document.getElementById('dashTotalEvents').innerText = yearEvents.length;
       document.getElementById('dashTotalDepts').innerText = state.departments.length;
       
@@ -4049,7 +4461,7 @@
       }).length;
       document.getElementById('dashUpcomingEvents').innerText = upcomingCount;
 
-      // 2. Chart 1: สัดส่วนแยกตามฝ่าย
+      // 2. หมวดที่ 1: Chart 1 (สัดส่วนแยกตามฝ่าย)
       const deptLabels = [];
       const deptCounts = [];
       const deptColors = [];
@@ -4085,7 +4497,7 @@
         }
       });
 
-      // 3. Chart 2: กิจกรรมแยกตามเดือน
+      // 3. หมวดที่ 1: Chart 2 (กิจกรรมแยกตามเดือน)
       const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
       const monthlyCounts = new Array(12).fill(0);
       yearEvents.forEach(e => {
@@ -4120,66 +4532,79 @@
         }
       });
 
-      // 4. Dash Events Table Body
-      const tbody = document.getElementById('dashEventsTableBody');
-      tbody.innerHTML = '';
-      const sortedEvents = [...yearEvents].sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
-      
-      sortedEvents.forEach(evt => {
-        const dept = state.departments.find(d => d.id === evt.departmentId) || { name: 'ทั่วไป', color: '#64748b' };
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50 transition';
-        tr.innerHTML = `
-          <td class="p-2.5 font-medium text-slate-700">${evt.startDate}</td>
-          <td class="p-2.5 font-bold text-slate-800">${evt.title}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-white text-[10px] font-medium" style="background-color: ${dept.color}">${dept.name}</span></td>
-          <td class="p-2.5 text-slate-500">${evt.semester || '-'}</td>
-          <td class="p-2.5 text-slate-500">${evt.location || '-'}</td>
-          <td class="p-2.5 text-right space-x-1">
-            <button class="p-1 hover:bg-slate-200 text-slate-600 rounded" title="แก้ไข" data-dash-edit="${evt.id}">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-            </button>
-            <button class="p-1 hover:bg-rose-100 text-rose-600 rounded" title="ลบ" data-dash-del="${evt.id}">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          </td>
-        `;
+      // 4. หมวดที่ 2: จัดการกิจกรรม
+      populateDashEventsDeptFilter();
+      renderDashEventsTable();
 
-        tr.querySelector(`[data-dash-edit="${evt.id}"]`).onclick = () => openEditEventModal(evt);
-        tr.querySelector(`[data-dash-del="${evt.id}"]`).onclick = () => {
-          if (confirm(`ลบกิจกรรม "${evt.title}" ใช่หรือไม่?`)) {
-            // บันทึกลง deletedEventIds เพื่อป้องกันไม่ให้ถูก sync กลับคืนมา
-            if (!Array.isArray(state.deletedEventIds)) state.deletedEventIds = [];
-            if (!state.deletedEventIds.includes(evt.id)) {
-              state.deletedEventIds.push(evt.id);
-            }
+      // 5. หมวดที่ 3: จัดการฝ่ายและสี
+      renderDeptManagementList();
+      setupDashDeptColorSwatches();
 
-            state.events = state.events.filter(x => x.id !== evt.id);
-            saveStateLocal();
-
-            // ส่งคำสั่งลบไปยัง Google Sheets หรือ Cloud API
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-              google.script.run.deleteEvent(evt.id, state.adminPin);
-            } else if (gasApiUrl) {
-              sendToCloudApi('deleteEvent', { id: evt.id, adminPin: state.adminPin });
-            }
-
-            renderAdminDashboard();
-            renderUI();
-            showToast('ลบกิจกรรมสำเร็จ');
-          }
-        };
-
-        tbody.appendChild(tr);
-      });
-
-      // 5. Dash Users Table Body (User Management)
+      // 6. หมวดที่ 4: ผู้ใช้งานและแอดมิน
       renderAdminUsersTable();
-
-      // 6. Dash Admins Table Body (Admin Accounts Management)
       renderAdminListTable();
 
+      // รักษาสถานะแท็บปัจจุบัน
+      switchAdminTab(currentAdminTab);
+
       lucide.createIcons();
+    }
+
+    function initAdminDashboardEvents() {
+      const tabMappings = [
+        { id: 'adminTabAll', key: 'all' },
+        { id: 'adminTabStats', key: 'stats' },
+        { id: 'adminTabEvents', key: 'events' },
+        { id: 'adminTabDepts', key: 'depts' },
+        { id: 'adminTabUsers', key: 'users' },
+        { id: 'adminTabSync', key: 'sync' }
+      ];
+
+      tabMappings.forEach(t => {
+        const btn = document.getElementById(t.id);
+        if (btn) {
+          btn.onclick = () => switchAdminTab(t.key);
+        }
+      });
+
+      const btnAdminQuickAdd = document.getElementById('btnAdminQuickAdd');
+      if (btnAdminQuickAdd) btnAdminQuickAdd.onclick = () => openAddEventModal();
+
+      const btnAdminQuickDept = document.getElementById('btnAdminQuickDept');
+      if (btnAdminQuickDept) {
+        btnAdminQuickDept.onclick = () => {
+          switchAdminTab('depts');
+          const sec = document.getElementById('adminSecDepts');
+          if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+      }
+
+      const btnAdminExit = document.getElementById('btnAdminExit');
+      if (btnAdminExit) btnAdminExit.onclick = () => switchCalendarView('month');
+
+      const searchInput = document.getElementById('dashEventsSearchInput');
+      if (searchInput) searchInput.oninput = () => renderDashEventsTable();
+
+      const deptFilter = document.getElementById('dashEventsDeptFilter');
+      if (deptFilter) deptFilter.onchange = () => renderDashEventsTable();
+
+      const termFilter = document.getElementById('dashEventsTermFilter');
+      if (termFilter) termFilter.onchange = () => renderDashEventsTable();
+
+      const btnDashAddDept = document.getElementById('btnDashAddDeptSubmit');
+      if (btnDashAddDept) {
+        btnDashAddDept.onclick = () => {
+          const nameInput = document.getElementById('dashNewDeptName');
+          const pinInput = document.getElementById('dashNewDeptPin');
+          const colorInput = document.getElementById('dashNewDeptColor');
+          addNewDepartment(nameInput ? nameInput.value : '', pinInput ? pinInput.value : '', colorInput ? colorInput.value : '#7c3aed', () => {
+            if (nameInput) nameInput.value = '';
+            if (pinInput) pinInput.value = '';
+          });
+        };
+      }
+
+      setupDashDeptColorSwatches();
     }
 
     function renderAdminUsersTable() {
@@ -4993,6 +5418,7 @@
     // Launch
     window.addEventListener('DOMContentLoaded', () => {
       initData();
+      initAdminDashboardEvents();
     });
   </script>
 </body>
