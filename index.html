@@ -356,8 +356,14 @@
           </div>
         </div>
 
+        <!-- Refresh / Real-time Sync Button -->
+        <button id="btnSyncRefresh" class="p-2 text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 rounded-xl border border-purple-200 transition shadow-2xs cursor-pointer flex items-center gap-1" title="ดึงข้อมูลกิจกรรมล่าสุด (รีเฟรชข้อมูล)">
+          <i data-lucide="refresh-cw" class="w-4 h-4" id="iconSyncRefresh"></i>
+          <span class="text-xs font-semibold hidden md:inline">รีเฟรช</span>
+        </button>
+
         <!-- Manage Departments Button -->
-        <button id="btnManageDept" class="p-2 text-slate-600 hover:text-purple-900 hover:bg-purple-50 rounded-xl border border-slate-200 transition" title="จัดการฝ่ายและสี">
+        <button id="btnManageDept" class="p-2 text-slate-600 hover:text-purple-900 hover:bg-purple-50 rounded-xl border border-slate-200 transition cursor-pointer" title="จัดการฝ่ายและสี">
           <i data-lucide="settings-2" class="w-4 h-4"></i>
         </button>
       </div>
@@ -601,6 +607,31 @@
             </tbody>
           </table>
         </div>
+      </div>
+
+      <!-- Real-time Google Sheet Cloud Sync Configuration -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="cloud-lightning" class="w-4 h-4 text-purple-700"></i> การเชื่อมต่อข้อมูลคลาวด์แบบเรียลไทม์ (Google Apps Script API)
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">เชื่อมต่อกับ Web App URL ของ Google Apps Script เพื่อให้สมาร์ทโฟน แท็บเล็ต และคอมพิวเตอร์อัปเดตข้อมูลตรงกันแบบ Real-time ทันที</p>
+          </div>
+          <span id="gasStatusBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            พร้อมใช้งาน
+          </span>
+        </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <input type="url" id="inputGasApiUrl" placeholder="https://script.google.com/macros/s/.../exec"
+            class="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-300">
+          <button id="btnSaveGasApiUrl" type="button" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i> บันทึกและทดสอบเชื่อมต่อ
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400">
+          * ระบบมีระบบตรวจจับการเปลี่ยนแปลงอัตโนมัติ (Auto Polling ทุก 15 วินาที) และปุ่มกดรีเฟรชข้อมูล <i data-lucide="refresh-cw" class="w-3 h-3 inline text-purple-600"></i> ทันใจ
+        </p>
       </div>
     </div>
 
@@ -1637,32 +1668,134 @@
     ];
 
     // ==========================================
-    // 4. STORAGE & INITIALIZATION
+    // 4. STORAGE & CLOUD REAL-TIME SYNC
     // ==========================================
+    let gasApiUrl = localStorage.getItem('school_cal_gas_url') || '';
+    let isSyncing = false;
+    let autoSyncInterval = null;
+
     function initData() {
-      // ตรวจสอบว่ารันอยู่บน Google Apps Script หรือ Local Test
+      // 1. โหลดข้อมูลในเครื่องทันทีก่อน เพื่อให้หน้าเว็บแสดงผลทันทีไม่มีดีเลย์
+      loadLocalData();
+
+      // 2. หากรันอยู่ในสภาพแวดล้อม Google Apps Script โดยตรง
       if (typeof google !== 'undefined' && google.script && google.script.run) {
-        // ดึงจาก Google Apps Script Backend
-        google.script.run
-          .withSuccessHandler(function(response) {
-            if (response && response.departments) {
-              state.departments = response.departments;
-              state.events = response.events;
-              if (response.users && Array.isArray(response.users) && response.users.length > 0) {
-                state.users = response.users;
-              }
-              renderUI();
-            }
-          })
-          .withFailureHandler(function(err) {
-            console.error('GAS Error, fallback to Local:', err);
-            loadLocalData();
-          })
-          .getInitialData();
-      } else {
-        // ทำงานใน LocalStorage (เปิดดูในเบราว์เซอร์ได้ทันที)
-        loadLocalData();
+        syncFromGasNative();
+        // เริ่มต้น Real-time Polling ทุก 15 วินาที
+        startAutoSync(() => syncFromGasNative(true));
+      } else if (gasApiUrl) {
+        // หากมี Web App URL คลาวด์ ให้ดึงข้อมูลสดทันที
+        syncFromCloudApi();
+        // เริ่มต้น Real-time Polling ทุก 15 วินาที
+        startAutoSync(() => syncFromCloudApi(true));
       }
+    }
+
+    function syncFromGasNative(isSilent) {
+      if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+      if (!isSilent) setSyncLoading(true);
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          if (!isSilent) setSyncLoading(false);
+          if (response && response.events) {
+            applySyncedData(response);
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (!isSilent) {
+            setSyncLoading(false);
+            console.error('GAS Native Error:', err);
+          }
+        })
+        .getInitialData();
+    }
+
+    function syncFromCloudApi(isSilent) {
+      if (!gasApiUrl) return;
+      if (isSyncing) return;
+      isSyncing = true;
+      if (!isSilent) setSyncLoading(true);
+
+      const fetchUrl = `${gasApiUrl}${gasApiUrl.includes('?') ? '&' : '?'}action=getInitialData&_t=${Date.now()}`;
+
+      fetch(fetchUrl)
+        .then(res => res.json())
+        .then(response => {
+          isSyncing = false;
+          if (!isSilent) {
+            setSyncLoading(false);
+            showToast('อัปเดตข้อมูลสดเรียบร้อยแล้ว');
+          }
+          if (response && response.success && response.events) {
+            applySyncedData(response);
+          }
+        })
+        .catch(err => {
+          isSyncing = false;
+          if (!isSilent) {
+            setSyncLoading(false);
+            console.error('Cloud Sync Error:', err);
+            showToast('เชื่อมต่อคลาวด์ไม่สำเร็จ ใช้ข้อมูลในเครื่อง');
+          }
+        });
+    }
+
+    function applySyncedData(response) {
+      if (Array.isArray(response.departments) && response.departments.length > 0) {
+        state.departments = response.departments;
+      }
+      if (Array.isArray(response.events)) {
+        // ผสานวันหยุดระบบกับกิจกรรมจากชีต
+        const eventMap = new Map();
+        DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => eventMap.set(e.id, e));
+        response.events.forEach(e => eventMap.set(e.id, e));
+        state.events = Array.from(eventMap.values());
+      }
+      if (Array.isArray(response.users) && response.users.length > 0) {
+        state.users = response.users;
+      }
+      saveStateLocal();
+      renderUI();
+    }
+
+    function sendToCloudApi(actionName, payload, successCallback) {
+      if (!gasApiUrl) return;
+      
+      fetch(gasApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: actionName, ...payload })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (successCallback) successCallback(res);
+        // รีเฟรชข้อมูลหลังบันทึก
+        setTimeout(() => syncFromCloudApi(true), 500);
+      })
+      .catch(err => console.error('Cloud save error:', err));
+    }
+
+    function setSyncLoading(isLoading) {
+      const icon = document.getElementById('iconSyncRefresh');
+      if (icon) {
+        if (isLoading) {
+          icon.classList.add('animate-spin');
+        } else {
+          icon.classList.remove('animate-spin');
+        }
+      }
+    }
+
+    function startAutoSync(syncFn) {
+      if (autoSyncInterval) clearInterval(autoSyncInterval);
+      // Auto-poll ทุก 15 วินาที เพื่อความเรียลไทม์
+      autoSyncInterval = setInterval(() => {
+        // ทำงานเฉพาะเมื่อหน้าจอยังเปิดอยู่ (Visibility check)
+        if (!document.hidden) {
+          syncFn();
+        }
+      }, 15000);
     }
 
     function loadLocalData() {
@@ -2636,6 +2769,8 @@
         google.script.run
           .withSuccessHandler(() => showToast('บันทึกลง Google Sheets แล้ว'))
           .saveEvent(eventData);
+      } else if (gasApiUrl) {
+        sendToCloudApi('saveEvent', { eventData: eventData });
       }
 
       closeModal('modalEvent');
@@ -2652,6 +2787,8 @@
 
         if (typeof google !== 'undefined' && google.script && google.script.run) {
           google.script.run.deleteEvent(id, state.adminPin);
+        } else if (gasApiUrl) {
+          sendToCloudApi('deleteEvent', { id: id, adminPin: state.adminPin });
         }
 
         closeModal('modalEvent');
@@ -2692,6 +2829,8 @@
           saveStateLocal();
           if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run.saveDepartment(dept, state.adminPin);
+          } else if (gasApiUrl) {
+            sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
           }
           renderUI();
           showToast(`เปลี่ยนสีฝ่าย ${dept.name} แล้ว`);
@@ -2706,6 +2845,8 @@
               saveStateLocal();
               if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.deleteDepartment(dept.id, state.adminPin);
+              } else if (gasApiUrl) {
+                sendToCloudApi('deleteDepartment', { id: dept.id, adminPin: state.adminPin });
               }
               renderDeptManagementList();
               renderUI();
@@ -2740,6 +2881,8 @@
       saveStateLocal();
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.saveDepartment(newDept, state.adminPin);
+      } else if (gasApiUrl) {
+        sendToCloudApi('saveDepartment', { deptData: newDept, adminPin: state.adminPin });
       }
       nameInput.value = '';
       renderDeptManagementList();
@@ -3185,6 +3328,54 @@
       renderUI();
     });
 
+    // Real-time Sync Refresh Button
+    const btnSyncRefresh = document.getElementById('btnSyncRefresh');
+    if (btnSyncRefresh) {
+      btnSyncRefresh.onclick = () => {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          syncFromGasNative(false);
+        } else if (gasApiUrl) {
+          syncFromCloudApi(false);
+        } else {
+          loadLocalData();
+          renderUI();
+          showToast('รีเฟรชข้อมูลในเครื่องแล้ว (สามารถเชื่อมต่อ Cloud URL ในแดชบอร์ดแอดมินเพื่อซิงค์ข้อมูลสด)');
+        }
+      };
+    }
+
+    // Cloud API Settings Listeners in Admin Dashboard
+    const inputGasApiUrl = document.getElementById('inputGasApiUrl');
+    const btnSaveGasApiUrl = document.getElementById('btnSaveGasApiUrl');
+    const gasStatusBadge = document.getElementById('gasStatusBadge');
+
+    if (inputGasApiUrl) {
+      inputGasApiUrl.value = gasApiUrl;
+    }
+
+    if (btnSaveGasApiUrl) {
+      btnSaveGasApiUrl.onclick = () => {
+        const url = (inputGasApiUrl ? inputGasApiUrl.value.trim() : '');
+        gasApiUrl = url;
+        localStorage.setItem('school_cal_gas_url', url);
+        if (url) {
+          showToast('บันทึก Cloud URL สำเร็จ กำลังทดสอบดึงข้อมูลสด...');
+          syncFromCloudApi(false);
+          startAutoSync(() => syncFromCloudApi(true));
+          if (gasStatusBadge) {
+            gasStatusBadge.innerText = 'เชื่อมต่อคลาวด์แล้ว';
+            gasStatusBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+          }
+        } else {
+          showToast('ยกเลิกการเชื่อมต่อ Cloud URL (ใช้ระบบบันทึกในเครื่อง)');
+          if (gasStatusBadge) {
+            gasStatusBadge.innerText = 'โหมดออฟไลน์';
+            gasStatusBadge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200';
+          }
+        }
+      };
+    }
+
     btnClearSearch.addEventListener('click', () => {
       inputSearch.value = '';
       state.searchQuery = '';
@@ -3441,6 +3632,8 @@
 
             if (typeof google !== 'undefined' && google.script && google.script.run) {
               google.script.run.deleteUser(targetId, state.adminPin);
+            } else if (gasApiUrl) {
+              sendToCloudApi('deleteUser', { userId: targetId, adminPin: state.adminPin });
             }
 
             renderAdminUsersTable();
@@ -3912,9 +4105,11 @@
 
       saveStateLocal();
 
-      // Sync to Google Sheets if running on GAS
+      // Sync to Google Sheets if running on GAS or Cloud API
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.registerUser(userData);
+      } else if (gasApiUrl) {
+        sendToCloudApi('registerUser', { userData: userData });
       }
 
       closeModal('modalUserAuth');

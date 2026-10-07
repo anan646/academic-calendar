@@ -36,6 +36,14 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  const url = event.request.url;
+
+  // ไม่แคช API calls หรือ Google Apps Script requests เพื่อให้ข้อมูลสดใหม่ตลอดเวลา
+  if (url.includes('script.google.com') || url.includes('action=')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {

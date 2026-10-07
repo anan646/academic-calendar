@@ -17,11 +17,85 @@ function getSpreadsheet() {
 }
 
 function doGet(e) {
+  // รองรับ JSON API เมื่อถูกเรียกจากภายนอก (เช่น เว็บหรือ PWA ที่โฮสต์บน Vercel / GitHub Pages / สมาร์ทโฟน)
+  if (e && e.parameter && e.parameter.action) {
+    return handleApiGet(e);
+  }
+
   return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function doPost(e) {
+  return handleApiPost(e);
+}
+
+function handleApiGet(e) {
+  var action = e.parameter.action;
+  var callback = e.parameter.callback;
+  var result = { success: false, message: 'Invalid action' };
+
+  try {
+    getOrCreateSheets();
+    if (action === 'getInitialData') {
+      result = getInitialData();
+    } else if (action === 'getEvents') {
+      result = { success: true, events: getEvents() };
+    } else if (action === 'getDepartments') {
+      result = { success: true, departments: getDepartments() };
+    } else if (action === 'getUsers') {
+      result = { success: true, users: getUsers() };
+    }
+  } catch (err) {
+    result = { success: false, error: err.message };
+  }
+
+  var outputText = JSON.stringify(result);
+  if (callback) {
+    // JSONP Support
+    return ContentService.createTextOutput(callback + '(' + outputText + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
+  return ContentService.createTextOutput(outputText)
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleApiPost(e) {
+  var result = { success: false, message: 'Invalid request' };
+  try {
+    getOrCreateSheets();
+    var postData = {};
+    if (e && e.postData && e.postData.contents) {
+      postData = JSON.parse(e.postData.contents);
+    } else if (e && e.parameter) {
+      postData = e.parameter;
+    }
+
+    var action = postData.action || (e && e.parameter && e.parameter.action);
+
+    if (action === 'saveEvent') {
+      result = saveEvent(postData.eventData || postData);
+    } else if (action === 'deleteEvent') {
+      result = deleteEvent(postData.id, postData.adminPin);
+    } else if (action === 'registerUser') {
+      result = registerUser(postData.userData || postData);
+    } else if (action === 'deleteUser') {
+      result = deleteUser(postData.userId, postData.adminPin);
+    } else if (action === 'saveDepartment') {
+      result = saveDepartment(postData.deptData || postData, postData.adminPin);
+    } else if (action === 'deleteDepartment') {
+      result = deleteDepartment(postData.id, postData.adminPin);
+    }
+  } catch (err) {
+    result = { success: false, error: err.message };
+  }
+
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function include(filename) {
