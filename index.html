@@ -828,28 +828,45 @@
 
       <div class="p-6 space-y-4">
         <!-- Add New Department -->
-        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
-          <span class="text-xs font-bold text-slate-700 block">เพิ่มฝ่ายใหม่</span>
-          <div class="flex items-center gap-2">
-            <input type="text" id="newDeptName" placeholder="ชื่อฝ่าย เช่น ฝ่ายแนะแนว"
-              class="flex-1 px-3 py-1.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <input type="color" id="newDeptColor" value="#7c3aed" class="w-9 h-9 p-0.5 rounded-lg border border-slate-300 cursor-pointer">
-            <button id="btnAddDeptSubmit" class="px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-semibold shadow-sm transition">
-              เพิ่ม
-            </button>
+        <div class="bg-purple-50/50 p-4 rounded-2xl border border-purple-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-purple-950 flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-purple-600"></i> เพิ่มฝ่ายใหม่
+            </span>
+            <span class="text-[11px] text-purple-600">กำหนดรหัสผ่านประจำฝ่าย</span>
           </div>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+            <div class="sm:col-span-6">
+              <input type="text" id="newDeptName" placeholder="ชื่อฝ่าย เช่น ฝ่ายแนะแนว"
+                class="w-full px-3 py-2 text-xs rounded-xl border border-purple-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div class="sm:col-span-4 relative">
+              <input type="text" id="newDeptPin" maxlength="8" placeholder="รหัส PIN (เช่น 5555)"
+                class="w-full px-3 py-2 text-xs rounded-xl border border-purple-200 bg-white font-mono font-semibold text-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+            <div class="sm:col-span-2 flex items-center gap-1.5">
+              <input type="color" id="newDeptColor" value="#7c3aed" class="w-9 h-8 p-0.5 rounded-xl border border-purple-200 cursor-pointer bg-white" title="เลือกสีประจำฝ่าย">
+              <button id="btnAddDeptSubmit" class="flex-1 py-2 px-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer">
+                เพิ่ม
+              </button>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-tight">รหัส PIN นี้จะใช้สำหรับให้บุคลากรของฝ่ายเข้าสู่ระบบเพื่อลงกิจกรรม</p>
         </div>
 
         <!-- Department List -->
         <div>
-          <span class="text-xs font-semibold text-slate-600 mb-2 block">ฝ่ายที่มีอยู่ในระบบ:</span>
-          <div id="deptManagementList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-700 block">ฝ่ายที่มีอยู่ในระบบ (แก้ไขสีและรหัสผ่านได้):</span>
+            <span class="text-[10px] text-slate-400">คลิกที่รหัสเพื่อแก้ไข</span>
+          </div>
+          <div id="deptManagementList" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
             <!-- List injected dynamically -->
           </div>
         </div>
       </div>
-      <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
-        <button id="btnFinishDept" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl">
+      <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex justify-end">
+        <button id="btnFinishDept" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl cursor-pointer">
           ปิดหน้าต่าง
         </button>
       </div>
@@ -1058,74 +1075,107 @@
     </div>
   </div>
 
-  <!-- MODAL: USER AUTH & REGISTRATION (สมัครสมาชิก / เข้าสู่ระบบเพื่อระบุตัวตนและหน่วยงาน) -->
+  <!-- MODAL: USER AUTH (เข้าสู่ระบบผู้ลงกิจกรรมประจำฝ่ายด้วยรหัสผ่าน PIN) -->
   <div id="modalUserAuth" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="bg-gradient-to-r from-violet-800 to-purple-900 px-6 py-4 text-white flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="p-1.5 bg-white/20 rounded-lg">
-            <i data-lucide="user-circle" class="w-5 h-5 text-white"></i>
+    <div class="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-purple-100 overflow-hidden">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-purple-800 to-indigo-900 px-6 py-5 text-white flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-white font-bold shrink-0">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-base leading-tight">ข้อมูลผู้ใช้งาน</h3>
-            <p class="text-[11px] text-purple-200">ระบุชื่อและหน่วยงานสังกัด</p>
+            <h3 class="font-bold text-base leading-tight">เข้าสู่ระบบผู้ลงกิจกรรม</h3>
+            <p class="text-[11px] text-purple-200">สำหรับบุคลากรประจำฝ่ายที่มีรหัสผ่าน</p>
           </div>
         </div>
-        <button id="btnCloseModalUserAuth" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10">
+        <button id="btnCloseModalUserAuth" class="text-white/70 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer" title="ปิดหน้าต่าง">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <!-- Current Logged In View -->
       <div id="userLoggedInCard" class="p-6 space-y-4 hidden text-center">
-        <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center mx-auto text-xl font-bold" id="userAvatarText">
+        <div class="w-16 h-16 bg-gradient-to-tr from-purple-700 to-indigo-700 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold shadow-md shadow-purple-200" id="userAvatarText">
           ผ
         </div>
         <div>
-          <h4 class="font-bold text-slate-800 text-base" id="profileDisplayName">ชื่อผู้ใช้</h4>
-          <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200" id="profileDisplayDept">
-            สังกัดฝ่าย
+          <h4 class="font-bold text-slate-900 text-lg" id="profileDisplayName">ชื่อผู้ใช้</h4>
+          <span class="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-800 border border-purple-200" id="profileDisplayDept">
+            <i data-lucide="building" class="w-3.5 h-3.5 text-purple-600"></i> สังกัดฝ่าย
           </span>
         </div>
-        <p class="text-xs text-slate-500">กิจกรรมที่คุณบันทึกจะระบุชื่อและหน่วยงานนี้โดยอัตโนมัติ</p>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          คุณได้รับสิทธิ์บันทึกและแก้ไขกิจกรรมเฉพาะในนาม <strong class="text-purple-900">ฝ่ายของคุณ</strong> เท่านั้น
+        </p>
         <div class="pt-2 flex gap-2">
-          <button type="button" id="btnSwitchProfileInCard" class="w-1/2 py-2 bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-semibold rounded-xl border border-purple-200 transition">
-            สลับ / แก้ไขโปรไฟล์
+          <button type="button" id="btnSwitchProfileInCard" class="w-1/2 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold rounded-xl border border-purple-200 transition cursor-pointer">
+            สลับฝ่าย / โปรไฟล์
           </button>
-          <button type="button" id="btnLogoutUser" class="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
+          <button type="button" id="btnLogoutUser" class="w-1/2 py-2.5 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-xs font-bold rounded-xl transition cursor-pointer">
             ออกจากระบบ
           </button>
         </div>
       </div>
 
-      <!-- Register / Switch Profile Form -->
+      <!-- Staff PIN Login Form -->
       <form id="formUserAuth" class="p-6 space-y-4">
+        <!-- Select Department First -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อ - สกุล <span class="text-rose-500">*</span></label>
-          <input type="text" id="inputUserName" required placeholder="เช่น อ.สมชาย ใจดี, นางสาวอานิสา"
-            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">สังกัดฝ่าย / หน่วยงาน <span class="text-rose-500">*</span></label>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+            <span>สังกัดฝ่ายที่ต้องการลงกิจกรรม <span class="text-rose-500">*</span></span>
+            <span class="text-[10px] text-purple-600 font-normal">เลือกฝ่ายของคุณ</span>
+          </label>
           <select id="selectUserDept" required
-            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition shadow-2xs">
             <!-- Populated dynamically from departments -->
           </select>
         </div>
 
+        <!-- Department PIN -->
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">อีเมลหรือเบอร์ติดต่อ (ถ้ามี)</label>
-          <input type="text" id="inputUserContact" placeholder="email@school.ac.th หรือ 081-xxx-xxxx"
-            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+            <span>รหัสผ่านประจำฝ่าย (PIN) <span class="text-rose-500">*</span></span>
+            <span class="text-[10px] text-slate-400 font-normal">สอบถามจากแอดมินหรือหัวหน้าฝ่าย</span>
+          </label>
+          <div class="relative">
+            <input type="password" id="inputDeptPin" required maxlength="20" placeholder="กรอกรหัสผ่านประจำฝ่าย" autocomplete="current-password"
+              class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 font-mono tracking-widest text-center text-base font-bold transition shadow-2xs">
+            <button id="btnToggleShowDeptPin" type="button" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 cursor-pointer" title="แสดง/ซ่อนรหัสผ่าน">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="deptPinErrorText" class="text-xs text-rose-600 font-medium hidden mt-1.5 flex items-center gap-1">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0"></i>
+            <span id="deptPinErrorMsg">รหัสผ่านประจำฝ่ายไม่ถูกต้อง</span>
+          </div>
+        </div>
+
+        <!-- Staff Name -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            ชื่อ - สกุล ผู้บันทึก <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="inputUserName" required placeholder="เช่น อ.สมชาย ใจดี, เจ้าหน้าที่งานวิชาการ"
+            class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition shadow-2xs font-medium">
+        </div>
+
+        <!-- Contact (Optional) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            เบอร์โทรหรืออีเมลติดต่อ <span class="text-slate-400 text-[10px] font-normal">(ระบุหรือไม่ก็ได้)</span>
+          </label>
+          <input type="text" id="inputUserContact" placeholder="เช่น 081-xxx-xxxx หรือ email@school.ac.th"
+            class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition shadow-2xs">
         </div>
 
         <div class="pt-2 flex gap-2">
-          <button type="button" id="btnCancelUserAuth" class="w-1/3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl">
+          <button type="button" id="btnCancelUserAuth" class="w-1/3 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">
             ยกเลิก
           </button>
-          <button type="submit" class="w-2/3 py-2 text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white rounded-xl shadow-md transition">
-            บันทึกเข้าใช้งาน
+          <button type="submit" class="w-2/3 py-2.5 text-xs font-bold bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-xl shadow-md hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-1.5">
+            <i data-lucide="key" class="w-3.5 h-3.5"></i>
+            <span>ยืนยันเข้าใช้งาน</span>
           </button>
         </div>
       </form>
@@ -1312,11 +1362,11 @@
     // 3. SEED DATA & HOLIDAYS (พ.ศ. & ฮ.ศ.)
     // ==========================================
     const DEFAULT_DEPARTMENTS = [
-      { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626' },
-      { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb' },
-      { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a' },
-      { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c' },
-      { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea' }
+      { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626', pin: '' },
+      { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb', pin: '1111' },
+      { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a', pin: '2222' },
+      { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c', pin: '3333' },
+      { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea', pin: '4444' }
     ];
 
     const DEFAULT_HOLIDAYS_AND_EVENTS = [
@@ -1871,7 +1921,22 @@
       }
       const deletedSet = new Set(state.deletedEventIds);
 
-      state.departments = storedDepts ? JSON.parse(storedDepts) : DEFAULT_DEPARTMENTS;
+      if (storedDepts) {
+        try {
+          const parsed = JSON.parse(storedDepts);
+          // เติม default pin หากฝ่ายเดิมยังไม่มี pin
+          const defMap = {};
+          DEFAULT_DEPARTMENTS.forEach(d => { if (d.pin) defMap[d.id] = d.pin; });
+          state.departments = parsed.map(d => ({
+            ...d,
+            pin: (d.pin !== undefined && d.pin !== '') ? String(d.pin) : (defMap[d.id] || '')
+          }));
+        } catch (e) {
+          state.departments = DEFAULT_DEPARTMENTS;
+        }
+      } else {
+        state.departments = DEFAULT_DEPARTMENTS;
+      }
 
       // Smart Merge: ดึงกิจกรรมที่ผู้ใช้บันทึกไว้ มารวมกับวันหยุดระบบล่าสุด โดยตัดรายการที่ถูกลบออก
       let loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS.filter(e => !deletedSet.has(e.id));
@@ -2813,9 +2878,31 @@
       document.getElementById('viewEventCreatorName').innerText = `ผู้บันทึก: ${evt.creatorName || evt.createdBy || 'ส่วนกลาง'}`;
       document.getElementById('viewEventCreatorDept').innerText = `หน่วยงาน: ${evt.creatorDept || dept.name || 'ไม่ระบุ'}`;
 
-      // ปุ่มแก้ไข (เปิด Modal แก้ไข)
+      // ปุ่มแก้ไข (แสดงเฉพาะแอดมิน หรือเจ้าหน้าที่ที่สังกัดฝ่ายเดียวกันกับกิจกรรม)
       const btnEdit = document.getElementById('btnEditFromView');
-      btnEdit.onclick = () => openEditEventModal(evt);
+      const editActionsContainer = document.getElementById('viewAdminActions');
+      
+      const isHoliday = evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_');
+      let canEdit = false;
+
+      if (state.isAdmin) {
+        canEdit = true;
+      } else if (state.currentUser && !isHoliday) {
+        const userDept = state.departments.find(d => d.name === state.currentUser.department);
+        // สามารถแก้ไขได้หากเป็นฝ่ายของตนเอง
+        if (userDept && userDept.id === evt.departmentId) {
+          canEdit = true;
+        }
+      }
+
+      if (editActionsContainer) {
+        if (canEdit) {
+          editActionsContainer.classList.remove('hidden');
+          btnEdit.onclick = () => openEditEventModal(evt);
+        } else {
+          editActionsContainer.classList.add('hidden');
+        }
+      }
 
       openModal('modalEventView');
     }
@@ -2966,35 +3053,94 @@
 
       state.departments.forEach((dept, index) => {
         const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs';
+        item.className = 'p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2';
+
+        const isHoliday = dept.id === 'dept_holiday';
+        const currentPin = dept.pin || '';
 
         item.innerHTML = `
-          <div class="flex items-center gap-2">
-            <input type="color" value="${dept.color}" class="w-6 h-6 rounded cursor-pointer border border-slate-300" data-dept-id="${dept.id}">
-            <span class="font-medium text-slate-800">${dept.name}</span>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <input type="color" value="${dept.color}" class="w-7 h-7 rounded-lg cursor-pointer border border-slate-300 p-0.5 shrink-0 bg-white" data-dept-id="${dept.id}" title="เปลี่ยนสีฝ่าย">
+              <span class="font-bold text-slate-800 truncate">${dept.name}</span>
+            </div>
+            <div class="shrink-0 flex items-center gap-1">
+              ${isHoliday ? '<span class="text-slate-400 text-[10px] bg-slate-100 px-2 py-0.5 rounded-md">(วันหยุดระบบ)</span>' : `
+                <button class="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition cursor-pointer" data-del-dept="${dept.id}" title="ลบฝ่าย">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              `}
+            </div>
           </div>
-          <div>
-            ${dept.id === 'dept_holiday' ? '<span class="text-slate-400 text-[10px]">(วันหยุดระบบ)</span>' : `
-              <button class="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded" data-del-dept="${dept.id}">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            `}
-          </div>
+          ${!isHoliday ? `
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 text-[11px]">
+              <span class="text-slate-500 flex items-center gap-1">
+                <i data-lucide="key" class="w-3.5 h-3.5 text-purple-600"></i> รหัสผ่าน (PIN):
+              </span>
+              <div class="flex items-center gap-1.5">
+                <div class="relative">
+                  <input type="password" value="${currentPin}" maxlength="10" placeholder="ตั้งรหัส"
+                    class="w-24 px-2 py-1 text-center font-mono font-bold rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
+                    data-pin-input="${dept.id}">
+                  <button type="button" class="text-slate-400 hover:text-slate-600 p-0.5 align-middle cursor-pointer" data-toggle-pin="${dept.id}" title="ดู/ซ่อนรหัส">
+                    <i data-lucide="eye" class="w-3 h-3"></i>
+                  </button>
+                </div>
+                <button type="button" class="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-lg font-bold text-[10px] transition cursor-pointer" data-save-pin="${dept.id}">
+                  บันทึก
+                </button>
+              </div>
+            </div>
+          ` : ''}
         `;
 
         // Color change
         const colorInput = item.querySelector(`input[data-dept-id="${dept.id}"]`);
-        colorInput.addEventListener('change', (e) => {
-          dept.color = e.target.value;
-          saveStateLocal();
-          if (typeof google !== 'undefined' && google.script && google.script.run) {
-            google.script.run.saveDepartment(dept, state.adminPin);
-          } else if (gasApiUrl) {
-            sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
-          }
-          renderUI();
-          showToast(`เปลี่ยนสีฝ่าย ${dept.name} แล้ว`);
-        });
+        if (colorInput) {
+          colorInput.addEventListener('change', (e) => {
+            dept.color = e.target.value;
+            saveStateLocal();
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+              google.script.run.saveDepartment(dept, state.adminPin);
+            } else if (gasApiUrl) {
+              sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
+            }
+            renderUI();
+            showToast(`เปลี่ยนสีฝ่าย "${dept.name}" เรียบร้อยแล้ว`);
+          });
+        }
+
+        // Toggle PIN eye
+        const togglePinBtn = item.querySelector(`button[data-toggle-pin="${dept.id}"]`);
+        const pinInput = item.querySelector(`input[data-pin-input="${dept.id}"]`);
+        if (togglePinBtn && pinInput) {
+          togglePinBtn.addEventListener('click', () => {
+            if (pinInput.type === 'password') {
+              pinInput.type = 'text';
+              togglePinBtn.innerHTML = '<i data-lucide="eye-off" class="w-3 h-3"></i>';
+            } else {
+              pinInput.type = 'password';
+              togglePinBtn.innerHTML = '<i data-lucide="eye" class="w-3 h-3"></i>';
+            }
+            lucide.createIcons();
+          });
+        }
+
+        // Save PIN
+        const savePinBtn = item.querySelector(`button[data-save-pin="${dept.id}"]`);
+        if (savePinBtn && pinInput) {
+          savePinBtn.addEventListener('click', () => {
+            const newPin = pinInput.value.trim();
+            dept.pin = newPin;
+            saveStateLocal();
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+              google.script.run.saveDepartment(dept, state.adminPin);
+            } else if (gasApiUrl) {
+              sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
+            }
+            showToast(`บันทึกรหัสผ่านฝ่าย "${dept.name}" สำเร็จ`);
+          });
+        }
 
         // Delete button
         const delBtn = item.querySelector(`button[data-del-dept="${dept.id}"]`);
@@ -3022,8 +3168,10 @@
 
     document.getElementById('btnAddDeptSubmit').onclick = function() {
       const nameInput = document.getElementById('newDeptName');
+      const pinInput = document.getElementById('newDeptPin');
       const colorInput = document.getElementById('newDeptColor');
       const name = nameInput.value.trim();
+      const pin = pinInput ? pinInput.value.trim() : '1234';
       const color = colorInput.value;
 
       if (!name) {
@@ -3034,7 +3182,8 @@
       const newDept = {
         id: 'dept_' + Date.now(),
         name: name,
-        color: color
+        color: color,
+        pin: pin || '1234'
       };
 
       state.departments.push(newDept);
@@ -3045,9 +3194,10 @@
         sendToCloudApi('saveDepartment', { deptData: newDept, adminPin: state.adminPin });
       }
       nameInput.value = '';
+      if (pinInput) pinInput.value = '';
       renderDeptManagementList();
       renderUI();
-      showToast(`เพิ่ม "${name}" เรียบร้อย`);
+      showToast(`เพิ่มฝ่าย "${name}" (PIN: ${newDept.pin}) เรียบร้อยแล้ว`);
     };
 
     // ==========================================
@@ -4215,6 +4365,8 @@
 
       const loggedInCard = document.getElementById('userLoggedInCard');
       const authForm = document.getElementById('formUserAuth');
+      const pinErr = document.getElementById('deptPinErrorText');
+      if (pinErr) pinErr.classList.add('hidden');
 
       if (state.currentUser) {
         loggedInCard.classList.remove('hidden');
@@ -4227,9 +4379,28 @@
         authForm.classList.remove('hidden');
         document.getElementById('inputUserName').value = '';
         document.getElementById('inputUserContact').value = '';
+        const pinInput = document.getElementById('inputDeptPin');
+        if (pinInput) pinInput.value = '';
       }
 
       openModal('modalUserAuth');
+    }
+
+    // Toggle Eye icon for Dept PIN
+    const btnToggleDeptPin = document.getElementById('btnToggleShowDeptPin');
+    if (btnToggleDeptPin) {
+      btnToggleDeptPin.onclick = () => {
+        const pinInput = document.getElementById('inputDeptPin');
+        if (!pinInput) return;
+        if (pinInput.type === 'password') {
+          pinInput.type = 'text';
+          btnToggleDeptPin.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i>';
+        } else {
+          pinInput.type = 'password';
+          btnToggleDeptPin.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i>';
+        }
+        lucide.createIcons();
+      };
     }
 
     // สลับไปยังฟอร์มแก้ไขโปรไฟล์เมื่อล็อกอินอยู่
@@ -4248,24 +4419,52 @@
             document.getElementById('selectUserDept').value = state.currentUser.department;
           }
         }
+        const pinInput = document.getElementById('inputDeptPin');
+        if (pinInput) pinInput.value = '';
+        const pinErr = document.getElementById('deptPinErrorText');
+        if (pinErr) pinErr.classList.add('hidden');
       };
     }
 
     document.getElementById('formUserAuth').addEventListener('submit', function(e) {
       e.preventDefault();
       const name = document.getElementById('inputUserName').value.trim();
-      const dept = document.getElementById('selectUserDept').value;
+      const deptName = document.getElementById('selectUserDept').value;
+      const enteredPin = document.getElementById('inputDeptPin').value.trim();
       const contact = document.getElementById('inputUserContact').value.trim();
+      const pinErr = document.getElementById('deptPinErrorText');
+      const pinErrMsg = document.getElementById('deptPinErrorMsg');
 
       if (!name) {
         alert('กรุณากรอกชื่อ-สกุล');
         return;
       }
 
+      // ตรวจสอบความถูกต้องของรหัส PIN ประจำฝ่าย
+      const targetDept = state.departments.find(d => d.name === deptName || d.id === deptName);
+      const expectedPin = targetDept ? String(targetDept.pin || '') : '';
+
+      // อนุญาตหาก PIN ตรงกับของฝ่าย หรือใช้ Admin PIN แทนได้
+      const isValidDeptPin = expectedPin ? (enteredPin === expectedPin) : true;
+      const isValidAdminPin = (enteredPin === state.adminPin || (Array.isArray(state.admins) && state.admins.some(a => String(a.pin) === enteredPin)));
+
+      if (!isValidDeptPin && !isValidAdminPin) {
+        if (pinErr) {
+          pinErr.classList.remove('hidden');
+          if (pinErrMsg) {
+            pinErrMsg.innerText = `รหัสผ่านประจำฝ่ายของ "${deptName}" ไม่ถูกต้อง กรุณาตรวจสอบหรือสอบถามแอดมิน`;
+          }
+        }
+        document.getElementById('inputDeptPin').focus();
+        return;
+      }
+
+      if (pinErr) pinErr.classList.add('hidden');
+
       const userData = {
         id: state.currentUser?.id || ('u_' + Date.now()),
         name: name,
-        department: dept,
+        department: deptName,
         contact: contact,
         registeredAt: formatDateYMD(new Date()),
         role: 'staff'
@@ -4294,9 +4493,9 @@
       closeModal('modalUserAuth');
       renderUI();
       renderLandingPage();
-      showToast(`ยินดีต้อนรับคุณ ${name} (${dept})`);
+      showToast(`เข้าสู่ระบบสำเร็จ: คุณ ${name} (${deptName})`);
 
-      // ส่วนผู้ลงกิจกรรม: เมื่อลงทะเบียนเสร็จแล้ว เด้งไปยังหน้าปฏิทินและเปิดป็อปอัพลงกิจกรรมได้ทันที
+      // ส่วนผู้ลงกิจกรรม: เมื่อยืนยันเสร็จแล้ว เด้งไปยังหน้าปฏิทินและเปิดป็อปอัพลงกิจกรรมได้ทันที
       if (pendingOpenAddEventAfterAuth) {
         pendingOpenAddEventAfterAuth = false;
         showCalendarPage('month', 'staff');

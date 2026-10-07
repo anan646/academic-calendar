@@ -112,12 +112,12 @@ function getOrCreateSheets() {
   var deptSheet = ss.getSheetByName('Departments');
   if (!deptSheet) {
     deptSheet = ss.insertSheet('Departments');
-    deptSheet.appendRow(['id', 'name', 'color', 'createdAt']);
-    deptSheet.appendRow(['dept_acad', 'ฝ่ายวิชาการ', '#2563eb', new Date().toISOString()]);
-    deptSheet.appendRow(['dept_student', 'ฝ่ายกิจการนักเรียน', '#16a34a', new Date().toISOString()]);
-    deptSheet.appendRow(['dept_admin', 'ฝ่ายบริหารทั่วไปและแผนงาน', '#ea580c', new Date().toISOString()]);
-    deptSheet.appendRow(['dept_finance', 'ฝ่ายงบประมาณและการเงิน', '#9333ea', new Date().toISOString()]);
-    deptSheet.appendRow(['dept_holiday', 'วันหยุด/เทศกาล', '#dc2626', new Date().toISOString()]);
+    deptSheet.appendRow(['id', 'name', 'color', 'pin', 'createdAt']);
+    deptSheet.appendRow(['dept_acad', 'ฝ่ายวิชาการ', '#2563eb', '1111', new Date().toISOString()]);
+    deptSheet.appendRow(['dept_student', 'ฝ่ายกิจการนักเรียน', '#16a34a', '2222', new Date().toISOString()]);
+    deptSheet.appendRow(['dept_admin', 'ฝ่ายบริหารทั่วไปและแผนงาน', '#ea580c', '3333', new Date().toISOString()]);
+    deptSheet.appendRow(['dept_finance', 'ฝ่ายงบประมาณและการเงิน', '#9333ea', '4444', new Date().toISOString()]);
+    deptSheet.appendRow(['dept_holiday', 'วันหยุด/เทศกาล', '#dc2626', '', new Date().toISOString()]);
   }
 
   // 2. ชีตกิจกรรม (Events)
@@ -185,11 +185,11 @@ function getInitialData() {
 
 function getDefaultDepartments() {
   return [
-    { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626' },
-    { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb' },
-    { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a' },
-    { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c' },
-    { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea' }
+    { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626', pin: '' },
+    { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb', pin: '1111' },
+    { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a', pin: '2222' },
+    { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c', pin: '3333' },
+    { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea', pin: '4444' }
   ];
 }
 
@@ -350,16 +350,41 @@ function getDepartments() {
   if (!sheet) return getDefaultDepartments();
 
   var data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return [];
+  if (data.length <= 1) return getDefaultDepartments();
+
+  // หา index ของคอลัมน์ pin ถ้ามี
+  var headers = data[0] || [];
+  var pinColIdx = -1;
+  for (var h = 0; h < headers.length; h++) {
+    if (String(headers[h]).toLowerCase() === 'pin') {
+      pinColIdx = h;
+      break;
+    }
+  }
+
+  var defaults = getDefaultDepartments();
+  var defaultPinMap = {};
+  defaults.forEach(function(d) {
+    if (d.pin) defaultPinMap[d.id] = d.pin;
+  });
 
   var results = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
     if (row[0]) {
+      var dId = String(row[0]);
+      var dPin = '';
+      if (pinColIdx > -1 && row[pinColIdx] !== undefined && row[pinColIdx] !== '') {
+        dPin = String(row[pinColIdx]);
+      } else if (defaultPinMap[dId]) {
+        dPin = defaultPinMap[dId];
+      }
+
       results.push({
-        id: String(row[0]),
+        id: dId,
         name: String(row[1]),
-        color: String(row[2]) || '#2563eb'
+        color: String(row[2]) || '#2563eb',
+        pin: dPin
       });
     }
   }
@@ -372,6 +397,22 @@ function saveDepartment(deptData, adminPin) {
   var data = sheet.getDataRange().getValues();
   var id = deptData.id || ('dept_' + new Date().getTime());
 
+  // ตรวจสอบคอลัมน์ pin ใน header
+  var headers = data[0] || [];
+  var pinColIdx = -1;
+  for (var h = 0; h < headers.length; h++) {
+    if (String(headers[h]).toLowerCase() === 'pin') {
+      pinColIdx = h;
+      break;
+    }
+  }
+
+  // หากยังไม่มีคอลัมน์ pin ให้เพิ่มใน header
+  if (pinColIdx === -1) {
+    pinColIdx = headers.length;
+    sheet.getRange(1, pinColIdx + 1).setValue('pin');
+  }
+
   var rowIndex = -1;
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(id)) {
@@ -383,8 +424,18 @@ function saveDepartment(deptData, adminPin) {
   if (rowIndex > -1) {
     sheet.getRange(rowIndex, 2).setValue(deptData.name);
     sheet.getRange(rowIndex, 3).setValue(deptData.color);
+    if (deptData.pin !== undefined) {
+      sheet.getRange(rowIndex, pinColIdx + 1).setValue(String(deptData.pin));
+    }
   } else {
-    sheet.appendRow([id, deptData.name, deptData.color, new Date().toISOString()]);
+    var newRow = [id, deptData.name, deptData.color];
+    // เติมค่าว่างจนถึงคอลัมน์ pin
+    while (newRow.length < pinColIdx) {
+      newRow.push('');
+    }
+    newRow[pinColIdx] = String(deptData.pin || '');
+    newRow.push(new Date().toISOString());
+    sheet.appendRow(newRow);
   }
 
   return { success: true, id: id };
