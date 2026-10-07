@@ -653,46 +653,56 @@
   <!-- ==================== MODALS ==================== -->
 
   <!-- MODAL: ADD / EDIT EVENT -->
-  <div id="modalEvent" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transition-all scale-95 duration-200" id="modalEventCard">
-      <div class="bg-purple-50/80 px-6 py-4 border-b border-purple-100 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="p-2 bg-purple-600 text-white rounded-xl shadow-sm">
-            <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+  <div id="modalEvent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-purple-100 overflow-hidden transition-all scale-95 duration-200 my-auto" id="modalEventCard">
+      <!-- Header with soothing gradient -->
+      <div class="bg-gradient-to-r from-purple-800 via-indigo-800 to-purple-900 px-6 py-4.5 text-white flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-xs">
+            <i data-lucide="calendar-plus" class="w-5 h-5 text-purple-100"></i>
           </div>
           <div>
-            <h3 id="modalEventTitle" class="font-bold text-slate-800 text-base">บันทึกกิจกรรมประจำปีการศึกษา</h3>
-            <p class="text-[11px] text-purple-700/80">กรอกข้อมูลกิจกรรมและกำหนดการ</p>
+            <h3 id="modalEventTitle" class="font-bold text-white text-base tracking-tight">บันทึกกิจกรรมประจำปีการศึกษา</h3>
+            <p class="text-[11px] text-purple-200 font-normal">ระบบบันทึกและจัดการกำหนดการโรงเรียน</p>
           </div>
         </div>
-        <button id="btnCloseModalEvent" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-white/80 transition">
+        <button id="btnCloseModalEvent" type="button" class="w-8 h-8 flex items-center justify-center text-purple-200 hover:text-white rounded-xl hover:bg-white/15 transition cursor-pointer" title="ปิดหน้าต่าง">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form id="formEvent" class="p-6 space-y-4">
+      <form id="formEvent" class="p-6 space-y-4.5">
         <input type="hidden" id="eventFieldId">
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่องาน / กิจกรรม <span class="text-rose-500">*</span></label>
+        <!-- Title Input -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700">ชื่องาน / กิจกรรม <span class="text-rose-500">*</span></label>
           <input type="text" id="eventFieldTitle" required placeholder="เช่น สอบกลางภาคเรียนที่ 1, วันกิจกรรมเปิดบ้านวิชาการ"
-            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition shadow-2xs">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">ฝ่ายที่รับผิดชอบ <span class="text-rose-500">*</span></label>
+        <!-- Department and Academic Term Card -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-purple-50/40 p-3.5 rounded-2xl border border-purple-100/70">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700">ฝ่ายที่รับผิดชอบ <span class="text-rose-500">*</span></label>
+              <span id="deptLockBadge" class="hidden text-[10px] text-purple-700 bg-purple-100/80 px-1.5 py-0.5 rounded-md font-semibold">
+                <i data-lucide="lock" class="w-3 h-3 inline"></i> ฝ่ายของคุณ
+              </span>
+            </div>
             <select id="eventFieldDept" required
-              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition shadow-2xs font-medium">
               <!-- Options populated dynamically -->
             </select>
+            <p id="deptLockHelperText" class="text-[10px] text-purple-600 hidden leading-tight">บันทึกได้เฉพาะฝ่ายที่คุณสังกัดตามที่ลงทะเบียนไว้</p>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">ปีการศึกษา / ภาคเรียน</label>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700">ปีการศึกษา / ภาคเรียน</label>
             <div class="flex gap-2">
-              <input type="text" id="eventFieldYear" placeholder="พ.ศ. เช่น 2568"
-                class="w-1/2 px-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <select id="eventFieldSemester" class="w-1/2 px-2 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <input type="text" id="eventFieldYear" placeholder="พ.ศ. 2568"
+                class="w-1/2 px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-center font-semibold text-slate-800">
+              <select id="eventFieldSemester" class="w-1/2 px-2 py-2 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium">
                 <option value="1">เทอม 1</option>
                 <option value="2">เทอม 2</option>
                 <option value="ปิดภาคเรียน">ปิดภาคเรียน</option>
@@ -702,65 +712,78 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">วันที่เริ่มต้น <span class="text-rose-500">*</span></label>
-            <input type="date" id="eventFieldStartDate" required
-              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <!-- Dates Card -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700">วันที่เริ่มต้น <span class="text-rose-500">*</span></label>
+            <div class="relative">
+              <input type="date" id="eventFieldStartDate" required
+                class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition font-medium">
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">วันที่สิ้นสุด</label>
-            <input type="date" id="eventFieldEndDate"
-              class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700">วันที่สิ้นสุด</label>
+            <div class="relative">
+              <input type="date" id="eventFieldEndDate"
+                class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition font-medium">
+            </div>
           </div>
         </div>
 
         <!-- Conflict Warning Alert Box -->
-        <div id="conflictWarningBox" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 space-y-1">
+        <div id="conflictWarningBox" class="hidden p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs text-amber-900 space-y-1 shadow-2xs">
           <div class="flex items-center gap-1.5 font-bold text-amber-900">
-            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
-            <span>ตรวจพบกิจกรรมซ้ำซ้อนในวันเดียวกัน:</span>
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0"></i>
+            <span>ตรวจพบกิจกรรมในวันเดียวกัน:</span>
           </div>
-          <div id="conflictEventsList" class="pl-5 list-disc space-y-0.5 text-slate-700"></div>
-          <span class="text-[11px] text-amber-700 block italic mt-1">* คุณยังสามารถบันทึกได้หากเป็นกิจกรรมร่วมกันหรือจัดพร้อมกัน</span>
+          <div id="conflictEventsList" class="pl-5 space-y-0.5 text-slate-700"></div>
+          <span class="text-[11px] text-amber-700 block italic mt-1 font-medium">* คุณยังสามารถบันทึกได้หากเป็นกิจกรรมร่วมกันหรือจัดพร้อมกัน</span>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">สถานที่ / ผู้เข้าร่วม</label>
-          <input type="text" id="eventFieldLocation" placeholder="เช่น หอประชุมใหญ่, นักเรียนทุกระดับชั้น"
-            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <!-- Location -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700">สถานที่ / กลุ่มเป้าหมาย</label>
+          <div class="relative">
+            <input type="text" id="eventFieldLocation" placeholder="เช่น หอประชุมใหญ่, นักเรียนทุกระดับชั้น"
+              class="w-full pl-9 pr-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition">
+            <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">รายละเอียดเพิ่มเติม</label>
-          <textarea id="eventFieldDescription" rows="3" placeholder="ระบุวัตถุประสงค์ กำหนดการ หรือหมายเหตุ..."
-            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+        <!-- Description -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700">รายละเอียดเพิ่มเติม</label>
+          <textarea id="eventFieldDescription" rows="3" placeholder="ระบุวัตถุประสงค์ กำหนดการ หรือหมายเหตุสำคัญ..."
+            class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition leading-relaxed"></textarea>
         </div>
 
         <!-- Creator Tag / Auto-filled from Logged-in User -->
-        <div class="bg-purple-50/70 p-3 rounded-xl border border-purple-100 flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2 text-purple-900">
-            <i data-lucide="user-check" class="w-4 h-4 text-purple-600"></i>
+        <div class="bg-purple-50/80 p-3 rounded-2xl border border-purple-100 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2.5 text-purple-950">
+            <div class="w-7 h-7 rounded-lg bg-purple-200/60 text-purple-800 flex items-center justify-center font-bold">
+              <i data-lucide="user-check" class="w-4 h-4"></i>
+            </div>
             <div>
-              <span class="font-semibold block" id="formCreatorNameLabel">ผู้บันทึก: ผู้ใช้ทั่วไป</span>
-              <span class="text-[11px] text-purple-700" id="formCreatorDeptLabel">สังกัด: ยังไม่ได้เข้าสู่ระบบ</span>
+              <span class="font-bold block" id="formCreatorNameLabel">ผู้บันทึก: ผู้ใช้ทั่วไป</span>
+              <span class="text-[11px] text-purple-700 font-medium" id="formCreatorDeptLabel">สังกัด: ยังไม่ได้เข้าสู่ระบบ</span>
             </div>
           </div>
-          <button type="button" id="btnSwitchUserFromForm" class="text-xs text-purple-700 hover:text-purple-900 font-semibold underline">
+          <button type="button" id="btnSwitchUserFromForm" class="text-xs text-purple-800 hover:text-purple-950 font-bold px-2.5 py-1 rounded-lg bg-white/80 hover:bg-white border border-purple-200 transition cursor-pointer">
             เปลี่ยนผู้ใช้
           </button>
         </div>
 
-        <div class="flex items-center justify-between pt-3 border-t border-slate-200">
-          <button type="button" id="btnDeleteEvent" class="hidden px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition">
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+          <button type="button" id="btnDeleteEvent" class="hidden px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer">
             <i data-lucide="trash-2" class="w-4 h-4 inline-block mr-1"></i> ลบกิจกรรม
           </button>
-          <div class="flex items-center gap-2 ml-auto">
-            <button type="button" id="btnCancelEvent" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-xl transition font-medium">
-              ยกเลิก
+          <div class="flex items-center gap-2.5 ml-auto">
+            <button type="button" id="btnCancelEvent" class="px-4 py-2 text-xs sm:text-sm text-slate-600 hover:bg-slate-100 rounded-xl transition font-semibold cursor-pointer">
+              ปิดหน้าต่าง
             </button>
-            <button type="submit" class="px-5 py-2 text-sm bg-purple-700 hover:bg-purple-800 text-white rounded-xl shadow-md transition font-semibold">
-              บันทึกข้อมูล
+            <button type="submit" class="px-5 py-2 text-xs sm:text-sm bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-xl shadow-md hover:shadow-lg transition font-bold cursor-pointer">
+              บันทึกกิจกรรม
             </button>
           </div>
         </div>
@@ -1176,7 +1199,8 @@
       currentUser: null, // { id, name, department, contact, role }
       users: [],
       departments: [],
-      events: []
+      events: [],
+      deletedEventIds: []
     };
 
     const DEFAULT_ADMINS = [
@@ -1747,10 +1771,15 @@
         state.departments = response.departments;
       }
       if (Array.isArray(response.events)) {
-        // ผสานวันหยุดระบบกับกิจกรรมจากชีต
+        // ผสานวันหยุดระบบกับกิจกรรมจากชีต โดยกรองกิจกรรมที่เคยถูกลบออกเด็ดขาด
+        const deletedSet = new Set(state.deletedEventIds || []);
         const eventMap = new Map();
-        DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => eventMap.set(e.id, e));
-        response.events.forEach(e => eventMap.set(e.id, e));
+        DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => {
+          if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
+        });
+        response.events.forEach(e => {
+          if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
+        });
         state.events = Array.from(eventMap.values());
       }
       if (Array.isArray(response.users) && response.users.length > 0) {
@@ -1804,28 +1833,44 @@
       const storedEvts = localStorage.getItem('school_cal_events');
       const storedUser = localStorage.getItem('school_cal_current_user');
       const storedUsers = localStorage.getItem('school_cal_users');
+      const storedDeleted = localStorage.getItem('school_cal_deleted_events');
+
+      if (storedDeleted) {
+        try {
+          state.deletedEventIds = JSON.parse(storedDeleted) || [];
+        } catch (e) {
+          state.deletedEventIds = [];
+        }
+      } else {
+        state.deletedEventIds = [];
+      }
+      const deletedSet = new Set(state.deletedEventIds);
 
       state.departments = storedDepts ? JSON.parse(storedDepts) : DEFAULT_DEPARTMENTS;
 
-      // Smart Merge: ดึงกิจกรรมที่ผู้ใช้บันทึกไว้ มารวมกับวันหยุดระบบล่าสุด
-      let loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS;
+      // Smart Merge: ดึงกิจกรรมที่ผู้ใช้บันทึกไว้ มารวมกับวันหยุดระบบล่าสุด โดยตัดรายการที่ถูกลบออก
+      let loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS.filter(e => !deletedSet.has(e.id));
       if (storedEvts) {
         try {
           const userStoredList = JSON.parse(storedEvts);
           if (Array.isArray(userStoredList)) {
-            // เก็บ user-created events (ที่ไม่ได้เป็นวันหยุดระบบเดิม)
-            const userCustomEvents = userStoredList.filter(e => !e.id.startsWith('h_') && !e.id.startsWith('th_') && e.departmentId !== 'dept_holiday');
+            // เก็บ user-created events (ที่ไม่ได้เป็นวันหยุดระบบเดิม และไม่ได้ถูกลบ)
+            const userCustomEvents = userStoredList.filter(e => !e.id.startsWith('h_') && !e.id.startsWith('th_') && e.departmentId !== 'dept_holiday' && !deletedSet.has(e.id));
             
             // Map รวม DEFAULT_HOLIDAYS_AND_EVENTS กับ userCustomEvents
             const eventMap = new Map();
-            DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => eventMap.set(e.id, e));
-            userCustomEvents.forEach(e => eventMap.set(e.id, e));
+            DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => {
+              if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
+            });
+            userCustomEvents.forEach(e => {
+              if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
+            });
             
             loadedEvents = Array.from(eventMap.values());
           }
         } catch (e) {
           console.error('Error merging local events:', e);
-          loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS;
+          loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS.filter(e => !deletedSet.has(e.id));
         }
       }
 
@@ -1886,6 +1931,7 @@
       localStorage.setItem('school_cal_users', JSON.stringify(state.users));
       localStorage.setItem('school_cal_admins', JSON.stringify(state.admins));
       localStorage.setItem('school_cal_admin_pin', state.adminPin);
+      localStorage.setItem('school_cal_deleted_events', JSON.stringify(state.deletedEventIds || []));
       if (state.currentUser) {
         localStorage.setItem('school_cal_current_user', JSON.stringify(state.currentUser));
       } else {
@@ -2600,6 +2646,9 @@
         document.getElementById('eventFieldEndDate').value = todayStr;
       }
 
+      // ตรวจสอบและล็อกฝ่ายสำหรับผู้ลงกิจกรรม (ไม่ใช่แอดมิน)
+      applyDepartmentLockForStaff();
+
       checkEventConflicts();
       openModal('modalEvent');
     }
@@ -2609,6 +2658,15 @@
         showToast('กรุณาลงทะเบียนหรือเข้าสู่ระบบก่อนแก้ไขกิจกรรม');
         openUserAuthModal();
         return;
+      }
+
+      // ผู้ลงกิจกรรมทั่วไปแก้ไขได้เฉพาะกิจกรรมของฝ่ายตนเอง
+      if (!state.isAdmin && state.currentUser) {
+        const userDept = state.departments.find(d => d.name === state.currentUser.department);
+        if (userDept && evt.departmentId !== userDept.id) {
+          alert(`คุณไม่มีสิทธิ์แก้ไขกิจกรรมของ "${getDeptName(evt.departmentId)}"\nเนื่องจากคุณสังกัด "${state.currentUser.department}" (บันทึกได้เฉพาะฝ่ายตนเอง)`);
+          return;
+        }
       }
 
       if (state.activePage === 'landing') {
@@ -2626,9 +2684,12 @@
       document.getElementById('eventFieldLocation').value = evt.location || '';
       document.getElementById('eventFieldDescription').value = evt.description || '';
 
+      // ตรวจสอบและล็อกฝ่ายสำหรับผู้ลงกิจกรรม
+      applyDepartmentLockForStaff();
+
       checkEventConflicts();
 
-      // ลบได้เมื่อเป็นแอดมิน หรือไม่ใช่ระบบวันหยุดล็อก
+      // ลบได้เมื่อเป็นแอดมิน หรือเป็นผู้บันทึกกิจกรรมของฝ่ายตนเอง
       const btnDel = document.getElementById('btnDeleteEvent');
       if (state.isAdmin || evt.id.startsWith('evt_') || evt.id.startsWith('sample_')) {
         btnDel.classList.remove('hidden');
@@ -2638,6 +2699,38 @@
 
       closeModal('modalEventView');
       openModal('modalEvent');
+    }
+
+    function applyDepartmentLockForStaff() {
+      const deptSelect = document.getElementById('eventFieldDept');
+      const badge = document.getElementById('deptLockBadge');
+      const helper = document.getElementById('deptLockHelperText');
+
+      if (!deptSelect) return;
+
+      if (!state.isAdmin && state.currentUser) {
+        const userDept = state.departments.find(d => d.name === state.currentUser.department);
+        if (userDept) {
+          deptSelect.value = userDept.id;
+        }
+        deptSelect.disabled = true;
+        deptSelect.classList.add('bg-slate-100', 'cursor-not-allowed', 'text-slate-700');
+        if (badge) badge.classList.remove('hidden');
+        if (helper) {
+          helper.innerText = `คุณสังกัด "${state.currentUser.department}" (บันทึกได้เฉพาะฝ่ายตนเอง)`;
+          helper.classList.remove('hidden');
+        }
+      } else {
+        deptSelect.disabled = false;
+        deptSelect.classList.remove('bg-slate-100', 'cursor-not-allowed');
+        if (badge) badge.classList.add('hidden');
+        if (helper) helper.classList.add('hidden');
+      }
+    }
+
+    function getDeptName(deptId) {
+      const d = state.departments.find(x => x.id === deptId);
+      return d ? d.name : 'ฝ่ายที่กำหนด';
     }
 
     function openViewEventModal(evt, dateObj, hijriInfo) {
@@ -2741,10 +2834,19 @@
       const creatorName = state.currentUser ? state.currentUser.name : 'ผู้ใช้ทั่วไป';
       const creatorDept = state.currentUser ? state.currentUser.department : 'ทั่วไป';
 
+      let deptId = document.getElementById('eventFieldDept').value;
+      // Enforce department constraint for logged-in staff
+      if (!state.isAdmin && state.currentUser) {
+        const userDept = state.departments.find(d => d.name === state.currentUser.department);
+        if (userDept) {
+          deptId = userDept.id;
+        }
+      }
+
       const eventData = {
         id: document.getElementById('eventFieldId').value || ('evt_' + Date.now()),
         title: document.getElementById('eventFieldTitle').value.trim(),
-        departmentId: document.getElementById('eventFieldDept').value,
+        departmentId: deptId,
         academicYear: document.getElementById('eventFieldYear').value.trim(),
         semester: document.getElementById('eventFieldSemester').value,
         startDate: document.getElementById('eventFieldStartDate').value,
@@ -2762,6 +2864,10 @@
         state.events[index] = eventData;
       } else {
         state.events.push(eventData);
+      }
+      // หากเคยมี ID นี้อยู่ใน deletedEventIds ให้นำออก
+      if (Array.isArray(state.deletedEventIds)) {
+        state.deletedEventIds = state.deletedEventIds.filter(id => id !== eventData.id);
       }
       saveStateLocal();
 
@@ -2783,6 +2889,12 @@
       const id = document.getElementById('eventFieldId').value;
       if (!id) return;
       if (confirm('คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?')) {
+        // บันทึกลงในรายการ deletedEventIds เพื่อป้องกันไม่ให้ถูก sync กลับคืนมา
+        if (!Array.isArray(state.deletedEventIds)) state.deletedEventIds = [];
+        if (!state.deletedEventIds.includes(id)) {
+          state.deletedEventIds.push(id);
+        }
+
         state.events = state.events.filter(x => x.id !== id);
         saveStateLocal();
 
@@ -3548,9 +3660,24 @@
         tr.querySelector(`[data-dash-edit="${evt.id}"]`).onclick = () => openEditEventModal(evt);
         tr.querySelector(`[data-dash-del="${evt.id}"]`).onclick = () => {
           if (confirm(`ลบกิจกรรม "${evt.title}" ใช่หรือไม่?`)) {
+            // บันทึกลง deletedEventIds เพื่อป้องกันไม่ให้ถูก sync กลับคืนมา
+            if (!Array.isArray(state.deletedEventIds)) state.deletedEventIds = [];
+            if (!state.deletedEventIds.includes(evt.id)) {
+              state.deletedEventIds.push(evt.id);
+            }
+
             state.events = state.events.filter(x => x.id !== evt.id);
             saveStateLocal();
+
+            // ส่งคำสั่งลบไปยัง Google Sheets หรือ Cloud API
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+              google.script.run.deleteEvent(evt.id, state.adminPin);
+            } else if (gasApiUrl) {
+              sendToCloudApi('deleteEvent', { id: evt.id, adminPin: state.adminPin });
+            }
+
             renderAdminDashboard();
+            renderUI();
             showToast('ลบกิจกรรมสำเร็จ');
           }
         };
@@ -4017,6 +4144,10 @@
       openModal('modalDepartment');
     };
     document.getElementById('btnCloseModalDept').onclick = () => closeModal('modalDepartment');
+    const btnFinishDept = document.getElementById('btnFinishDept');
+    if (btnFinishDept) {
+      btnFinishDept.onclick = () => closeModal('modalDepartment');
+    }
     document.getElementById('btnCloseEventView').onclick = () => closeModal('modalEventView');
 
     // User Auth Modal Triggers & Form
