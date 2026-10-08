@@ -333,6 +333,16 @@
           </select>
         </div>
 
+        <!-- FTU Calendar Toggle Button (เปิด / ปิด ปฏิทิน ม.ฟาฏอนี) -->
+        <button id="btnToggleFtuCalendar" type="button" 
+          class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-2xs cursor-pointer active:scale-95 bg-emerald-50 text-emerald-800 border-amber-300 hover:bg-emerald-100"
+          title="คลิกเพื่อเปิดหรือปิดการแสดงปฏิทิน ม.ฟาฏอนี">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-600"></i>
+          <span class="hidden sm:inline">ปฏิทิน ม.ฟาฏอนี:</span>
+          <span class="sm:hidden">ม.ฟาฏอนี:</span>
+          <span id="labelToggleFtuStatus" class="font-extrabold text-emerald-700">เปิด ✓</span>
+        </button>
+
         <!-- "My Events" Filter Button -->
         <button id="btnFilterMyEvents" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-purple-50 hover:text-purple-700 transition" title="ดูกิจกรรมที่ฉันเป็นผู้ลง">
           <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
@@ -1502,6 +1512,7 @@
       selectedDept: 'all',
       selectedDepts: [], // [] = All, or array of dept IDs e.g. ['dept_acad', 'dept_holiday']
       selectedYear: String(initialYearBE),
+      showFtuCalendar: localStorage.getItem('school_cal_show_ftu') !== 'false',
       searchQuery: '',
       filterMyEvents: false,
       viewMode: 'month', // 'month' or 'list' or 'dashboard'
@@ -4269,6 +4280,10 @@
       const hasMultiDepts = Array.isArray(state.selectedDepts) && state.selectedDepts.length > 0;
 
       return state.events.filter(e => {
+        // หากปิดการแสดงปฏิทิน ม.ฟาฏอนี ให้ตัดกิจกรรม ม.ฟาฏอนี ออกทั้งหมด
+        if (state.showFtuCalendar === false && (e.departmentId === 'dept_ftu' || e.id.startsWith('ftu_'))) {
+          return false;
+        }
         let matchDept = true;
         if (hasMultiDepts) {
           matchDept = state.selectedDepts.includes(e.departmentId);
@@ -5090,6 +5105,106 @@
     function getDeptName(deptId) {
       const d = state.departments.find(x => x.id === deptId);
       return d ? d.name : 'ฝ่ายที่กำหนด';
+    }
+
+    function updateFtuToggleButton() {
+      const btn = document.getElementById('btnToggleFtuCalendar');
+      const label = document.getElementById('labelToggleFtuStatus');
+      if (!btn || !label) return;
+
+      if (state.showFtuCalendar) {
+        btn.className = 'inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-2xs cursor-pointer active:scale-95 bg-emerald-50 text-emerald-900 border-amber-300 hover:bg-emerald-100/90 ring-1 ring-amber-300/40';
+        label.className = 'font-black text-emerald-700';
+        label.innerText = 'เปิด ✓';
+        btn.title = 'ปฏิทิน ม.ฟาฏอนี กำลังแสดงผลอยู่ (คลิกเพื่อปิด)';
+      } else {
+        btn.className = 'inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border transition shadow-2xs cursor-pointer active:scale-95 bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 hover:text-slate-700';
+        label.className = 'font-bold text-slate-500';
+        label.innerText = 'ปิด ✕';
+        btn.title = 'ปฏิทิน ม.ฟาฏอนี ถูกซ่อนอยู่ (คลิกเพื่อเปิด)';
+      }
+    }
+
+    function openDayEventsModal(dateStr, eventsList, dateObj, hijriInfo) {
+      const modal = document.getElementById('modalDayEvents');
+      if (!modal) return;
+
+      const dateLabel = formatThaiDateFull(dateObj);
+      document.getElementById('dayEventsModalDate').innerText = dateLabel;
+      document.getElementById('dayEventsModalHijri').innerText = `ตรงกับ: ${hijriInfo.formatted}`;
+      document.getElementById('dayEventsModalCount').innerText = `รวม ${eventsList.length} กิจกรรม`;
+
+      const listContainer = document.getElementById('dayEventsModalList');
+      listContainer.innerHTML = '';
+
+      eventsList.forEach(evt => {
+        const isFtu = evt.departmentId === 'dept_ftu' || evt.id.startsWith('ftu_');
+        const isHoliday = !isFtu && (evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_'));
+        const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#e11d48' : (isFtu ? '#047857' : '#7c3aed'), name: isHoliday ? 'วันสำคัญ/วันหยุด' : (isFtu ? 'ปฏิทิน ม.ฟาฏอนี' : 'ทั่วไป') };
+        const baseColor = dept.color || '#7c3aed';
+
+        const s = evt.startDate;
+        const e = evt.endDate || evt.startDate;
+        const isShort = (s === e) || ((new Date(e) - new Date(s)) <= 2 * 86400000);
+
+        let typeBadge = '';
+        if (isShort) {
+          typeBadge = '<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-bold shrink-0">กิจกรรมเฉพาะวัน</span>';
+        } else if (dateStr === s) {
+          typeBadge = '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold shrink-0">🟢 วันเริ่มต้น</span>';
+        } else if (dateStr === e) {
+          typeBadge = '<span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-bold shrink-0">🔴 วันสิ้นสุด</span>';
+        } else {
+          typeBadge = '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold shrink-0">⏳ อยู่ในช่วง</span>';
+        }
+
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-2xl border transition cursor-pointer hover:shadow-xs flex items-center justify-between gap-3 ' + 
+          (isFtu ? 'bg-emerald-50/40 border-amber-200/70 hover:bg-emerald-50/80' : 'bg-slate-50 border-slate-200 hover:bg-white');
+
+        item.innerHTML = `
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              ${typeBadge}
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
+                style="background-color: ${baseColor}15; border-color: ${baseColor}30; color: ${baseColor}">
+                ${isFtu ? '🎓 ' + dept.name : dept.name}
+              </span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-snug truncate">${evt.title}</h4>
+            <div class="text-[11px] text-slate-500 flex items-center gap-2 flex-wrap">
+              <span>ช่วง: ${evt.startDate} ${evt.endDate && evt.endDate !== evt.startDate ? 'ถึง ' + evt.endDate : ''}</span>
+              ${evt.location ? `<span class="text-slate-400">• ${evt.location}</span>` : ''}
+            </div>
+          </div>
+          <div class="shrink-0 text-slate-400">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </div>
+        `;
+
+        item.onclick = () => {
+          closeModal('modalDayEvents');
+          openViewEventModal(evt, dateObj, hijriInfo);
+        };
+
+        listContainer.appendChild(item);
+      });
+
+      const btnAdd = document.getElementById('dayEventsModalBtnAdd');
+      if (btnAdd) {
+        if (state.currentUser || state.isAdmin) {
+          btnAdd.classList.remove('hidden');
+          btnAdd.onclick = () => {
+            closeModal('modalDayEvents');
+            openAddEventModal(dateStr);
+          };
+        } else {
+          btnAdd.classList.add('hidden');
+        }
+      }
+
+      openModal('modalDayEvents');
+      lucide.createIcons();
     }
 
     function openViewEventModal(evt, dateObj, hijriInfo) {
@@ -6009,7 +6124,22 @@
 
     // Quick Search & My Events Event Listeners
     const inputSearch = document.getElementById('inputSearchEvent');
-    const btnClearSearch = document.getElementById('btnClearSearch');
+    const btnToggleFtu = document.getElementById('btnToggleFtuCalendar');
+      if (btnToggleFtu) {
+        btnToggleFtu.onclick = () => {
+          state.showFtuCalendar = !state.showFtuCalendar;
+          localStorage.setItem('school_cal_show_ftu', String(state.showFtuCalendar));
+          updateFtuToggleButton();
+          renderUI();
+          if (state.showFtuCalendar) {
+            showToast('✓ เปิดการแสดงผล "ปฏิทิน ม.ฟาฏอนี"');
+          } else {
+            showToast('ซ่อนการแสดงผล "ปฏิทิน ม.ฟาฏอนี" เรียบร้อยแล้ว');
+          }
+        };
+      }
+
+      const btnClearSearch = document.getElementById('btnClearSearch');
     const btnFilterMyEvents = document.getElementById('btnFilterMyEvents');
 
     inputSearch.addEventListener('input', (e) => {
