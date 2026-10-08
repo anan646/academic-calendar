@@ -288,22 +288,44 @@
       
       <!-- Month & Year Selector with Dual Calendars (CE / BE / AH) -->
       <div class="flex items-center flex-wrap gap-2 sm:gap-2.5">
-        <div class="flex items-center bg-purple-50/70 rounded-xl p-1 border border-purple-100 shadow-2xs">
-          <button id="btnPrevYear" class="p-1.5 rounded-lg hover:bg-white text-purple-700 hover:text-purple-900 transition flex items-center justify-center" title="ปีก่อนหน้า (-1 ปี)">
-            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
-          </button>
-          <button id="btnPrevMonth" class="p-1.5 rounded-lg hover:bg-white text-purple-700 hover:text-purple-900 transition flex items-center justify-center" title="เดือนก่อนหน้า">
-            <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          </button>
-          <button id="btnToday" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-white text-purple-800 transition" title="กลับสู่วันนี้">
-            วันนี้
-          </button>
-          <button id="btnNextMonth" class="p-1.5 rounded-lg hover:bg-white text-purple-700 hover:text-purple-900 transition flex items-center justify-center" title="เดือนถัดไป">
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-          </button>
-          <button id="btnNextYear" class="p-1.5 rounded-lg hover:bg-white text-purple-700 hover:text-purple-900 transition flex items-center justify-center" title="ปีถัดไป (+1 ปี)">
-            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
-          </button>
+        <!-- Compact & Modern Month/Year Navigation (ภาพแนบที่ 1 ปรับดีไซน์ใช้งานง่าย & เมนูลัด 12 เดือน) -->
+        <div class="flex items-center gap-1.5">
+          <div class="flex items-center bg-gradient-to-r from-purple-50 to-indigo-50/70 rounded-2xl p-1 border border-purple-100/90 shadow-2xs">
+            <button id="btnPrevYear" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="ปีก่อนหน้า (-1 ปี)">
+              <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+            </button>
+            <button id="btnPrevMonth" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="เดือนก่อนหน้า">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button id="btnToday" class="px-3 py-1 rounded-xl text-xs font-bold bg-white text-purple-800 shadow-2xs hover:bg-purple-100/60 transition cursor-pointer active:scale-95 border border-purple-100/60" title="กลับสู่วันนี้">
+              วันนี้
+            </button>
+            <button id="btnNextMonth" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="เดือนถัดไป">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+            <button id="btnNextYear" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="ปีถัดไป (+1 ปี)">
+              <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Quick Month Dropdown Picker Button -->
+          <div class="relative">
+            <button id="btnToggleMonthPicker" type="button" class="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 rounded-2xl text-xs font-bold border border-purple-200 transition shadow-2xs flex items-center gap-1 cursor-pointer active:scale-95" title="เลือกเดือนแบบย่อ (12 เดือน)">
+              <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-purple-700"></i>
+              <span id="quickMonthShortBadge" class="font-extrabold">เดือนย่อ</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 text-purple-500"></i>
+            </button>
+            <!-- Dropdown grid of 12 short months -->
+            <div id="dropdownMonthPicker" class="hidden absolute left-0 sm:left-auto sm:right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-purple-100 p-2.5 z-50 animate-scaleUp">
+              <div class="flex items-center justify-between px-1 pb-2 border-b border-purple-50 text-[11px] font-bold text-slate-600">
+                <span>เลือกเดือนที่ต้องการ</span>
+                <span id="monthPickerYearLabel" class="text-purple-700 font-extrabold">พ.ศ. ...</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 pt-2" id="monthPickerGrid">
+                <!-- 12 short month buttons generated dynamically -->
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col ml-0 sm:ml-1">
@@ -408,6 +430,16 @@
           <span class="hidden sm:inline">จัดการฝ่ายและสี</span>
           <span class="sm:hidden">ฝ่าย & สี</span>
         </button>
+      </div>
+    </div>
+
+    <!-- QUICK MONTH SHORT PILLS (แถบย่อเดือน ม.ค. - ธ.ค. สำหรับกดเปลี่ยนเดือนได้ทันที) -->
+    <div class="flex items-center gap-1 overflow-x-auto pb-1 text-xs no-scrollbar bg-purple-50/30 p-1.5 rounded-2xl border border-purple-100/60" id="quickMonthBar">
+      <span class="text-slate-400 font-semibold px-2 text-[11px] whitespace-nowrap hidden sm:inline flex items-center gap-1">
+        <i data-lucide="compass" class="w-3 h-3 text-purple-600"></i> ลัดไปเดือน:
+      </span>
+      <div id="quickMonthPillsContainer" class="flex items-center gap-1 flex-nowrap w-full sm:w-auto">
+        <!-- 12 short month pill buttons injected dynamically via JS -->
       </div>
     </div>
 
@@ -577,9 +609,13 @@
             <i data-lucide="users" class="w-3.5 h-3.5"></i>
             <span>4. ผู้ใช้ & แอดมิน</span>
           </button>
+          <button id="adminTabFtuLinks" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
+            <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-300"></i>
+            <span>5. ลิงก์ปฏิทิน ม.ฟาฏอนี</span>
+          </button>
           <button id="adminTabSync" type="button" class="admin-tab-pill px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-purple-200 hover:text-white hover:bg-white/10 whitespace-nowrap cursor-pointer">
             <i data-lucide="cloud-lightning" class="w-3.5 h-3.5"></i>
-            <span>5. เชื่อมต่อคลาวด์</span>
+            <span>6. เชื่อมต่อคลาวด์</span>
           </button>
         </div>
       </div>
@@ -878,6 +914,34 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- หมวดที่ 6: จัดการลิงก์และปฏิทิน ม.ฟาฏอนี ทุกปีการศึกษา -->
+      <!-- ========================================== -->
+      <div id="adminSecFtuLinks" class="admin-section bg-white rounded-2xl border border-emerald-200/90 shadow-xs overflow-hidden p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-100 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-400 text-emerald-950 text-[10px] font-black uppercase">ม.ฟาฏอนี</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-700"></i> จัดการลิงก์ปฏิทินวิชาการ ม.ฟาฏอนี ปีการศึกษาต่อๆ ไป
+              </h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              กำหนดลิงก์ระบบทะเบียน e-Register (reg.ftu.ac.th) เพื่อให้ผู้ใช้สามารถคลิกเปิดดูหรือสลับดูปฏิทินของแต่ละปีการศึกษาได้ทันที
+            </p>
+          </div>
+          <button id="btnOpenAddFtuLinkModal" type="button" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer active:scale-95">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-amber-300"></i>
+            <span>+ เพิ่มลิงก์ปีการศึกษาใหม่</span>
+          </button>
+        </div>
+
+        <!-- FTU Links List Table / Cards -->
+        <div id="ftuLinksListContainer" class="space-y-2.5">
+          <!-- Rendered dynamically via JS -->
         </div>
       </div>
 
@@ -1283,11 +1347,38 @@
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-2 self-end sm:self-center">
-            <button type="button" id="btnPrintFtuModal" class="px-3.5 py-2 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl text-xs font-bold text-white transition flex items-center gap-1.5 cursor-pointer shadow-2xs" title="พิมพ์ปฏิทิน">
-              <i data-lucide="printer" class="w-4 h-4 text-amber-300"></i>
-              <span class="hidden sm:inline">พิมพ์ / PDF</span>
-            </button>
+          <div class="flex items-center gap-2 self-end sm:self-center flex-wrap">
+            <!-- Academic Year Select inside FTU modal -->
+            <div class="flex items-center bg-white/15 border border-amber-300/40 rounded-xl px-2.5 py-1 text-xs font-bold text-white shadow-2xs">
+              <span class="text-amber-200 text-[11px] mr-1.5">ปี:</span>
+              <select id="selectFtuModalYear" class="bg-transparent text-white font-extrabold focus:outline-none cursor-pointer text-xs">
+                <option value="2569" class="text-slate-900 font-bold" selected>2569 (ปัจจุบัน)</option>
+              </select>
+            </div>
+
+            <!-- Export Full FTU Calendar Dropdown Menu -->
+            <div class="relative">
+              <button type="button" id="btnExportFtuDropdownToggle" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95" title="ส่งออกข้อมูลปฏิทิน ม.ฟาฏอนี ทั้งหมด">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-900"></i>
+                <span>ส่งออก</span>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-emerald-900"></i>
+              </button>
+              <div id="dropdownExportFtu" class="hidden absolute right-0 mt-1.5 w-52 bg-white rounded-2xl shadow-2xl border border-emerald-100 py-1.5 z-50 text-xs">
+                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                  ส่งออกครบทุก 129 รายการ
+                </div>
+                <button type="button" id="btnExportFtuExcel" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
+                  <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> ส่งออกเป็น Excel (.xlsx)
+                </button>
+                <button type="button" id="btnExportFtuWord" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
+                  <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i> ส่งออกเป็น Word (.doc)
+                </button>
+                <button type="button" id="btnExportFtuPdf" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
+                  <i data-lucide="printer" class="w-4 h-4 text-rose-500"></i> พิมพ์ / บันทึก PDF (.pdf)
+                </button>
+              </div>
+            </div>
+
             <button type="button" id="btnCloseFtuModal" onclick="closeModal('modalFtuCalendar')" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center transition cursor-pointer" title="ปิดหน้าต่าง">
               <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -1428,6 +1519,63 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT FTU ACADEMIC YEAR LINK -->
+  <div id="modalAddFtuLink" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-emerald-100 overflow-hidden animate-scaleUp">
+      <div class="p-5 bg-gradient-to-r from-emerald-800 via-emerald-900 to-amber-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-amber-300 shadow-inner">
+            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base leading-tight">เพิ่ม / แก้ไขลิงก์ปฏิทิน ม.ฟาฏอนี</h3>
+            <p class="text-[11px] text-emerald-200">ระบุปีการศึกษา และลิงก์จากสำนักทะเบียน e-Register</p>
+          </div>
+        </div>
+        <button id="btnCloseModalAddFtuLink" type="button" class="text-white/70 hover:text-white p-1 rounded-xl hover:bg-white/10 transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formAddFtuLink" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ปีการศึกษา (พ.ศ.) *</label>
+          <input type="text" id="inputFtuLinkYear" placeholder="เช่น 2570 หรือ 2571" required
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold bg-slate-50 focus:bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ชื่อคำอธิบาย / หมายเหตุ</label>
+          <input type="text" id="inputFtuLinkTitle" placeholder="เช่น ปฏิทินวิชาการ มหาวิทยาลัยฟาฏอนี ปีการศึกษา 2570"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-50 focus:bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ลิงก์ภาคการศึกษาที่ 1 (URL)</label>
+          <input type="url" id="inputFtuLinkSem1" placeholder="https://reg.ftu.ac.th/registrar/calendar.asp?..."
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[11px] bg-slate-50 focus:bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ลิงก์ภาคการศึกษาที่ 2 (URL)</label>
+          <input type="url" id="inputFtuLinkSem2" placeholder="https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=...&semester=2"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[11px] bg-slate-50 focus:bg-white">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ลิงก์ภาคการศึกษาที่ 3 (ฤดูร้อน - URL)</label>
+          <input type="url" id="inputFtuLinkSem3" placeholder="https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=...&semester=3"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[11px] bg-slate-50 focus:bg-white">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button id="btnCancelAddFtuLink" type="button" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold transition shadow-xs cursor-pointer">
+            บันทึกข้อมูลลิงก์
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1658,6 +1806,11 @@
     const THAI_MONTHS = [
       'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
       'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    const THAI_MONTHS_SHORT = [
+      'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+      'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
     ];
 
     const HIJRI_MONTHS = [
@@ -3809,6 +3962,229 @@
     ];
 
     // ==========================================
+    // 3.1 DYNAMIC ANNUAL HOLIDAYS GENERATOR (พ.ศ. & ฮ.ศ. ทุกๆ ปี)
+    // ==========================================
+    const FIXED_SOLAR_HOLIDAYS = [
+      { id: 'ny', title: 'วันขึ้นปีใหม่', month: 1, day: 1, desc: 'วันหยุดราชการสากล' },
+      { id: 'chakri', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', month: 4, day: 6, desc: 'วันหยุดราชการ' },
+      { id: 'songkran', title: 'วันสงกรานต์', month: 4, day: 13, endDay: 15, desc: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'labor', title: 'วันแรงงานแห่งชาติ', month: 5, day: 1, desc: 'วันหยุดตามประเพณี' },
+      { id: 'coronation', title: 'วันฉัตรมงคล', month: 5, day: 4, desc: 'วันหยุดราชการ' },
+      { id: 'queen', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี', month: 6, day: 3, desc: 'วันหยุดราชการ' },
+      { id: 'king10', title: 'วันเฉลิมพระชนมพรรษาพระบาทสมเด็จพระเจ้าอยู่หัว', month: 7, day: 28, desc: 'วันหยุดราชการ' },
+      { id: 'mother', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระพันปีหลวง / วันแม่แห่งชาติ', month: 8, day: 12, desc: 'วันหยุดราชการ' },
+      { id: 'navamindra', title: 'วันนวมินทรมหาราช (วันคล้ายวันสวรรคต ร.9)', month: 10, day: 13, desc: 'วันหยุดราชการ' },
+      { id: 'chulalongkorn', title: 'วันปิยมหาราช', month: 10, day: 23, desc: 'วันหยุดราชการ' },
+      { id: 'father', title: 'วันคล้ายวันพระบรมราชสมภพ ร.9 / วันพ่อแห่งชาติ', month: 12, day: 5, desc: 'วันหยุดราชการ' },
+      { id: 'constitution', title: 'วันรัฐธรรมนูญ', month: 12, day: 10, desc: 'วันหยุดราชการ' },
+      { id: 'yearend', title: 'วันสิ้นปี', month: 12, day: 31, desc: 'วันหยุดราชการ' }
+    ];
+
+    function generateHolidaysForYear(ceYear) {
+      const holidays = [];
+      const beYear = ceYear + 543;
+      const pad2 = n => String(n).padStart(2, '0');
+
+      // 1. วันสำคัญและวันหยุดราชการไทยประจำปี (Fixed Solar Dates)
+      FIXED_SOLAR_HOLIDAYS.forEach(item => {
+        const sDate = `${ceYear}-${pad2(item.month)}-${pad2(item.day)}`;
+        const eDate = item.endDay ? `${ceYear}-${pad2(item.month)}-${pad2(item.endDay)}` : sDate;
+        holidays.push({
+          id: `th_${item.id}_${beYear}`,
+          title: item.title,
+          departmentId: 'dept_holiday',
+          startDate: sDate,
+          endDate: eDate,
+          academicYear: String(beYear),
+          semester: item.month >= 5 && item.month <= 10 ? '1' : (item.month >= 11 || item.month <= 2 ? '2' : 'ปิดภาคเรียน'),
+          description: item.desc
+        });
+      });
+
+      // 2. วันสำคัญและเทศกาลทางศาสนาอิสลามคำนวณตามปฏิทินฮิจเราะห์ศักราช (Intl Islamic Umalqura)
+      const startDate = new Date(ceYear, 0, 1);
+      const endDate = new Date(ceYear, 11, 31);
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const curDate = new Date(d);
+        const h = getHijriDate(curDate);
+        const dateStr = formatDateYMD(curDate);
+        const curMonth = curDate.getMonth() + 1;
+        const sem = curMonth >= 5 && curMonth <= 10 ? '1' : (curMonth >= 11 || curMonth <= 2 ? '2' : 'ปิดภาคเรียน');
+
+        // 1 มุฮัรรอม: วันขึ้นปีใหม่ฮิจเราะห์ศักราช
+        if (h.month === 1 && h.day === 1) {
+          holidays.push({
+            id: `h_hijri_ny_${h.year}_${dateStr}`,
+            title: `วันขึ้นปีใหม่ฮิจเราะห์ศักราช ${h.year} (1 มุฮัรรอม)`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันขึ้นปีใหม่ของชาวมุสลิมทั่วโลก'
+          });
+        }
+        // 10 มุฮัรรอม: วันอาชูรออ์
+        if (h.month === 1 && h.day === 10) {
+          holidays.push({
+            id: `h_ashura_${h.year}_${dateStr}`,
+            title: `วันอาชูรออ์ (10 มุฮัรรอม ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันถือศีลอดอาชูรออ์'
+          });
+        }
+        // 12 รอบีอุลเอาวัล: วันเมาลิดนบี
+        if (h.month === 3 && h.day === 12) {
+          holidays.push({
+            id: `h_mawlid_${h.year}_${dateStr}`,
+            title: `วันเมาลิดนบี (12 รอบีอุลเอาวัล ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันคล้ายวันประสูติท่านศาสดามุฮัมมัด (ซ.ล.)'
+          });
+        }
+        // 27 เราะญับ: วันอิสรออ์และมิอ์รอจญ์
+        if (h.month === 7 && h.day === 27) {
+          holidays.push({
+            id: `h_isra_${h.year}_${dateStr}`,
+            title: `วันอิสรออ์และมิอ์รอจญ์ (27 เราะญับ ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'การเดินทางยามค่ำคืนและการเสด็จสู่ฟากฟ้าของท่านศาสดามุฮัมมัด (ซ.ล.)'
+          });
+        }
+        // 15 ชะอ์บาน: ค่ำคืนนิศฟูชะอ์บาน
+        if (h.month === 8 && h.day === 15) {
+          holidays.push({
+            id: `h_nisfu_${h.year}_${dateStr}`,
+            title: `ค่ำคืนนิศฟูชะอ์บาน (15 ชะอ์บาน ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'ค่ำคืนกึ่งกลางเดือนชะอ์บาน'
+          });
+        }
+        // 1 รอมฎอน: เริ่มต้นถือศีลอด
+        if (h.month === 9 && h.day === 1) {
+          holidays.push({
+            id: `h_ramadan_${h.year}_${dateStr}`,
+            title: `เริ่มต้นถือศีลอดเดือนรอมฎอน (1 รอมฎอน ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'เข้าสู่เดือนรอมฎอนอันประเสริฐ'
+          });
+        }
+        // 17 รอมฎอน: วันนูซุลอัลกุรอาน
+        if (h.month === 9 && h.day === 17) {
+          holidays.push({
+            id: `h_nuzul_${h.year}_${dateStr}`,
+            title: `วันนูซุลอัลกุรอาน (17 รอมฎอน ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันรำลึกการประทานคัมภีร์อัลกุรอานครั้งแรก'
+          });
+        }
+        // 1 เชาวาล: วันตรุษอีดิ้ลฟิฏริ
+        if (h.month === 10 && h.day === 1) {
+          const dNext = new Date(curDate);
+          dNext.setDate(dNext.getDate() + 1);
+          holidays.push({
+            id: `h_eid_fitr_${h.year}_${dateStr}`,
+            title: `วันตรุษอีดิ้ลฟิฏริ (ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: formatDateYMD(dNext),
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน'
+          });
+        }
+        // 9 ซุลฮิจญะฮ์: วันอะเราะฟะฮ์
+        if (h.month === 12 && h.day === 9) {
+          holidays.push({
+            id: `h_arafah_${h.year}_${dateStr}`,
+            title: `วันอะเราะฟะฮ์ (9 ซุลฮิจญะฮ์ ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: dateStr,
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันวุกูฟที่ทุ่งอะเราะฟะฮ์ แนะนำให้ถือศีลอด'
+          });
+        }
+        // 10 ซุลฮิจญะฮ์: วันตรุษอีดิ้ลอัฎฮา
+        if (h.month === 12 && h.day === 10) {
+          const dNext = new Date(curDate);
+          dNext.setDate(dNext.getDate() + 2);
+          holidays.push({
+            id: `h_eid_adha_${h.year}_${dateStr}`,
+            title: `วันตรุษอีดิ้ลอัฎฮา (ฮ.ศ. ${h.year})`,
+            departmentId: 'dept_holiday',
+            startDate: dateStr,
+            endDate: formatDateYMD(dNext),
+            academicYear: String(beYear),
+            semester: sem,
+            description: 'วันเฉลิมฉลองเทศกาลกุรบาน'
+          });
+        }
+      }
+      return holidays;
+    }
+
+    // ==========================================
+    // 3.2 FTU ACADEMIC YEAR LINKS CONFIGURATION (ลิงก์ปฏิทิน ม.ฟาฏอนี ทุกปีการศึกษา)
+    // ==========================================
+    const DEFAULT_FTU_LINKS = [
+      {
+        year: '2569',
+        title: 'ปฏิทินกิจกรรมและการศึกษา มหาวิทยาลัยฟาฏอนี ปีการศึกษา 2569',
+        sem1Url: 'https://reg.ftu.ac.th/registrar/calendar.asp?avs793781252=9',
+        sem2Url: 'https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=2569&semester=2',
+        sem3Url: 'https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=2569&semester=3',
+        status: 'active',
+        hasLocalData: true
+      },
+      {
+        year: '2570',
+        title: 'ปฏิทินกิจกรรมและการศึกษา มหาวิทยาลัยฟาฏอนี ปีการศึกษา 2570',
+        sem1Url: 'https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=2570&semester=1',
+        sem2Url: 'https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=2570&semester=2',
+        sem3Url: 'https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=2570&semester=3',
+        status: 'upcoming',
+        hasLocalData: false
+      }
+    ];
+
+    let ftuAcademicLinks = [];
+    try {
+      const storedFtuLinks = localStorage.getItem('school_cal_ftu_links');
+      ftuAcademicLinks = storedFtuLinks ? JSON.parse(storedFtuLinks) : DEFAULT_FTU_LINKS;
+      if (!Array.isArray(ftuAcademicLinks) || ftuAcademicLinks.length === 0) {
+        ftuAcademicLinks = DEFAULT_FTU_LINKS;
+      }
+    } catch (e) {
+      ftuAcademicLinks = DEFAULT_FTU_LINKS;
+    }
+
+    // ==========================================
     // 4. STORAGE & CLOUD REAL-TIME SYNC
     // ==========================================
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzUxpWd50A7Hc9TERrqX-MxeezIkzvjxt0f6ROkjl8KDSJY6HHs5Uud9_I4RLkCQnr76A/exec';
@@ -4017,20 +4393,31 @@
         state.departments = DEFAULT_DEPARTMENTS;
       }
 
-      // Smart Merge: ดึงกิจกรรมที่ผู้ใช้บันทึกไว้ มารวมกับวันหยุดระบบล่าสุด โดยตัดรายการที่ถูกลบออก
-      let loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS.filter(e => !deletedSet.has(e.id));
+      // Smart Merge: สร้างวันสำคัญของไทยและฮ.ศ. ครอบคลุมหลายปี (อดีต ปัจจุบัน และอนาคต)
+      const currentYearCE = new Date().getFullYear();
+      const multiYearHolidays = [];
+      for (let y = currentYearCE - 3; y <= currentYearCE + 5; y++) {
+        multiYearHolidays.push(...generateHolidaysForYear(y));
+      }
+
+      // ผสาน DEFAULT_HOLIDAYS_AND_EVENTS เดิมกับวันสำคัญหลายปี
+      const allSystemHolidaysMap = new Map();
+      DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => allSystemHolidaysMap.set(e.id, e));
+      multiYearHolidays.forEach(e => {
+        if (!allSystemHolidaysMap.has(e.id)) {
+          allSystemHolidaysMap.set(e.id, e);
+        }
+      });
+
+      let loadedEvents = Array.from(allSystemHolidaysMap.values()).filter(e => !deletedSet.has(e.id));
       if (storedEvts) {
         try {
           const userStoredList = JSON.parse(storedEvts);
           if (Array.isArray(userStoredList)) {
-            // เก็บ user-created events (ที่ไม่ได้เป็นวันหยุดระบบเดิม และไม่ได้ถูกลบ)
             const userCustomEvents = userStoredList.filter(e => !e.id.startsWith('h_') && !e.id.startsWith('th_') && !e.id.startsWith('ftu_') && e.departmentId !== 'dept_holiday' && e.departmentId !== 'dept_ftu' && !deletedSet.has(e.id));
             
-            // Map รวม DEFAULT_HOLIDAYS_AND_EVENTS กับ userCustomEvents
             const eventMap = new Map();
-            DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => {
-              if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
-            });
+            loadedEvents.forEach(e => eventMap.set(e.id, e));
             userCustomEvents.forEach(e => {
               if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
             });
@@ -4039,7 +4426,6 @@
           }
         } catch (e) {
           console.error('Error merging local events:', e);
-          loadedEvents = DEFAULT_HOLIDAYS_AND_EVENTS.filter(e => !deletedSet.has(e.id));
         }
       }
 
@@ -4177,6 +4563,18 @@
       const beYear = year + 543;
       
       document.getElementById('currentMonthYearBE').innerText = `${THAI_MONTHS[month]} พ.ศ. ${beYear} (ค.ศ. ${year})`;
+
+      // Update Quick Short Month indicators
+      const shortBadge = document.getElementById('quickMonthShortBadge');
+      if (shortBadge && THAI_MONTHS_SHORT[month]) {
+        shortBadge.innerText = THAI_MONTHS_SHORT[month];
+      }
+      const pickerYearLbl = document.getElementById('monthPickerYearLabel');
+      if (pickerYearLbl) {
+        pickerYearLbl.innerText = `พ.ศ. ${beYear}`;
+      }
+      renderQuickMonthPills();
+      renderMonthPickerGrid();
       
       // คำนวณช่วงเดือนฮิจเราะห์ในเดือนนี้ (วันแรก และ วันสิ้นเดือน)
       const firstDayDate = new Date(year, month, 1);
@@ -4291,6 +4689,59 @@
           item.innerHTML = `<span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: ${baseColor}"></span><span>${dept.name}</span>`;
         }
         container.appendChild(item);
+      });
+    }
+
+    function renderQuickMonthPills() {
+      const container = document.getElementById('quickMonthPillsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const currentM = state.currentDate.getMonth();
+      THAI_MONTHS_SHORT.forEach((shortName, mIdx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        const isActive = mIdx === currentM;
+        btn.className = `px-2.5 py-1 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer active:scale-95 ${
+          isActive 
+            ? 'bg-purple-900 text-white shadow-xs' 
+            : 'bg-white hover:bg-purple-100/70 text-slate-700 border border-purple-100/80 hover:text-purple-950 shadow-2xs'
+        }`;
+        btn.innerText = shortName;
+        btn.title = `ข้ามไปเดือน ${THAI_MONTHS[mIdx]}`;
+        btn.onclick = () => {
+          state.currentDate.setMonth(mIdx);
+          renderUI();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function renderMonthPickerGrid() {
+      const grid = document.getElementById('monthPickerGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const currentM = state.currentDate.getMonth();
+      THAI_MONTHS_SHORT.forEach((shortName, mIdx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        const isActive = mIdx === currentM;
+        btn.className = `py-1.5 px-1 rounded-xl text-xs font-bold transition cursor-pointer active:scale-95 text-center ${
+          isActive 
+            ? 'bg-purple-700 text-white shadow-xs' 
+            : 'bg-purple-50/70 hover:bg-purple-100 text-purple-900 border border-purple-100'
+        }`;
+        btn.innerText = shortName;
+        btn.title = THAI_MONTHS[mIdx];
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          state.currentDate.setMonth(mIdx);
+          const dropdown = document.getElementById('dropdownMonthPicker');
+          if (dropdown) dropdown.classList.add('hidden');
+          renderUI();
+        };
+        grid.appendChild(btn);
       });
     }
 
@@ -5473,6 +5924,318 @@
       lucide.createIcons();
     }
 
+    // ==========================================
+    // 7.1 EXPORT FUNCTIONS DEDICATED FOR FTU ACADEMIC CALENDAR (ส่งออกข้อมูล ม.ฟาฏอนี ครบทุกรายการ)
+    // ==========================================
+    function getFtuExportData() {
+      return FTU_2569_EVENTS.map((evt, idx) => {
+        const s = parseDateYMD(evt.startDate);
+        const e = evt.endDate ? parseDateYMD(evt.endDate) : s;
+        const hijri = getHijriDate(s);
+        return {
+          ลำดับ: idx + 1,
+          ภาคการศึกษา: evt.semester || '1',
+          วันที่เริ่มต้น: evt.startDate,
+          วันที่สิ้นสุด: evt.endDate || evt.startDate,
+          วันที่ไทย: formatThaiDateFull(s),
+          วันที่ฮิจเราะห์: hijri.formatted,
+          กิจกรรมปฏิทิน: evt.title,
+          สถานที่: evt.location || 'มหาวิทยาลัยฟาฏอนี',
+          รายละเอียด: evt.description || evt.title,
+          หน่วยงาน: 'สำนักทะเบียนและประมวลผล มหาวิทยาลัยฟาฏอนี'
+        };
+      });
+    }
+
+    function exportFtuToExcel() {
+      const data = getFtuExportData();
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'ปฏิทิน ม.ฟาฏอนี 2569');
+      XLSX.writeFile(wb, 'ปฏิทินการศึกษา_มหาวิทยาลัยฟาฏอนี_2569_ครบทุกรายการ.xlsx');
+      showToast('✓ ส่งออกปฏิทิน ม.ฟาฏอนี 2569 เป็น Excel สำเร็จ (129 รายการ)');
+    }
+
+    function exportFtuToWord() {
+      const data = getFtuExportData();
+      let tableRows = '';
+      data.forEach(item => {
+        tableRows += `
+          <tr>
+            <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;">${item.ลำดับ}</td>
+            <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;">${item.ภาคการศึกษา}</td>
+            <td style="padding:6px;border:1px solid #cbd5e1;">${item.วันที่ไทย}</td>
+            <td style="padding:6px;border:1px solid #cbd5e1;color:#6b21a8;">${item.วันที่ฮิจเราะห์}</td>
+            <td style="padding:6px;border:1px solid #cbd5e1;font-weight:bold;">${item.กิจกรรมปฏิทิน}</td>
+            <td style="padding:6px;border:1px solid #cbd5e1;font-size:10px;">${item.รายละเอียด}</td>
+          </tr>
+        `;
+      });
+
+      const docHtml = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset='utf-8'>
+          <title>ปฏิทินการศึกษา มหาวิทยาลัยฟาฏอนี 2569</title>
+          <style>
+            @page { size: A4 landscape; margin: 1.5cm; }
+            body { font-family: 'Sarabun', 'Prompt', sans-serif; font-size: 11px; }
+            table { width: 100%; border-collapse: collapse; font-size: 11px; }
+            th { background: #047857; color: #ffffff; padding: 8px; border: 1px solid #cbd5e1; }
+          </style>
+        </head>
+        <body>
+          <h2 style="text-align:center;color:#065f46;margin-bottom:4px;">ปฏิทินกิจกรรมและการศึกษา มหาวิทยาลัยฟาฏอนี ประจำปีการศึกษา 2569</h2>
+          <p style="text-align:center;color:#64748b;margin-top:0;">ข้อมูลสำนักทะเบียนและประมวลผล (e-Register) ครบทั้ง 3 ภาคการศึกษา (129 รายการ)</p>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px;">ที่</th>
+                <th style="width:60px;">ภาคเรียน</th>
+                <th style="width:140px;">วันที่ (พ.ศ.)</th>
+                <th style="width:140px;">วันที่ (ฮ.ศ.)</th>
+                <th>กิจกรรม / กำหนดการ</th>
+                <th style="width:200px;">รายละเอียด</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + docHtml], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ปฏิทินการศึกษา_มหาวิทยาลัยฟาฏอนี_2569_ครบทุกรายการ.doc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('✓ ส่งออกปฏิทิน ม.ฟาฏอนี 2569 เป็น Word สำเร็จ (129 รายการ)');
+    }
+
+    function exportFtuToPdf() {
+      const data = getFtuExportData();
+      const container = document.createElement('div');
+      container.style.width = '1050px';
+      container.style.padding = '24px 28px';
+      container.style.fontFamily = "'Prompt', 'Sarabun', sans-serif";
+      container.style.color = '#1e293b';
+      container.style.backgroundColor = '#ffffff';
+
+      let rows = '';
+      data.forEach((item, idx) => {
+        const rowBg = idx % 2 === 1 ? '#f8fafc' : '#ffffff';
+        rows += `
+          <tr style="background-color: ${rowBg}; border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">${item.ลำดับ}</td>
+            <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #047857;">${item.ภาคการศึกษา}</td>
+            <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">${item.วันที่ไทย}</td>
+            <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #6b21a8; font-weight: 500;">${item.วันที่ฮิจเราะห์}</td>
+            <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: bold; color: #0f172a;">${item.กิจกรรมปฏิทิน}</td>
+            <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #64748b; font-size: 10px;">${item.รายละเอียด}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="text-align: center; margin-bottom: 18px; border-bottom: 2px solid #047857; padding-bottom: 12px;">
+          <h2 style="font-size: 20px; font-weight: bold; margin: 0; color: #065f46;">ปฏิทินกิจกรรมและการศึกษา มหาวิทยาลัยฟาฏอนี ประจำปีการศึกษา 2569</h2>
+          <p style="font-size: 11px; color: #64748b; margin: 4px 0 0 0;">ข้อมูลสำนักทะเบียนและประมวลผล ครบทั้ง 3 ภาคการศึกษา รวม 129 รายการ (คู่ขนาน พ.ศ. และ ฮ.ศ.)</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 10.5px;">
+          <thead>
+            <tr style="background-color: #047857; color: white;">
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 35px;">ที่</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 55px;">เทอม</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 140px;">วันที่ (พ.ศ.)</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 155px;">วันที่ (ฮ.ศ.)</th>
+              <th style="padding: 8px 10px; border: 1px solid #cbd5e1;">กิจกรรม / กำหนดการ</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 220px;">รายละเอียด</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+
+      document.body.appendChild(container);
+      const opt = {
+        margin: [6, 6, 6, 6],
+        filename: 'ปฏิทินการศึกษา_มหาวิทยาลัยฟาฏอนี_2569_ครบทุกรายการ.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().set(opt).from(container).save().then(() => {
+        document.body.removeChild(container);
+        showToast('✓ ส่งออก PDF ปฏิทิน ม.ฟาฏอนี 2569 ครบทั้ง 129 รายการเรียบร้อยแล้ว');
+      });
+    }
+
+    // ==========================================
+    // 7.2 FTU ACADEMIC YEAR LINKS MANAGEMENT (จัดการลิงก์ ม.ฟาฏอนี ปีต่อๆ ไป)
+    // ==========================================
+    function renderAdminFtuLinksList() {
+      const container = document.getElementById('ftuLinksListContainer');
+      const selectModal = document.getElementById('selectFtuModalYear');
+      if (!container) return;
+
+      container.innerHTML = '';
+      if (selectModal) selectModal.innerHTML = '';
+
+      ftuAcademicLinks.forEach((link, idx) => {
+        // Populate modal select
+        if (selectModal) {
+          const opt = document.createElement('option');
+          opt.value = link.year;
+          opt.className = 'text-slate-900 font-bold';
+          opt.innerText = `ปี ${link.year} ${link.year === '2569' ? '(มีข้อมูลในระบบ)' : '(เปิดลิงก์ภายนอก)'}`;
+          if (link.year === '2569') opt.selected = true;
+          selectModal.appendChild(opt);
+        }
+
+        // Render card in admin dashboard
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-emerald-300 transition shadow-2xs space-y-2.5';
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-800 text-white font-extrabold text-xs shadow-2xs">
+                ปีการศึกษา ${link.year}
+              </span>
+              <h4 class="font-bold text-slate-800 text-sm">${link.title || ('ปฏิทิน ม.ฟาฏอนี ' + link.year)}</h4>
+              ${link.year === '2569' ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">129 รายการพร้อมใช้งาน</span>' : ''}
+            </div>
+            <div class="flex items-center gap-1.5 self-end sm:self-auto">
+              <button type="button" class="btn-edit-ftu-link px-2.5 py-1 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs transition flex items-center gap-1 cursor-pointer" data-idx="${idx}">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> แก้ไข
+              </button>
+              ${link.year !== '2569' ? `
+                <button type="button" class="btn-del-ftu-link px-2.5 py-1 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs transition flex items-center gap-1 cursor-pointer" data-idx="${idx}">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ลบ
+                </button>
+              ` : ''}
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px]">
+            <a href="${link.sem1Url || '#'}" target="_blank" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 text-emerald-800 flex items-center gap-1.5 transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+              <span class="font-bold">เทอม 1:</span>
+              <span class="truncate text-slate-500">${link.sem1Url ? 'reg.ftu.ac.th (คลิกเปิด)' : 'ยังไม่มีลิงก์'}</span>
+            </a>
+            <a href="${link.sem2Url || '#'}" target="_blank" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 text-emerald-800 flex items-center gap-1.5 transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+              <span class="font-bold">เทอม 2:</span>
+              <span class="truncate text-slate-500">${link.sem2Url ? 'reg.ftu.ac.th (คลิกเปิด)' : 'ยังไม่มีลิงก์'}</span>
+            </a>
+            <a href="${link.sem3Url || '#'}" target="_blank" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 text-emerald-800 flex items-center gap-1.5 transition">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+              <span class="font-bold">เทอม 3 (ฤดูร้อน):</span>
+              <span class="truncate text-slate-500">${link.sem3Url ? 'reg.ftu.ac.th (คลิกเปิด)' : 'ยังไม่มีลิงก์'}</span>
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Wire edit and delete buttons
+      container.querySelectorAll('.btn-edit-ftu-link').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.getAttribute('data-idx'), 10);
+          openEditFtuLinkModal(idx);
+        };
+      });
+
+      container.querySelectorAll('.btn-del-ftu-link').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.getAttribute('data-idx'), 10);
+          if (confirm(`ต้องการลบการตั้งค่าลิงก์ปีการศึกษา "${ftuAcademicLinks[idx].year}" ใช่หรือไม่?`)) {
+            ftuAcademicLinks.splice(idx, 1);
+            localStorage.setItem('school_cal_ftu_links', JSON.stringify(ftuAcademicLinks));
+            renderAdminFtuLinksList();
+            showToast('ลบลิงก์ปีการศึกษาเรียบร้อยแล้ว');
+          }
+        };
+      });
+
+      lucide.createIcons();
+    }
+
+    let editingFtuLinkIdx = -1;
+    function openAddFtuLinkModal() {
+      editingFtuLinkIdx = -1;
+      document.getElementById('formAddFtuLink').reset();
+      openModal('modalAddFtuLink');
+      document.getElementById('inputFtuLinkYear').focus();
+    }
+
+    function openEditFtuLinkModal(idx) {
+      editingFtuLinkIdx = idx;
+      const item = ftuAcademicLinks[idx];
+      document.getElementById('inputFtuLinkYear').value = item.year || '';
+      document.getElementById('inputFtuLinkTitle').value = item.title || '';
+      document.getElementById('inputFtuLinkSem1').value = item.sem1Url || '';
+      document.getElementById('inputFtuLinkSem2').value = item.sem2Url || '';
+      document.getElementById('inputFtuLinkSem3').value = item.sem3Url || '';
+      openModal('modalAddFtuLink');
+    }
+
+    document.getElementById('formAddFtuLink').onsubmit = (e) => {
+      e.preventDefault();
+      const year = document.getElementById('inputFtuLinkYear').value.trim();
+      const title = document.getElementById('inputFtuLinkTitle').value.trim() || `ปฏิทินกิจกรรมและการศึกษา มหาวิทยาลัยฟาฏอนี ปีการศึกษา ${year}`;
+      const sem1Url = document.getElementById('inputFtuLinkSem1').value.trim();
+      const sem2Url = document.getElementById('inputFtuLinkSem2').value.trim();
+      const sem3Url = document.getElementById('inputFtuLinkSem3').value.trim();
+
+      if (!year) {
+        alert('กรุณาระบุปีการศึกษา');
+        return;
+      }
+
+      const linkObj = {
+        year,
+        title,
+        sem1Url,
+        sem2Url,
+        sem3Url,
+        status: 'active'
+      };
+
+      if (editingFtuLinkIdx >= 0) {
+        ftuAcademicLinks[editingFtuLinkIdx] = linkObj;
+      } else {
+        const existIdx = ftuAcademicLinks.findIndex(l => l.year === year);
+        if (existIdx >= 0) {
+          ftuAcademicLinks[existIdx] = linkObj;
+        } else {
+          ftuAcademicLinks.push(linkObj);
+        }
+      }
+
+      ftuAcademicLinks.sort((a, b) => parseInt(a.year, 10) - parseInt(b.year, 10));
+      localStorage.setItem('school_cal_ftu_links', JSON.stringify(ftuAcademicLinks));
+      closeModal('modalAddFtuLink');
+      renderAdminFtuLinksList();
+      showToast(`✓ บันทึกลิงก์ปฏิทิน ม.ฟาฏอนี ปีการศึกษา ${year} เรียบร้อยแล้ว`);
+    };
+
+    const btnOpenAddFtuLink = document.getElementById('btnOpenAddFtuLinkModal');
+    if (btnOpenAddFtuLink) btnOpenAddFtuLink.onclick = openAddFtuLinkModal;
+
+    const btnCloseModalAddFtuLink = document.getElementById('btnCloseModalAddFtuLink');
+    if (btnCloseModalAddFtuLink) btnCloseModalAddFtuLink.onclick = () => closeModal('modalAddFtuLink');
+
+    const btnCancelAddFtuLink = document.getElementById('btnCancelAddFtuLink');
+    if (btnCancelAddFtuLink) btnCancelAddFtuLink.onclick = () => closeModal('modalAddFtuLink');
+
     function openViewEventModal(evt, dateObj, hijriInfo) {
       activeViewingEvent = evt;
       const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
@@ -6415,6 +7178,83 @@
       const btnOpenFtu3 = document.getElementById('btnLandingOpenFtuHub');
       if (btnOpenFtu3) btnOpenFtu3.onclick = () => openFtuCalendarModal('1');
 
+      // Toggle Quick Month Picker Dropdown
+      const btnToggleMonth = document.getElementById('btnToggleMonthPicker');
+      const dropdownMonth = document.getElementById('dropdownMonthPicker');
+      if (btnToggleMonth && dropdownMonth) {
+        btnToggleMonth.onclick = (e) => {
+          e.stopPropagation();
+          dropdownMonth.classList.toggle('hidden');
+        };
+        document.addEventListener('click', (e) => {
+          if (!dropdownMonth.contains(e.target) && !btnToggleMonth.contains(e.target)) {
+            dropdownMonth.classList.add('hidden');
+          }
+        });
+      }
+
+      // FTU Modal Export Dropdown & Year Switcher
+      const btnExportFtuToggle = document.getElementById('btnExportFtuDropdownToggle');
+      const dropdownExportFtu = document.getElementById('dropdownExportFtu');
+      if (btnExportFtuToggle && dropdownExportFtu) {
+        btnExportFtuToggle.onclick = (e) => {
+          e.stopPropagation();
+          dropdownExportFtu.classList.toggle('hidden');
+        };
+        document.addEventListener('click', (e) => {
+          if (!dropdownExportFtu.contains(e.target) && !btnExportFtuToggle.contains(e.target)) {
+            dropdownExportFtu.classList.add('hidden');
+          }
+        });
+      }
+
+      const btnFtuExpExcel = document.getElementById('btnExportFtuExcel');
+      if (btnFtuExpExcel) {
+        btnFtuExpExcel.onclick = () => {
+          if (dropdownExportFtu) dropdownExportFtu.classList.add('hidden');
+          exportFtuToExcel();
+        };
+      }
+
+      const btnFtuExpWord = document.getElementById('btnExportFtuWord');
+      if (btnFtuExpWord) {
+        btnFtuExpWord.onclick = () => {
+          if (dropdownExportFtu) dropdownExportFtu.classList.add('hidden');
+          exportFtuToWord();
+        };
+      }
+
+      const btnFtuExpPdf = document.getElementById('btnExportFtuPdf');
+      if (btnFtuExpPdf) {
+        btnFtuExpPdf.onclick = () => {
+          if (dropdownExportFtu) dropdownExportFtu.classList.add('hidden');
+          exportFtuToPdf();
+        };
+      }
+
+      // FTU Modal Year Switcher
+      const selectFtuModalYear = document.getElementById('selectFtuModalYear');
+      if (selectFtuModalYear) {
+        selectFtuModalYear.onchange = (e) => {
+          const selectedYr = e.target.value;
+          if (selectedYr === '2569') {
+            renderFtuCalendarList();
+          } else {
+            const foundLink = ftuAcademicLinks.find(l => l.year === selectedYr);
+            if (foundLink) {
+              const openUrl = foundLink.sem1Url || foundLink.sem2Url || foundLink.sem3Url;
+              if (openUrl) {
+                if (confirm(`ต้องการเปิดหน้าปฏิทินวิชาการ ม.ฟาฏอนี ปีการศึกษา ${selectedYr} ผ่านระบบ e-Register ใช่หรือไม่?\n\nURL: ${openUrl}`)) {
+                  window.open(openUrl, '_blank');
+                }
+              } else {
+                alert(`ยังไม่ได้กำหนด URL ของปีการศึกษา ${selectedYr} สามารถไปเพิ่มลิงก์ได้ที่แดชบอร์ดแอดมิน หมวดที่ 5`);
+              }
+            }
+          }
+        };
+      }
+
       // Semester tabs inside modal
       document.querySelectorAll('.ftu-sem-tab').forEach(tab => {
         tab.onclick = () => {
@@ -6573,6 +7413,7 @@
         { id: 'adminTabEvents', key: 'events', sec: 'adminSecEvents' },
         { id: 'adminTabDepts', key: 'depts', sec: 'adminSecDepts' },
         { id: 'adminTabUsers', key: 'users', sec: 'adminSecUsers' },
+        { id: 'adminTabFtuLinks', key: 'ftuLinks', sec: 'adminSecFtuLinks' },
         { id: 'adminTabSync', key: 'sync', sec: 'adminSecSync' }
       ];
 
@@ -6588,7 +7429,7 @@
         }
       });
 
-      const secIds = ['adminSecStats', 'adminSecEvents', 'adminSecDepts', 'adminSecUsers', 'adminSecSync'];
+      const secIds = ['adminSecStats', 'adminSecEvents', 'adminSecDepts', 'adminSecUsers', 'adminSecFtuLinks', 'adminSecSync'];
       secIds.forEach(secId => {
         const el = document.getElementById(secId);
         if (el) {
@@ -6853,6 +7694,9 @@
       renderAdminUsersTable();
       renderAdminListTable();
 
+      // 7. หมวดที่ 5: จัดการลิงก์ปฏิทิน ม.ฟาฏอนี
+      renderAdminFtuLinksList();
+
       // รักษาสถานะแท็บปัจจุบัน
       switchAdminTab(currentAdminTab);
 
@@ -6866,6 +7710,7 @@
         { id: 'adminTabEvents', key: 'events' },
         { id: 'adminTabDepts', key: 'depts' },
         { id: 'adminTabUsers', key: 'users' },
+        { id: 'adminTabFtuLinks', key: 'ftuLinks' },
         { id: 'adminTabSync', key: 'sync' }
       ];
 
