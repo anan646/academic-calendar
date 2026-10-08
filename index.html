@@ -91,6 +91,15 @@
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(8px);
     }
+    /* PWA & Mobile Display Mode: Hide navbar button and keep floating button */
+    @media (display-mode: standalone) {
+      #btnNavOpenFtuHub {
+        display: none !important;
+      }
+      #btnFabOpenFtuHubContainer {
+        display: block !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -115,17 +124,16 @@
 
       <!-- Action Buttons & User Profile (Dynamically adjusted per portal) -->
       <div class="flex items-center space-x-2" id="navActionsContainer">
-        <!-- FTU Academic Calendar Hub Button (โดดเด่น คมชัด บนทุกหน้าจอและ PWA) -->
+        <!-- FTU Academic Calendar Hub Button (แสดงบนจอคอมพิวเตอร์ และซ่อนบนมือถือ/PWA โดยให้มีเพียงปุ่มลอยบนหน้าจอ) -->
         <button id="btnNavOpenFtuHub" type="button"
-          class="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-700 via-emerald-800 to-amber-700 hover:from-emerald-800 hover:to-amber-800 text-white border-2 border-amber-300/80 text-xs sm:text-sm font-black rounded-xl shadow-md hover:shadow-lg ring-1 ring-amber-400/40 transition active:scale-95 cursor-pointer shrink-0" 
+          class="hidden md:inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-700 via-emerald-800 to-amber-700 hover:from-emerald-800 hover:to-amber-800 text-white border-2 border-amber-300/80 text-xs sm:text-sm font-black rounded-xl shadow-md hover:shadow-lg ring-1 ring-amber-400/40 transition active:scale-95 cursor-pointer shrink-0" 
           title="เปิดดูปฏิทินวิชาการ มหาวิทยาลัยฟาฏอนี (คู่ขนาน พ.ศ./ฮ.ศ.)">
           <div class="w-5 h-5 rounded-lg bg-amber-400/25 flex items-center justify-center shrink-0 border border-amber-300/50">
             <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-200"></i>
           </div>
           <span class="tracking-tight text-white flex items-center gap-1">
-            <span class="inline sm:hidden font-black text-xs text-amber-100">ม.ฟาฏอนี</span>
-            <span class="hidden sm:inline font-bold">ปฏิทิน ม.ฟาฏอนี</span>
-            <span class="text-[10px] px-1 py-0.2 rounded bg-amber-400/30 text-amber-100 font-extrabold border border-amber-300/40 hidden md:inline">2569</span>
+            <span class="font-bold">ปฏิทิน ม.ฟาฏอนี</span>
+            <span class="text-[10px] px-1 py-0.2 rounded bg-amber-400/30 text-amber-100 font-extrabold border border-amber-300/40 hidden lg:inline">2569</span>
           </span>
         </button>
         <button id="btnNavLanding" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition" title="กลับสู่หน้าแรก">
@@ -366,21 +374,25 @@
 
         <!-- Row 2: สลับมุมมอง + ส่งออก + ซิงค์ + จัดการฝ่าย -->
         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-start sm:justify-end w-full">
-          <!-- View Switcher (Month / Week / List / Admin Dashboard) -->
+          <!-- View Switcher (Month / Week / Day / List / Admin Dashboard) -->
           <div class="flex items-center bg-slate-100 p-0.5 sm:p-1 rounded-xl border border-slate-200">
-            <button id="viewBtnMonth" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition cursor-pointer">
+            <button id="viewBtnMonth" class="px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-purple-900 shadow-sm transition cursor-pointer">
               <span class="hidden sm:inline">ปฏิทินรายเดือน</span>
               <span class="sm:hidden">เดือน</span>
             </button>
-            <button id="viewBtnWeek" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">
+            <button id="viewBtnWeek" class="px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">
               <span class="hidden sm:inline">ประจำสัปดาห์</span>
               <span class="sm:hidden">สัปดาห์</span>
             </button>
-            <button id="viewBtnList" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">
+            <button id="viewBtnDay" class="px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">
+              <span class="hidden sm:inline">กิจกรรมประจำวัน</span>
+              <span class="sm:hidden">ประจำวัน</span>
+            </button>
+            <button id="viewBtnList" class="px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer">
               <span class="hidden sm:inline">รายการกิจกรรม</span>
               <span class="sm:hidden">รายการ</span>
             </button>
-            <button id="viewBtnDashboard" class="hidden px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer">
+            <button id="viewBtnDashboard" class="hidden px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1 cursor-pointer">
               <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
               <span class="hidden sm:inline">แดชบอร์ด</span>
             </button>
@@ -432,14 +444,22 @@
       </div>
     </div>
 
-    <!-- DEPARTMENT FILTER PILLS (ฝ่ายต่างๆ & ป้ายสี) -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
-      <span class="text-slate-500 font-medium whitespace-nowrap flex items-center gap-1">
-        <i data-lucide="filter" class="w-3.5 h-3.5"></i> ฝ่าย:
-      </span>
-      <div id="deptFilterContainer" class="flex items-center gap-1.5 flex-nowrap">
-        <!-- Department pill buttons injected dynamically -->
+    <!-- DEPARTMENT & BRANCH FILTER (ฟิลเตอร์เลือกฝ่าย/สาขาแบบดรอปดาวน์ ประหยัดพื้นที่และเลือกได้รวดเร็ว) -->
+    <div class="flex items-center gap-2 text-xs py-0.5">
+      <div class="flex items-center gap-2 bg-slate-50 hover:bg-white px-3 py-1.5 rounded-xl border border-slate-200 transition shadow-2xs">
+        <span class="text-slate-500 font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0">
+          <i data-lucide="filter" class="w-3.5 h-3.5 text-purple-600"></i>
+          <span>เลือกฝ่าย / สาขาวิชา:</span>
+        </span>
+        <select id="selectDeptFilter" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer pr-1 min-w-[200px] sm:min-w-[250px]">
+          <option value="all">ทุกฝ่าย / ทุกสาขาวิชา (ทั้งหมด)</option>
+          <!-- Populated dynamically via JS -->
+        </select>
+        <span id="selectDeptColorDot" class="w-2.5 h-2.5 rounded-full bg-purple-600 shrink-0 hidden"></span>
       </div>
+      <button id="btnResetDeptFilter" type="button" class="hidden px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-purple-50 text-slate-600 text-[11px] font-semibold transition cursor-pointer" title="ล้างตัวกรองฝ่าย">
+        ล้างตัวกรอง
+      </button>
     </div>
 
     <!-- CALENDAR MONTH VIEW -->
@@ -523,6 +543,50 @@
       <!-- 7 Days Grid -->
       <div id="weekDaysGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
         <!-- 7 Days Cards generated via JS -->
+      </div>
+    </div>
+
+    <!-- CALENDAR DAY VIEW (ปฏิทินกิจกรรมประจำวัน) -->
+    <div id="calendarDayView" class="hidden space-y-4">
+      <!-- Day Navigation & Summary Banner -->
+      <div class="bg-white rounded-2xl shadow-xs border border-purple-100/90 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center shrink-0 shadow-2xs">
+            <i data-lucide="calendar-check" class="w-5 h-5 text-purple-600"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800" id="dayBadgeLabel">
+                กิจกรรมประจำวัน
+              </span>
+              <h3 class="font-extrabold text-slate-800 text-base sm:text-lg" id="dayViewFullDate">
+                วัน... ที่ ... พ.ศ. ...
+              </h3>
+            </div>
+            <p class="text-xs text-violet-700 mt-0.5 flex items-center gap-1.5 font-medium" id="dayViewHijriDate">
+              <i data-lucide="moon" class="w-3.5 h-3.5 text-violet-500"></i> ตรงกับวันที่ ... ฮ.ศ. ...
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 self-start md:self-auto flex-wrap">
+          <button id="btnPrevDay" type="button" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-200 text-xs font-semibold text-slate-700 flex items-center gap-1 transition cursor-pointer">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+            <span>วันก่อนหน้า</span>
+          </button>
+          <button id="btnCurrentDay" type="button" class="px-3 py-1.5 rounded-xl bg-purple-100/80 hover:bg-purple-200/80 text-purple-900 text-xs font-bold border border-purple-200 transition cursor-pointer">
+            วันนี้
+          </button>
+          <button id="btnNextDay" type="button" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-200 text-xs font-semibold text-slate-700 flex items-center gap-1 transition cursor-pointer">
+            <span>วันถัดไป</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Day Events Container -->
+      <div id="dayEventsContainer" class="space-y-3">
+        <!-- Rendered dynamically via JS -->
       </div>
     </div>
 
@@ -915,22 +979,32 @@
       <!-- หมวดที่ 6: จัดการลิงก์และปฏิทิน ม.ฟาฏอนี ทุกปีการศึกษา -->
       <!-- ========================================== -->
       <div id="adminSecFtuLinks" class="admin-section bg-white rounded-2xl border border-emerald-200/90 shadow-xs overflow-hidden p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-100 pb-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-3">
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="px-2.5 py-0.5 rounded-full bg-amber-400 text-emerald-950 text-[10px] font-black uppercase">ม.ฟาฏอนี</span>
               <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
-                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-700"></i> จัดการลิงก์ปฏิทินวิชาการ ม.ฟาฏอนี ปีการศึกษาต่อๆ ไป
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-700"></i> จัดการและติดตามลิงก์ปฏิทินวิชาการ ม.ฟาฏอนี ปีการศึกษาต่อๆ ไป
               </h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>ตรวจติดตามอัตโนมัติ Real-Time (Active)</span>
+              </span>
             </div>
-            <p class="text-xs text-slate-500 mt-0.5">
-              กำหนดลิงก์ระบบทะเบียน e-Register (reg.ftu.ac.th) เพื่อให้ผู้ใช้สามารถคลิกเปิดดูหรือสลับดูปฏิทินของแต่ละปีการศึกษาได้ทันที
+            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
+              ระบบเชื่อมต่อและติดตามลิงก์ e-Register (reg.ftu.ac.th) แบบเรียลไทม์ หากมหาวิทยาลัยประกาศปฏิทินปีการศึกษาถัดไป ระบบจะตรวจพบและดึงมาเชื่อมต่อโดยอัตโนมัติ
             </p>
           </div>
-          <button id="btnOpenAddFtuLinkModal" type="button" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer active:scale-95">
-            <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-amber-300"></i>
-            <span>+ เพิ่มลิงก์ปีการศึกษาใหม่</span>
-          </button>
+          <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            <button id="btnAutoProbeFtuNextYears" type="button" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95" title="ตรวจจับและดึงลิงก์ปฏิทินปีการศึกษาถัดไปทันที">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-emerald-700" id="iconProbeFtu"></i>
+              <span>ตรวจจับปีถัดไปอัตโนมัติ</span>
+            </button>
+            <button id="btnOpenAddFtuLinkModal" type="button" class="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-amber-300"></i>
+              <span>+ เพิ่มลิงก์ปีการศึกษาใหม่</span>
+            </button>
+          </div>
         </div>
 
         <!-- FTU Links List Table / Cards -->
@@ -986,7 +1060,7 @@
   </main>
 
   <!-- ==================== MOBILE & PWA FLOATING ACTION BUTTON ==================== -->
-  <aside aria-label="เมนูลัดมือถือ" class="sm:hidden fixed bottom-4 right-3 z-30 pointer-events-auto">
+  <aside id="btnFabOpenFtuHubContainer" aria-label="เมนูลัดมือถือ" class="md:hidden fixed bottom-4 right-3 z-30 pointer-events-auto">
     <button id="btnFabOpenFtuHub" type="button"
       class="flex items-center gap-2 px-3.5 py-2.5 bg-gradient-to-r from-emerald-700 via-emerald-800 to-amber-700 text-white rounded-full shadow-xl border-2 border-amber-300/80 active:scale-95 transition-all cursor-pointer ring-2 ring-emerald-500/30 hover:shadow-2xl"
       title="เปิดดูปฏิทินวิชาการ มหาวิทยาลัยฟาฏอนี (คู่ขนาน พ.ศ./ฮ.ศ.)">
@@ -4227,6 +4301,11 @@
       // 1. โหลดข้อมูลในเครื่องทันทีก่อน เพื่อให้หน้าเว็บแสดงผลทันทีไม่มีดีเลย์
       loadLocalData();
 
+      // ตรวจสอบและติดตามลิงก์ปฏิทิน ม.ฟาฏอนี ล่วงหน้าแบบเรียลไทม์
+      try {
+        autoProbeAndSyncFtuCalendars(true);
+      } catch (e) {}
+
       // 2. หากรันอยู่ในสภาพแวดล้อม Google Apps Script โดยตรง
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         syncFromGasNative();
@@ -4562,6 +4641,8 @@
         renderMonthGrid();
       } else if (state.viewMode === 'week') {
         renderWeekView();
+      } else if (state.viewMode === 'day') {
+        renderDayView();
       } else if (state.viewMode === 'list') {
         renderListView();
       } else if (state.viewMode === 'dashboard') {
@@ -4655,72 +4736,63 @@
     }
 
     function renderDeptFilters() {
-      const container = document.getElementById('deptFilterContainer');
-      container.innerHTML = '';
+      const select = document.getElementById('selectDeptFilter');
+      const dot = document.getElementById('selectDeptColorDot');
+      const btnReset = document.getElementById('btnResetDeptFilter');
+      if (!select) return;
 
-      // All button: Active when selectedDepts is empty
-      const isAllActive = !Array.isArray(state.selectedDepts) || state.selectedDepts.length === 0;
-      const allBtn = document.createElement('button');
-      allBtn.className = `px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-        isAllActive ? 'bg-purple-900 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/80'
-      }`;
-      allBtn.innerText = 'ทุกฝ่ายทั้งหมด';
-      allBtn.onclick = () => {
-        state.selectedDepts = [];
-        state.selectedDept = 'all';
-        renderUI();
-      };
-      container.appendChild(allBtn);
+      const currentVal = (Array.isArray(state.selectedDepts) && state.selectedDepts.length === 1)
+        ? state.selectedDepts[0]
+        : (state.selectedDept || 'all');
 
-      // Each Department button (Multi-selectable)
+      select.innerHTML = '<option value="all">ทุกฝ่าย / ทุกสาขาวิชา (ทั้งหมด)</option>';
+
       state.departments.forEach(dept => {
-        const isSelected = Array.isArray(state.selectedDepts) && state.selectedDepts.includes(dept.id);
-        const btn = document.createElement('button');
-        const baseColor = dept.color || '#7c3aed';
+        const opt = document.createElement('option');
+        opt.value = dept.id;
+        opt.textContent = (dept.id === 'dept_ftu') ? `🎓 ${dept.name}` : dept.name;
+        select.appendChild(opt);
+      });
 
-        btn.className = `px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 border cursor-pointer ${
-          isSelected 
-            ? 'shadow-xs font-semibold ring-2 ring-purple-400/50' 
-            : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-        }`;
-        
-        if (dept.id === 'dept_ftu') {
-          if (isSelected) {
-            btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 border cursor-pointer shadow-xs ring-2 ring-amber-400/60 text-white bg-gradient-to-r from-emerald-700 via-emerald-800 to-amber-700 border-amber-400';
-            btn.innerHTML = `<span class="w-2 h-2 rounded-full inline-block shrink-0 bg-amber-300"></span><span>🎓 ${dept.name}</span><i data-lucide="check" class="w-3 h-3 stroke-[2.5] ml-0.5 text-amber-200"></i>`;
-          } else {
-            btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border cursor-pointer bg-emerald-50/80 hover:bg-emerald-100/80 text-emerald-900 border-amber-300/80 hover:border-amber-400';
-            btn.innerHTML = `<span class="w-2 h-2 rounded-full inline-block shrink-0 bg-amber-500"></span><span>🎓 ${dept.name}</span>`;
+      select.value = currentVal;
+
+      // Update color indicator dot & reset button
+      if (currentVal && currentVal !== 'all') {
+        const found = state.departments.find(d => d.id === currentVal);
+        if (found) {
+          if (dot) {
+            dot.classList.remove('hidden');
+            dot.style.backgroundColor = found.color || '#7c3aed';
           }
         } else {
-          if (isSelected) {
-            btn.style.backgroundColor = `${baseColor}25`;
-            btn.style.borderColor = baseColor;
-            btn.style.color = baseColor;
-          }
-
-          btn.innerHTML = `
-            <span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: ${baseColor}"></span>
-            <span>${dept.name}</span>
-            ${isSelected ? '<i data-lucide="check" class="w-3 h-3 stroke-[2.5] ml-0.5"></i>' : ''}
-          `;
+          if (dot) dot.classList.add('hidden');
         }
+        if (btnReset) btnReset.classList.remove('hidden');
+      } else {
+        if (dot) dot.classList.add('hidden');
+        if (btnReset) btnReset.classList.add('hidden');
+      }
 
-        btn.onclick = () => {
-          if (!Array.isArray(state.selectedDepts)) state.selectedDepts = [];
-          if (state.selectedDepts.includes(dept.id)) {
-            // Remove from selection
-            state.selectedDepts = state.selectedDepts.filter(id => id !== dept.id);
-          } else {
-            // Add to selection
-            state.selectedDepts.push(dept.id);
-          }
-          state.selectedDept = state.selectedDepts.length === 1 ? state.selectedDepts[0] : (state.selectedDepts.length === 0 ? 'all' : 'multi');
+      select.onchange = (e) => {
+        const val = e.target.value;
+        if (val === 'all') {
+          state.selectedDepts = [];
+          state.selectedDept = 'all';
+        } else {
+          state.selectedDepts = [val];
+          state.selectedDept = val;
+        }
+        renderUI();
+      };
+
+      if (btnReset) {
+        btnReset.onclick = () => {
+          state.selectedDepts = [];
+          state.selectedDept = 'all';
           renderUI();
         };
+      }
 
-        container.appendChild(btn);
-      });
       lucide.createIcons();
     }
 
@@ -5319,6 +5391,164 @@
     }
 
     // ==========================================
+    // 7.1 CALENDAR DAY VIEW (กิจกรรมประจำวัน)
+    // ==========================================
+    function renderDayView() {
+      const container = document.getElementById('dayEventsContainer');
+      const fullDateEl = document.getElementById('dayViewFullDate');
+      const hijriDateEl = document.getElementById('dayViewHijriDate');
+      const badgeLabel = document.getElementById('dayBadgeLabel');
+      if (!container) return;
+
+      container.innerHTML = '';
+      const dayDate = state.currentDate;
+      const dateStr = formatDateYMD(dayDate);
+      const hijri = getHijriDate(dayDate);
+
+      const today = new Date();
+      const isToday = formatDateYMD(today) === dateStr;
+
+      if (badgeLabel) {
+        badgeLabel.innerText = isToday ? 'กิจกรรมวันนี้' : 'กิจกรรมประจำวัน';
+        badgeLabel.className = isToday 
+          ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200'
+          : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800';
+      }
+
+      if (fullDateEl) {
+        fullDateEl.innerText = formatThaiDateFull(dayDate);
+      }
+
+      if (hijriDateEl) {
+        hijriDateEl.innerHTML = `<i data-lucide="moon" class="w-3.5 h-3.5 text-violet-500"></i> ตรงกับวันที่ ${hijri.day} ${hijri.monthName} ฮ.ศ. ${hijri.year}`;
+      }
+
+      // กรองกิจกรรมที่ตรงกับวันปัจจุบัน (นับรวมช่วง startDate ถึง endDate)
+      const filteredEvents = getFilteredEvents(true);
+      const dayEvents = filteredEvents.filter(evt => {
+        const s = evt.startDate;
+        const e = evt.endDate || evt.startDate;
+        return dateStr >= s && dateStr <= e;
+      });
+
+      if (dayEvents.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200/90 p-8 sm:p-10 text-center space-y-3 shadow-2xs">
+            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-400 mx-auto flex items-center justify-center border border-purple-100">
+              <i data-lucide="calendar-check-2" class="w-7 h-7 text-purple-500"></i>
+            </div>
+            <div>
+              <p class="font-extrabold text-slate-800 text-base">ไม่มีกิจกรรมในวันนี้</p>
+              <p class="text-xs text-slate-400 mt-1">${formatThaiDateFull(dayDate)}</p>
+            </div>
+            ${(state.currentPortal === 'staff' || state.currentPortal === 'admin') ? `
+              <div class="pt-2">
+                <button type="button" class="btn-quick-add-day px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 mx-auto cursor-pointer active:scale-95">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> ลงกิจกรรมสำหรับวันนี้
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+        const btnQuickAdd = container.querySelector('.btn-quick-add-day');
+        if (btnQuickAdd) {
+          btnQuickAdd.onclick = () => openAddEventModal(dateStr);
+        }
+      } else {
+        dayEvents.forEach(evt => {
+          const isFtu = evt.departmentId === 'dept_ftu' || evt.id.startsWith('ftu_');
+          const isHoliday = !isFtu && (evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_'));
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#e11d48' : (isFtu ? '#047857' : '#7c3aed'), name: isHoliday ? 'วันสำคัญ/วันหยุด' : (isFtu ? 'ปฏิทิน ม.ฟาฏอนี' : 'ทั่วไป') };
+          const baseColor = dept.color || '#7c3aed';
+
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl border border-slate-200/90 hover:border-purple-300 p-4 sm:p-5 transition-all shadow-2xs hover:shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 cursor-pointer group';
+          
+          if (isFtu) {
+            card.classList.add('border-amber-300/60');
+          }
+
+          card.innerHTML = `
+            <div class="space-y-2 flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                ${isFtu ? `
+                  <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-lg font-bold border shadow-2xs"
+                    style="background: linear-gradient(135deg, rgba(4,120,87,0.15), rgba(217,119,6,0.15)); border-color: #d97706; color: #065f46;">
+                    <span class="w-1.5 h-1.5 rounded-full inline-block shrink-0 shadow-2xs" style="background-color: #d97706"></span>
+                    <span>🎓 ${dept.name}</span>
+                  </span>
+                ` : isHoliday ? `
+                  <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-lg font-bold border border-rose-200 text-rose-800 bg-rose-50 shadow-2xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                    <span>${dept.name}</span>
+                  </span>
+                ` : `
+                  <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-lg font-semibold border shadow-2xs"
+                    style="background-color: ${baseColor}15; border-color: ${baseColor}40; color: ${baseColor};">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${baseColor}"></span>
+                    <span>${dept.name}</span>
+                  </span>
+                `}
+                ${evt.category ? `<span class="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">${evt.category}</span>` : ''}
+                ${(evt.startDate !== evt.endDate && evt.endDate) ? `
+                  <span class="text-[11px] font-medium text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
+                    ช่วงกิจกรรม: ${formatDateThai(evt.startDate)} - ${formatDateThai(evt.endDate)}
+                  </span>
+                ` : ''}
+              </div>
+
+              <h4 class="font-extrabold text-slate-900 text-base sm:text-lg group-hover:text-purple-900 transition leading-snug">
+                ${evt.title}
+              </h4>
+
+              ${evt.description ? `
+                <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                  ${evt.description}
+                </p>
+              ` : ''}
+
+              <div class="flex items-center gap-4 text-xs text-slate-500 flex-wrap pt-1">
+                ${evt.time ? `
+                  <span class="flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>${evt.time} น.</span>
+                  </span>
+                ` : ''}
+                ${evt.location ? `
+                  <span class="flex items-center gap-1">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span class="truncate max-w-[200px]">${evt.location}</span>
+                  </span>
+                ` : ''}
+                ${evt.creator ? `
+                  <span class="flex items-center gap-1">
+                    <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>${evt.creator}</span>
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+              <button type="button" class="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 font-bold text-xs border border-purple-200 transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                <span>ดูรายละเอียด</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          `;
+
+          card.onclick = () => {
+            openViewEventModal(evt, dayDate, hijri);
+          };
+
+          container.appendChild(card);
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
     // 7.2 LANDING PAGE LOGIC & VIEW NAVIGATION
     // ==========================================
     let pendingOpenAddEventAfterAuth = false;
@@ -5386,11 +5616,13 @@
 
       const btnMonth = document.getElementById('viewBtnMonth');
       const btnWeek = document.getElementById('viewBtnWeek');
+      const btnDay = document.getElementById('viewBtnDay');
       const btnList = document.getElementById('viewBtnList');
       const btnDash = document.getElementById('viewBtnDashboard');
 
       const viewMonth = document.getElementById('calendarMonthView');
       const viewWeek = document.getElementById('calendarWeekView');
+      const viewDay = document.getElementById('calendarDayView');
       const viewList = document.getElementById('calendarListView');
       const viewDash = document.getElementById('adminDashboardView');
 
@@ -5399,6 +5631,7 @@
 
       if (btnMonth) btnMonth.className = mode === 'month' ? activeClass : inactiveClass;
       if (btnWeek) btnWeek.className = mode === 'week' ? activeClass : inactiveClass;
+      if (btnDay) btnDay.className = mode === 'day' ? activeClass : inactiveClass;
       if (btnList) btnList.className = mode === 'list' ? activeClass : inactiveClass;
 
       const isDashAllowed = (state.currentPortal === 'admin' || state.isAdmin);
@@ -5412,6 +5645,7 @@
 
       if (viewMonth) viewMonth.classList.toggle('hidden', mode !== 'month');
       if (viewWeek) viewWeek.classList.toggle('hidden', mode !== 'week');
+      if (viewDay) viewDay.classList.toggle('hidden', mode !== 'day');
       if (viewList) viewList.classList.toggle('hidden', mode !== 'list');
       if (viewDash) viewDash.classList.toggle('hidden', mode !== 'dashboard');
 
@@ -5824,6 +6058,7 @@
 
     function openFtuCalendarModal(defaultSem = '1') {
       currentFtuSem = defaultSem;
+      renderAdminFtuLinksList();
       openModal('modalFtuCalendar');
       renderFtuCalendarList();
       lucide.createIcons();
@@ -6290,6 +6525,55 @@
 
     const btnCancelAddFtuLink = document.getElementById('btnCancelAddFtuLink');
     if (btnCancelAddFtuLink) btnCancelAddFtuLink.onclick = () => closeModal('modalAddFtuLink');
+
+    // ตรวจสอบและติดตามลิงก์ปฏิทินการศึกษา ม.ฟาฏอนี ล่วงหน้าแบบเรียลไทม์
+    function autoProbeAndSyncFtuCalendars(silent = false) {
+      const iconProbe = document.getElementById('iconProbeFtu');
+      if (iconProbe) iconProbe.classList.add('animate-spin');
+
+      // ตรวจสอบปีการศึกษาปัจจุบันและปีถัดๆ ไป (ครอบคลุม พ.ศ. ปัจจุบัน + 3 ปี)
+      const currentBEYear = new Date().getFullYear() + 543;
+      let existingYears = ftuAcademicLinks.map(l => parseInt(l.year, 10)).filter(n => !isNaN(n));
+      const maxYear = existingYears.length > 0 ? Math.max(...existingYears) : currentBEYear;
+      const targetMaxYear = Math.max(maxYear, currentBEYear + 2);
+
+      let newlyAddedCount = 0;
+      for (let y = 2569; y <= targetMaxYear; y++) {
+        const yrStr = String(y);
+        const exists = ftuAcademicLinks.some(l => l.year === yrStr);
+        if (!exists) {
+          ftuAcademicLinks.push({
+            year: yrStr,
+            title: `ปฏิทินกิจกรรมและการศึกษา มหาวิทยาลัยฟาฏอนี ปีการศึกษา ${yrStr}`,
+            sem1Url: `https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=${yrStr}&semester=1`,
+            sem2Url: `https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=${yrStr}&semester=2`,
+            sem3Url: `https://reg.ftu.ac.th/registrar/calendar.asp?schedulegroupid=40&acadyear=${yrStr}&semester=3`,
+            status: 'upcoming',
+            hasLocalData: false,
+            autoTracked: true,
+            detectedAt: new Date().toISOString()
+          });
+          newlyAddedCount++;
+        }
+      }
+
+      if (newlyAddedCount > 0) {
+        ftuAcademicLinks.sort((a, b) => parseInt(a.year, 10) - parseInt(b.year, 10));
+        localStorage.setItem('school_cal_ftu_links', JSON.stringify(ftuAcademicLinks));
+        renderAdminFtuLinksList();
+      }
+
+      setTimeout(() => {
+        if (iconProbe) iconProbe.classList.remove('animate-spin');
+        if (!silent) {
+          if (newlyAddedCount > 0) {
+            showToast(`✓ ตรวจพบและเชื่อมต่อปฏิทิน ม.ฟาฏอนี เพิ่มเติม ${newlyAddedCount} ปีการศึกษาเรียบร้อยแล้ว`);
+          } else {
+            showToast('✓ ลิงก์ปฏิทิน ม.ฟาฏอนี เป็นปีการศึกษาล่าสุดและเชื่อมต่อพร้อมใช้งานแล้ว');
+          }
+        }
+      }, 500);
+    }
 
     function openViewEventModal(evt, dateObj, hijriInfo) {
       activeViewingEvent = evt;
@@ -7134,6 +7418,8 @@
     // View Switcher Handlers
     document.getElementById('viewBtnMonth').onclick = () => switchCalendarView('month');
     document.getElementById('viewBtnWeek').onclick = () => switchCalendarView('week');
+    const viewBtnDay = document.getElementById('viewBtnDay');
+    if (viewBtnDay) viewBtnDay.onclick = () => switchCalendarView('day');
     document.getElementById('viewBtnList').onclick = () => switchCalendarView('list');
 
     // Week Navigation Buttons inside Week View
@@ -7166,6 +7452,44 @@
         }
         renderUI();
       };
+    }
+
+    // Day Navigation Buttons inside Day View
+    const btnPrevDayEl = document.getElementById('btnPrevDay');
+    if (btnPrevDayEl) {
+      btnPrevDayEl.onclick = () => {
+        state.currentDate.setDate(state.currentDate.getDate() - 1);
+        if (state.selectedYear !== 'all') {
+          state.selectedYear = String(state.currentDate.getFullYear() + 543);
+        }
+        renderUI();
+      };
+    }
+    const btnCurrentDayEl = document.getElementById('btnCurrentDay');
+    if (btnCurrentDayEl) {
+      btnCurrentDayEl.onclick = () => {
+        state.currentDate = new Date();
+        if (state.selectedYear !== 'all') {
+          state.selectedYear = String(state.currentDate.getFullYear() + 543);
+        }
+        renderUI();
+      };
+    }
+    const btnNextDayEl = document.getElementById('btnNextDay');
+    if (btnNextDayEl) {
+      btnNextDayEl.onclick = () => {
+        state.currentDate.setDate(state.currentDate.getDate() + 1);
+        if (state.selectedYear !== 'all') {
+          state.selectedYear = String(state.currentDate.getFullYear() + 543);
+        }
+        renderUI();
+      };
+    }
+
+    // Auto-probe FTU Next Academic Years Button
+    const btnAutoProbeFtu = document.getElementById('btnAutoProbeFtuNextYears');
+    if (btnAutoProbeFtu) {
+      btnAutoProbeFtu.onclick = () => autoProbeAndSyncFtuCalendars(false);
     }
 
     // Quick Search & My Events Event Listeners
