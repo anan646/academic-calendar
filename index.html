@@ -288,45 +288,12 @@
       
       <!-- Month & Year Selector with Dual Calendars (CE / BE / AH) -->
       <div class="flex items-center flex-wrap gap-2 sm:gap-2.5">
-        <!-- Compact & Modern Month/Year Navigation (ภาพแนบที่ 1 ปรับดีไซน์ใช้งานง่าย & เมนูลัด 12 เดือน) -->
-        <div class="flex items-center gap-1.5">
-          <div class="flex items-center bg-gradient-to-r from-purple-50 to-indigo-50/70 rounded-2xl p-1 border border-purple-100/90 shadow-2xs">
-            <button id="btnPrevYear" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="ปีก่อนหน้า (-1 ปี)">
-              <i data-lucide="chevrons-left" class="w-4 h-4"></i>
-            </button>
-            <button id="btnPrevMonth" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="เดือนก่อนหน้า">
-              <i data-lucide="chevron-left" class="w-4 h-4"></i>
-            </button>
-            <button id="btnToday" class="px-3 py-1 rounded-xl text-xs font-bold bg-white text-purple-800 shadow-2xs hover:bg-purple-100/60 transition cursor-pointer active:scale-95 border border-purple-100/60" title="กลับสู่วันนี้">
-              วันนี้
-            </button>
-            <button id="btnNextMonth" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="เดือนถัดไป">
-              <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </button>
-            <button id="btnNextYear" class="w-7 h-7 rounded-xl hover:bg-white hover:shadow-2xs text-purple-700 hover:text-purple-900 transition flex items-center justify-center cursor-pointer active:scale-95" title="ปีถัดไป (+1 ปี)">
-              <i data-lucide="chevrons-right" class="w-4 h-4"></i>
-            </button>
-          </div>
-
-          <!-- Quick Month Dropdown Picker Button -->
-          <div class="relative">
-            <button id="btnToggleMonthPicker" type="button" class="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 rounded-2xl text-xs font-bold border border-purple-200 transition shadow-2xs flex items-center gap-1 cursor-pointer active:scale-95" title="เลือกเดือนแบบย่อ (12 เดือน)">
-              <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-purple-700"></i>
-              <span id="quickMonthShortBadge" class="font-extrabold">เดือนย่อ</span>
-              <i data-lucide="chevron-down" class="w-3 h-3 text-purple-500"></i>
-            </button>
-            <!-- Dropdown grid of 12 short months -->
-            <div id="dropdownMonthPicker" class="hidden absolute left-0 sm:left-auto sm:right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-purple-100 p-2.5 z-50 animate-scaleUp">
-              <div class="flex items-center justify-between px-1 pb-2 border-b border-purple-50 text-[11px] font-bold text-slate-600">
-                <span>เลือกเดือนที่ต้องการ</span>
-                <span id="monthPickerYearLabel" class="text-purple-700 font-extrabold">พ.ศ. ...</span>
-              </div>
-              <div class="grid grid-cols-4 gap-1.5 pt-2" id="monthPickerGrid">
-                <!-- 12 short month buttons generated dynamically -->
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Today Button Only (ภาพแนบที่ 3: ให้มีแค่วันนี้ก็เพียงพอเนื่องจากมีปุ่มลัดเดือนและปีแล้ว) -->
+        <button id="btnToday" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-purple-50 text-purple-900 border border-purple-200/90 shadow-2xs transition cursor-pointer active:scale-95 flex items-center gap-1.5" title="กลับสู่วันนี้">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-700"></i>
+          <span>วันนี้</span>
+        </button>
+      </div>
 
         <div class="flex flex-col ml-0 sm:ml-1">
           <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
@@ -1323,11 +1290,11 @@
   <!-- MODAL: DEDICATED FTU CALENDAR HUB (ป็อปอัปเฉพาะ ปฏิทินวิชาการ ม.ฟาฏอนี 2569) -->
   <!-- ========================================== -->
   <div id="modalFtuCalendar" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-5">
-    <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-emerald-100 overflow-hidden flex flex-col max-h-[92vh] animate-scaleUp">
+    <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-emerald-100 flex flex-col max-h-[92vh] animate-scaleUp relative">
       
       <!-- Top Header: Emerald & Gold Branding -->
-      <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-amber-900 text-white p-5 sm:p-6 shadow-md relative overflow-hidden shrink-0">
-        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-900 to-amber-900 text-white p-5 sm:p-6 shadow-md relative z-30 shrink-0 rounded-t-3xl overflow-visible">
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 overflow-visible">
           <div class="flex items-center gap-3.5">
             <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm border border-amber-300/40 text-amber-300 flex items-center justify-center shadow-inner shrink-0">
               <i data-lucide="graduation-cap" class="w-7 h-7"></i>
@@ -1356,24 +1323,24 @@
               </select>
             </div>
 
-            <!-- Export Full FTU Calendar Dropdown Menu -->
-            <div class="relative">
-              <button type="button" id="btnExportFtuDropdownToggle" class="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95" title="ส่งออกข้อมูลปฏิทิน ม.ฟาฏอนี ทั้งหมด">
+            <!-- Export Full FTU Calendar Dropdown Menu (Z-index 50 & Overlapping Fixed) -->
+            <div class="relative z-40">
+              <button type="button" id="btnExportFtuDropdownToggle" class="px-3.5 py-1.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95" title="ส่งออกข้อมูลปฏิทิน ม.ฟาฏอนี ทั้งหมด">
                 <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-900"></i>
                 <span>ส่งออก</span>
                 <i data-lucide="chevron-down" class="w-3 h-3 text-emerald-900"></i>
               </button>
-              <div id="dropdownExportFtu" class="hidden absolute right-0 mt-1.5 w-52 bg-white rounded-2xl shadow-2xl border border-emerald-100 py-1.5 z-50 text-xs">
-                <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+              <div id="dropdownExportFtu" class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-emerald-200 py-2 z-50 text-xs">
+                <div class="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                   ส่งออกครบทุก 129 รายการ
                 </div>
-                <button type="button" id="btnExportFtuExcel" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
+                <button type="button" id="btnExportFtuExcel" class="w-full text-left px-3.5 py-2.5 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
                   <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> ส่งออกเป็น Excel (.xlsx)
                 </button>
-                <button type="button" id="btnExportFtuWord" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
+                <button type="button" id="btnExportFtuWord" class="w-full text-left px-3.5 py-2.5 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
                   <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i> ส่งออกเป็น Word (.doc)
                 </button>
-                <button type="button" id="btnExportFtuPdf" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
+                <button type="button" id="btnExportFtuPdf" class="w-full text-left px-3.5 py-2.5 hover:bg-emerald-50 flex items-center gap-2.5 text-slate-700 font-bold transition">
                   <i data-lucide="printer" class="w-4 h-4 text-rose-500"></i> พิมพ์ / บันทึก PDF (.pdf)
                 </button>
               </div>
@@ -1387,7 +1354,7 @@
       </div>
 
       <!-- Filter & Search Toolbar inside Modal -->
-      <div class="p-4 bg-emerald-50/60 border-b border-emerald-100/80 shrink-0 space-y-3">
+      <div class="p-4 bg-emerald-50/60 border-b border-emerald-100/80 shrink-0 space-y-3 relative z-10">
         <!-- Semester Tabs -->
         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           <button type="button" class="ftu-sem-tab px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 shrink-0 bg-emerald-800 text-white cursor-pointer" data-sem="1">
@@ -4149,6 +4116,26 @@
       return holidays;
     }
 
+    // ฟังก์ชันรับประกันว่าวันสำคัญของไทยและฮ.ศ. จะปรากฏครบถ้วนทุกๆ ปี (ทั้งอดีตและอนาคต)
+    function ensureHolidaysForYear(ceYear) {
+      if (!ceYear || isNaN(ceYear)) return;
+      const deletedSet = new Set(state.deletedEventIds || []);
+      // ตรวจสอบและสร้างวันสำคัญครอบคลุมปีเป้าหมายและปีรอยต่อ (+-1 ปี สำหรับวันข้ามเดือน)
+      [ceYear - 1, ceYear, ceYear + 1].forEach(y => {
+        const yStr = String(y);
+        const hasYearHols = state.events.some(e => 
+          e.departmentId === 'dept_holiday' && 
+          e.startDate && e.startDate.startsWith(yStr)
+        );
+        if (!hasYearHols) {
+          const newHols = generateHolidaysForYear(y).filter(e => !deletedSet.has(e.id));
+          if (newHols.length > 0) {
+            state.events.push(...newHols);
+          }
+        }
+      });
+    }
+
     // ==========================================
     // 3.2 FTU ACADEMIC YEAR LINKS CONFIGURATION (ลิงก์ปฏิทิน ม.ฟาฏอนี ทุกปีการศึกษา)
     // ==========================================
@@ -4289,17 +4276,23 @@
         } catch (e) {}
       }
       if (Array.isArray(response.events)) {
-        // ผสานวันหยุดระบบกับกิจกรรมจากชีต โดยกรองกิจกรรมที่เคยถูกลบออกเด็ดขาด
+        // ผสานวันหยุดระบบกับกิจกรรมจากชีต โดยกรองกิจกรรมที่เคยถูกลบออกเด็ดขาด และแยกปฏิทิน ม.ฟาฏอนี ออกเด็ดขาด
         const deletedSet = new Set(state.deletedEventIds || []);
         const eventMap = new Map();
         DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => {
           if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
         });
         response.events.forEach(e => {
-          if (!deletedSet.has(e.id)) eventMap.set(e.id, e);
+          if (!deletedSet.has(e.id) && !e.id.startsWith('ftu_') && e.departmentId !== 'dept_ftu') {
+            eventMap.set(e.id, e);
+          }
         });
-        state.events = Array.from(eventMap.values());
+        state.events = Array.from(eventMap.values()).filter(e => !e.id.startsWith('ftu_') && e.departmentId !== 'dept_ftu');
       }
+      if (Array.isArray(response.departments) && response.departments.length > 0) {
+        state.departments = state.departments.filter(d => d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
+      }
+      ensureHolidaysForYear(state.currentDate.getFullYear());
       if (Array.isArray(response.users) && response.users.length > 0) {
         state.users = response.users;
       }
@@ -4393,10 +4386,10 @@
         state.departments = DEFAULT_DEPARTMENTS;
       }
 
-      // Smart Merge: สร้างวันสำคัญของไทยและฮ.ศ. ครอบคลุมหลายปี (อดีต ปัจจุบัน และอนาคต)
+      // Smart Merge: สร้างวันสำคัญของไทยและฮ.ศ. ครอบคลุมหลายปีทั้งอดีตและอนาคต (20 ปี)
       const currentYearCE = new Date().getFullYear();
       const multiYearHolidays = [];
-      for (let y = currentYearCE - 3; y <= currentYearCE + 5; y++) {
+      for (let y = currentYearCE - 10; y <= currentYearCE + 10; y++) {
         multiYearHolidays.push(...generateHolidaysForYear(y));
       }
 
@@ -4512,6 +4505,8 @@
     // 5. RENDERING FUNCTIONS
     // ==========================================
     function renderUI() {
+      // ตรวจสอบและสร้างวันสำคัญประจำปีทันทีทุกครั้งที่เปลี่ยนหรือแสดงผล
+      ensureHolidaysForYear(state.currentDate.getFullYear());
       populateAcademicYearOptions();
       renderHeaderDates();
       renderUserProfileUI();
@@ -4777,8 +4772,8 @@
       const activeCalendarBE = state.currentDate.getFullYear() + 543;
       
       const yearsSet = new Set();
-      // สร้างช่วงปีล่วงหน้าและย้อนหลังจากปีปัจจุบัน (ย้อนหลัง 5 ปี, ล่วงหน้า 5 ปี)
-      for (let y = currentSystemBE - 5; y <= currentSystemBE + 5; y++) {
+      // สร้างช่วงปีล่วงหน้าและย้อนหลังจากปีปัจจุบัน (ย้อนหลัง 10 ปี, ล่วงหน้า 10 ปี ครอบคลุมทั้งอดีตและอนาคต)
+      for (let y = currentSystemBE - 10; y <= currentSystemBE + 10; y++) {
         yearsSet.add(y);
       }
       // เพิ่มปีที่กำลังเปิดดูอยู่ปัจจุบันเพื่อให้แสดงเสมอ
@@ -4832,8 +4827,8 @@
       const hasMultiDepts = Array.isArray(state.selectedDepts) && state.selectedDepts.length > 0;
 
       return state.events.filter(e => {
-        // หากปิดการแสดงปฏิทิน ม.ฟาฏอนี ให้ตัดกิจกรรม ม.ฟาฏอนี ออกทั้งหมด
-        if (state.showFtuCalendar === false && (e.departmentId === 'dept_ftu' || e.id.startsWith('ftu_'))) {
+        // กิจกรรม ม.ฟาฏอนี จะแสดงเฉพาะในป็อปอัปเฉพาะส่วนของ ม.ฟาฏอนี เท่านั้น แยกออกจากหน้าปฏิทินหลักเด็ดขาด
+        if (e.departmentId === 'dept_ftu' || e.id.startsWith('ftu_')) {
           return false;
         }
         let matchDept = true;
@@ -5153,7 +5148,7 @@
         hijriEl.innerHTML = `<i data-lucide="moon" class="w-3.5 h-3.5 text-violet-500"></i> ตรงกับ ${hText}`;
       }
 
-      const filteredEvents = getFilteredEvents(false);
+      const filteredEvents = getFilteredEvents(true);
       const today = new Date();
       const todayStr = formatDateYMD(today);
 
@@ -7022,60 +7017,20 @@
     // ==========================================
     // 13. UI EVENT LISTENERS
     // ==========================================
-    // ปุ่มเลื่อนปีและเดือน (ปีก่อนหน้า, เดือนก่อนหน้า, วันนี้, เดือนถัดไป, ปีถัดไป)
-    const btnPrevYear = document.getElementById('btnPrevYear');
-    if (btnPrevYear) {
-      btnPrevYear.onclick = () => {
-        state.currentDate.setFullYear(state.currentDate.getFullYear() - 1);
+    // ปุ่มวันนี้ (ภาพแนบที่ 3: มีเฉพาะปุ่มวันนี้เพื่อความเรียบง่ายและคลีนตา)
+    const btnTodayEl = document.getElementById('btnToday');
+    if (btnTodayEl) {
+      btnTodayEl.onclick = () => {
+        state.currentDate = new Date();
+        const curBE = String(state.currentDate.getFullYear() + 543);
         if (state.selectedYear !== 'all') {
-          state.selectedYear = String(state.currentDate.getFullYear() + 543);
+          state.selectedYear = curBE;
         }
+        ensureHolidaysForYear(state.currentDate.getFullYear());
         renderUI();
+        showToast('กลับสู่วันนี้เรียบร้อยแล้ว');
       };
     }
-
-    const btnNextYear = document.getElementById('btnNextYear');
-    if (btnNextYear) {
-      btnNextYear.onclick = () => {
-        state.currentDate.setFullYear(state.currentDate.getFullYear() + 1);
-        if (state.selectedYear !== 'all') {
-          state.selectedYear = String(state.currentDate.getFullYear() + 543);
-        }
-        renderUI();
-      };
-    }
-
-    document.getElementById('btnPrevMonth').onclick = () => {
-      if (state.viewMode === 'week') {
-        state.currentDate.setDate(state.currentDate.getDate() - 7);
-      } else {
-        state.currentDate.setMonth(state.currentDate.getMonth() - 1);
-      }
-      if (state.selectedYear !== 'all') {
-        state.selectedYear = String(state.currentDate.getFullYear() + 543);
-      }
-      renderUI();
-    };
-
-    document.getElementById('btnNextMonth').onclick = () => {
-      if (state.viewMode === 'week') {
-        state.currentDate.setDate(state.currentDate.getDate() + 7);
-      } else {
-        state.currentDate.setMonth(state.currentDate.getMonth() + 1);
-      }
-      if (state.selectedYear !== 'all') {
-        state.selectedYear = String(state.currentDate.getFullYear() + 543);
-      }
-      renderUI();
-    };
-
-    document.getElementById('btnToday').onclick = () => {
-      state.currentDate = new Date();
-      if (state.selectedYear !== 'all') {
-        state.selectedYear = String(state.currentDate.getFullYear() + 543);
-      }
-      renderUI();
-    };
 
     // Header Home Calendar Icon: กลับสู่หน้าปฏิทินเดือนปัจจุบันและรีเซ็ตมุมมอง
     const btnNavHome = document.getElementById('btnNavHomeCalendar');
@@ -7108,7 +7063,9 @@
       if (state.selectedYear !== 'all') {
         const targetBE = parseInt(state.selectedYear, 10);
         if (!isNaN(targetBE)) {
-          state.currentDate.setFullYear(targetBE - 543);
+          const ceYear = targetBE - 543;
+          state.currentDate.setFullYear(ceYear);
+          ensureHolidaysForYear(ceYear);
         }
       }
       renderUI();
