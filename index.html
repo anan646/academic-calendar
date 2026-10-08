@@ -116,6 +116,10 @@
       <!-- Action Buttons & User Profile (Dynamically adjusted per portal) -->
       <div class="flex items-center space-x-2" id="navActionsContainer">
         <!-- Back to Landing Button (always visible when inside calendar/dashboard) -->
+        <button id="btnNavOpenFtuHub" class="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-700 hover:to-amber-700 text-white border border-amber-300/40 text-xs sm:text-sm font-bold rounded-lg shadow-xs transition active:scale-95 cursor-pointer" title="เปิดดูปฏิทินวิชาการ มหาวิทยาลัยฟาฏอนี">
+          <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-200"></i>
+          <span class="hidden md:inline">ปฏิทิน ม.ฟาฏอนี</span>
+        </button>
         <button id="btnNavLanding" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition" title="กลับสู่หน้าแรก">
           <i data-lucide="arrow-left" class="w-4 h-4 text-purple-200"></i>
           <span>กลับหน้าหลัก</span>
@@ -245,6 +249,10 @@
             <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
               <i data-lucide="clock" class="w-4 h-4 text-purple-600"></i> กิจกรรมและวันสำคัญเร็วๆ นี้
             </h3>
+            <button id="btnLandingOpenFtuHub" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-700 to-amber-700 hover:from-emerald-800 hover:to-amber-800 text-white shadow-2xs border border-amber-300/50 transition cursor-pointer">
+              <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-200"></i>
+              <span>ดูปฏิทิน ม.ฟาฏอนี 2569</span>
+            </button>
             <button id="btnLandingViewAllList" class="text-xs font-semibold text-purple-700 hover:text-purple-900 transition flex items-center gap-1">
               ดูทั้งหมด →
             </button>
@@ -333,14 +341,12 @@
           </select>
         </div>
 
-        <!-- FTU Calendar Toggle Button (เปิด / ปิด ปฏิทิน ม.ฟาฏอนี) -->
-        <button id="btnToggleFtuCalendar" type="button" 
-          class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-2xs cursor-pointer active:scale-95 bg-emerald-50 text-emerald-800 border-amber-300 hover:bg-emerald-100"
-          title="คลิกเพื่อเปิดหรือปิดการแสดงปฏิทิน ม.ฟาฏอนี">
-          <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-600"></i>
-          <span class="hidden sm:inline">ปฏิทิน ม.ฟาฏอนี:</span>
-          <span class="sm:hidden">ม.ฟาฏอนี:</span>
-          <span id="labelToggleFtuStatus" class="font-extrabold text-emerald-700">เปิด ✓</span>
+        <!-- FTU Academic Calendar Hub Button -->
+        <button id="btnOpenFtuHubFromControls" type="button" 
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition shadow-2xs cursor-pointer active:scale-95 bg-gradient-to-r from-emerald-700 to-amber-700 hover:from-emerald-800 hover:to-amber-800 text-white border-amber-300/50"
+          title="เปิดดูปฏิทินวิชาการ มหาวิทยาลัยฟาฏอนี ปีการศึกษา 2569">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-200"></i>
+          <span>ปฏิทิน ม.ฟาฏอนี 2569</span>
         </button>
 
         <!-- "My Events" Filter Button -->
@@ -3295,7 +3301,6 @@
     ];
 
     const DEFAULT_DEPARTMENTS = [
-      { id: 'dept_ftu', name: 'ปฏิทิน ม.ฟาฏอนี', color: '#047857', pin: '5555' },
       { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626', pin: '' },
       { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb', pin: '1111' },
       { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a', pin: '2222' },
@@ -3697,8 +3702,7 @@
         semester: 'ปิดภาคเรียน',
         location: 'ห้องประชุมวิทยบริการ',
         description: 'ทบทวนและจัดทำแผนยุทธศาสตร์สถานศึกษา'
-      },
-      ...FTU_2569_EVENTS
+      }
     ];
 
     // ==========================================
@@ -3783,9 +3787,7 @@
           savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}');
         } catch (e) { savedPins = {}; }
 
-        if (!response.departments.some(d => d.id === 'dept_ftu' || d.name === 'ปฏิทิน ม.ฟาฏอนี')) {
-          response.departments.unshift({ id: 'dept_ftu', name: 'ปฏิทิน ม.ฟาฏอนี', color: '#047857', pin: '5555' });
-        }
+
         state.departments = response.departments.map(cloudDept => {
           const localDept = (state.departments || []).find(d => d.id === cloudDept.id || d.name === cloudDept.name);
           const cloudPin = (cloudDept.pin !== undefined && cloudDept.pin !== null && String(cloudDept.pin).trim() !== '') ? String(cloudDept.pin).trim() : '';
@@ -3886,10 +3888,7 @@
       if (storedDepts) {
         try {
           const parsed = JSON.parse(storedDepts);
-          // เพิ่ม dept_ftu หากยังไม่มีในข้อมูลที่เก็บไว้
-          if (!parsed.some(d => d.id === 'dept_ftu' || d.name === 'ปฏิทิน ม.ฟาฏอนี')) {
-            parsed.unshift({ id: 'dept_ftu', name: 'ปฏิทิน ม.ฟาฏอนี', color: '#047857', pin: '5555' });
-          }
+
           let savedPins = {};
           try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) {}
           const defMap = {};
@@ -3941,10 +3940,9 @@
         }
       }
 
-      if (!state.departments.some(d => d.id === 'dept_ftu' || d.name === 'ปฏิทิน ม.ฟาฏอนี')) {
-        state.departments.unshift({ id: 'dept_ftu', name: 'ปฏิทิน ม.ฟาฏอนี', color: '#047857', pin: '5555' });
-      }
-      state.events = loadedEvents;
+      // กรองกิจกรรม ม.ฟาฏอนี ออกจากปฏิทินหลักอย่างเด็ดขาด (ไปแสดงในป็อปอัปเฉพาะเท่านั้น)
+      state.departments = state.departments.filter(d => d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
+      state.events = loadedEvents.filter(e => !e.id.startsWith('ftu_') && e.departmentId !== 'dept_ftu');
       state.currentUser = storedUser ? JSON.parse(storedUser) : null;
 
       if (storedUsers) {
@@ -5207,6 +5205,171 @@
       lucide.createIcons();
     }
 
+
+    // ==========================================
+    // DEDICATED FTU CALENDAR HUB MODAL LOGIC
+    // ==========================================
+    let currentFtuSem = '1';
+    let currentFtuSearch = '';
+    let currentFtuCategory = 'all';
+
+    function openFtuCalendarModal(defaultSem = '1') {
+      currentFtuSem = defaultSem;
+      openModal('modalFtuCalendar');
+      renderFtuCalendarList();
+      lucide.createIcons();
+    }
+
+    function categorizeFtuEvent(title) {
+      const t = title.toLowerCase();
+      if (t.includes('ลงทะเบียน') || t.includes('เพิ่ม') || t.includes('ถอน') || t.includes('เปลี่ยนกลุ่ม') || t.includes('พิมพ์ใบแจ้งยอด')) {
+        return 'reg';
+      }
+      if (t.includes('สอบ') || t.includes('ผลการเรียน') || t.includes('ผลการศึกษา') || t.includes('สัญลักษณ์ p') || t.includes('ประเมินการสอน')) {
+        return 'exam';
+      }
+      if (t.includes('เปิดภาค') || t.includes('ปิดภาค') || t.includes('วันสุดท้ายของการเรียน') || t.includes('พิธีประสาทปริญญา') || t.includes('ปฐมนิเทศ')) {
+        return 'class';
+      }
+      if (t.includes('วันหยุด') || t.includes('วันตรุษ') || t.includes('ปิดวัน') || t.includes('เอียะติ๊กาฟ') || t.includes('รอมฏอน') || t.includes('รอมฎอน')) {
+        return 'holiday';
+      }
+      if (t.includes('cwie') || t.includes('สหกิจ')) {
+        return 'cwie';
+      }
+      return 'other';
+    }
+
+    function renderFtuCalendarList() {
+      const container = document.getElementById('ftuModalEventsList');
+      const countBadge = document.getElementById('ftuModalFilteredCount');
+      if (!container) return;
+
+      // Update Tab Buttons UI
+      document.querySelectorAll('.ftu-sem-tab').forEach(tab => {
+        const sem = tab.getAttribute('data-sem');
+        if (sem === currentFtuSem) {
+          tab.className = 'ftu-sem-tab px-4 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 shrink-0 bg-emerald-800 text-white cursor-pointer';
+        } else {
+          tab.className = 'ftu-sem-tab px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-200 cursor-pointer';
+        }
+      });
+
+      // Filter events
+      let events = FTU_2569_EVENTS.filter(e => {
+        const semMatch = currentFtuSem === '3' 
+          ? (e.semester === '3' || e.semester === 'ฤดูร้อน')
+          : (e.semester === currentFtuSem);
+        return semMatch;
+      });
+
+      // Category filter
+      if (currentFtuCategory !== 'all') {
+        events = events.filter(e => categorizeFtuEvent(e.title) === currentFtuCategory);
+      }
+
+      // Search filter
+      const q = (currentFtuSearch || '').trim().toLowerCase();
+      if (q) {
+        events = events.filter(e => {
+          return e.title.toLowerCase().includes(q) || 
+                 (e.description && e.description.toLowerCase().includes(q)) ||
+                 (e.startDate && e.startDate.includes(q)) ||
+                 (e.endDate && e.endDate.includes(q));
+        });
+      }
+
+      if (countBadge) {
+        countBadge.innerText = `${events.length} รายการ`;
+      }
+
+      container.innerHTML = '';
+
+      if (events.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center space-y-2">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <i data-lucide="search-x" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-600">ไม่พบกิจกรรมที่ตรงกับเงื่อนไขค้นหา</p>
+            <p class="text-xs text-slate-400">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่น</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      events.forEach((evt, idx) => {
+        const s = parseDateYMD(evt.startDate);
+        const e = evt.endDate ? parseDateYMD(evt.endDate) : s;
+        const hijri = getHijriDate(s);
+        const cat = categorizeFtuEvent(evt.title);
+
+        let catBadge = '';
+        if (cat === 'reg') {
+          catBadge = '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-50 text-blue-800 border border-blue-200">📝 ลงทะเบียน/เพิ่ม-ถอน</span>';
+        } else if (cat === 'exam') {
+          catBadge = '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200">📊 สอบ/ประเมินผล</span>';
+        } else if (cat === 'class') {
+          catBadge = '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">🎓 เปิด-ปิดเทอม/พิธีการ</span>';
+        } else if (cat === 'holiday') {
+          catBadge = '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-50 text-rose-800 border border-rose-200">🌙 วันสำคัญ/วันหยุด</span>';
+        } else if (cat === 'cwie') {
+          catBadge = '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-purple-50 text-purple-800 border border-purple-200">💼 CWIE/สหกิจ</span>';
+        } else {
+          catBadge = '<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-50 text-slate-700 border border-slate-200">ทั่วไป</span>';
+        }
+
+        const dateRangeStr = (evt.startDate === evt.endDate || !evt.endDate)
+          ? formatThaiDateFull(s)
+          : `${formatThaiDateFull(s)} ถึง ${formatThaiDateFull(e)}`;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-4 border border-slate-200/80 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group';
+
+        card.innerHTML = `
+          <div class="space-y-1.5 flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-800 font-black text-xs flex items-center justify-center shrink-0 border border-emerald-100">
+                ${idx + 1}
+              </span>
+              ${catBadge}
+              <span class="text-[11px] text-slate-500 font-medium">ภาคการศึกษา ${evt.semester}</span>
+            </div>
+            <h4 class="font-bold text-sm sm:text-base text-slate-900 group-hover:text-emerald-900 transition leading-snug">
+              ${evt.title}
+            </h4>
+            <div class="flex items-center gap-3 text-xs text-slate-500 flex-wrap pt-0.5">
+              <span class="flex items-center gap-1 font-semibold text-slate-700">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i> ${dateRangeStr}
+              </span>
+              <span class="text-violet-700 font-medium flex items-center gap-1">
+                <i data-lucide="moon" class="w-3.5 h-3.5 text-violet-500"></i> ${hijri.formatted}
+              </span>
+            </div>
+            ${evt.description && evt.description !== evt.title ? `
+              <p class="text-[11px] text-slate-500 mt-1 line-clamp-2 bg-slate-50/70 p-2 rounded-xl border border-slate-100">
+                ${evt.description}
+              </p>
+            ` : ''}
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <button type="button" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold border border-emerald-200 transition flex items-center gap-1 cursor-pointer">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> ดูรายละเอียด
+            </button>
+          </div>
+        `;
+
+        card.onclick = () => {
+          openViewEventModal(evt, s, hijri);
+        };
+
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
     function openViewEventModal(evt, dateObj, hijriInfo) {
       activeViewingEvent = evt;
       const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#64748b', name: 'ทั่วไป' };
@@ -6137,6 +6300,47 @@
             showToast('ซ่อนการแสดงผล "ปฏิทิน ม.ฟาฏอนี" เรียบร้อยแล้ว');
           }
         };
+      }
+
+      // Wire FTU Hub Modal Listeners
+      const btnOpenFtu1 = document.getElementById('btnNavOpenFtuHub');
+      if (btnOpenFtu1) btnOpenFtu1.onclick = () => openFtuCalendarModal('1');
+
+      const btnOpenFtu2 = document.getElementById('btnOpenFtuHubFromControls');
+      if (btnOpenFtu2) btnOpenFtu2.onclick = () => openFtuCalendarModal('1');
+
+      const btnOpenFtu3 = document.getElementById('btnLandingOpenFtuHub');
+      if (btnOpenFtu3) btnOpenFtu3.onclick = () => openFtuCalendarModal('1');
+
+      // Semester tabs inside modal
+      document.querySelectorAll('.ftu-sem-tab').forEach(tab => {
+        tab.onclick = () => {
+          currentFtuSem = tab.getAttribute('data-sem');
+          renderFtuCalendarList();
+        };
+      });
+
+      // Search & category inside modal
+      const inputFtuSearch = document.getElementById('inputFtuSearch');
+      if (inputFtuSearch) {
+        inputFtuSearch.oninput = (e) => {
+          currentFtuSearch = e.target.value;
+          renderFtuCalendarList();
+        };
+      }
+
+      const selectFtuCategory = document.getElementById('selectFtuCategory');
+      if (selectFtuCategory) {
+        selectFtuCategory.onchange = (e) => {
+          currentFtuCategory = e.target.value;
+          renderFtuCalendarList();
+        };
+      }
+
+      // Print button in FTU modal
+      const btnPrintFtu = document.getElementById('btnPrintFtuModal');
+      if (btnPrintFtu) {
+        btnPrintFtu.onclick = () => window.print();
       }
 
       const btnClearSearch = document.getElementById('btnClearSearch');
