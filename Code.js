@@ -79,6 +79,8 @@ function handleApiPost(e) {
 
     if (action === 'saveEvent') {
       result = saveEvent(postData.eventData || postData);
+    } else if (action === 'batchSaveEvents') {
+      result = batchSaveEvents(postData.eventsList || []);
     } else if (action === 'deleteEvent') {
       result = deleteEvent(postData.id, postData.adminPin);
     } else if (action === 'registerUser') {
@@ -185,6 +187,7 @@ function getInitialData() {
 
 function getDefaultDepartments() {
   return [
+    { id: 'dept_ftu', name: 'ปฏิทิน ม.ฟาฏอนี', color: '#047857', pin: '5555' },
     { id: 'dept_holiday', name: 'วันหยุดราชการ / สำคัญ', color: '#dc2626', pin: '' },
     { id: 'dept_acad', name: 'ฝ่ายวิชาการ', color: '#2563eb', pin: '1111' },
     { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a', pin: '2222' },
@@ -553,6 +556,74 @@ function deleteEvent(eventId, adminPin) {
     }
   }
   return { success: false, message: 'ไม่พบกิจกรรมที่ต้องการลบ' };
+}
+
+/**
+ * บันทึกกิจกรรมแบบกลุ่ม (Batch) เช่น ปฏิทิน ม.ฟาฏอนี
+ */
+function batchSaveEvents(eventsList) {
+  if (!Array.isArray(eventsList) || eventsList.length === 0) {
+    return { success: false, message: 'ไม่มีรายการกิจกรรม' };
+  }
+
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Events');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Events');
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var existingIds = {};
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0]) existingIds[String(data[i][0])] = i + 1;
+  }
+
+  var now = new Date().toISOString();
+  var rowsToAppend = [];
+
+  for (var k = 0; k < eventsList.length; k++) {
+    var ev = eventsList[k];
+    var id = ev.id || ('evt_' + new Date().getTime() + '_' + k);
+    if (existingIds[id]) {
+      var rIdx = existingIds[id];
+      sheet.getRange(rIdx, 2).setValue(ev.title);
+      sheet.getRange(rIdx, 3).setValue(ev.departmentId);
+      sheet.getRange(rIdx, 4).setValue(ev.startDate);
+      sheet.getRange(rIdx, 5).setValue(ev.endDate);
+      sheet.getRange(rIdx, 6).setValue(ev.academicYear);
+      sheet.getRange(rIdx, 7).setValue(ev.semester);
+      sheet.getRange(rIdx, 8).setValue(ev.location || '');
+      sheet.getRange(rIdx, 9).setValue(ev.description || '');
+      sheet.getRange(rIdx, 11).setValue(ev.creatorName || '');
+      sheet.getRange(rIdx, 12).setValue(ev.creatorDept || '');
+      sheet.getRange(rIdx, 14).setValue(now);
+    } else {
+      rowsToAppend.push([
+        id,
+        ev.title,
+        ev.departmentId,
+        ev.startDate,
+        ev.endDate,
+        ev.academicYear,
+        ev.semester,
+        ev.location || '',
+        ev.description || '',
+        ev.createdBy || 'ระบบ',
+        ev.creatorName || 'สำนักทะเบียนและประมวลผล',
+        ev.creatorDept || 'ปฏิทิน ม.ฟาฏอนี',
+        now,
+        now
+      ]);
+    }
+  }
+
+  if (rowsToAppend.length > 0) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAppend.length, rowsToAppend[0].length).setValues(rowsToAppend);
+  }
+
+  SpreadsheetApp.flush();
+  return { success: true, count: eventsList.length };
 }
 
 // ------------------------------
