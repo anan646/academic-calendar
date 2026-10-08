@@ -415,17 +415,19 @@ function saveDepartment(deptData, adminPin) {
 
   var rowIndex = -1;
   for (var i = 1; i < data.length; i++) {
-    if (String(data[i][0]) === String(id)) {
+    var rowId = String(data[i][0] || '').trim();
+    var rowName = String(data[i][1] || '').trim();
+    if ((id && rowId === String(id).trim()) || (deptData.name && rowName === String(deptData.name).trim())) {
       rowIndex = i + 1;
       break;
     }
   }
 
   if (rowIndex > -1) {
-    sheet.getRange(rowIndex, 2).setValue(deptData.name);
-    sheet.getRange(rowIndex, 3).setValue(deptData.color);
+    if (deptData.name) sheet.getRange(rowIndex, 2).setValue(deptData.name);
+    if (deptData.color) sheet.getRange(rowIndex, 3).setValue(deptData.color);
     if (deptData.pin !== undefined) {
-      sheet.getRange(rowIndex, pinColIdx + 1).setValue(String(deptData.pin));
+      sheet.getRange(rowIndex, pinColIdx + 1).setValue(String(deptData.pin || ''));
     }
   } else {
     var newRow = [id, deptData.name, deptData.color];
@@ -438,6 +440,7 @@ function saveDepartment(deptData, adminPin) {
     sheet.appendRow(newRow);
   }
 
+  SpreadsheetApp.flush();
   return { success: true, id: id };
 }
 

@@ -532,10 +532,6 @@
               <i data-lucide="plus-circle" class="w-4 h-4 text-purple-700"></i>
               <span>+ ลงกิจกรรมใหม่</span>
             </button>
-            <button id="btnAdminQuickDept" type="button" class="px-3.5 py-2 rounded-xl bg-purple-800/80 hover:bg-purple-700 text-white text-xs font-semibold border border-purple-600/50 transition flex items-center gap-1.5 cursor-pointer active:scale-95">
-              <i data-lucide="palette" class="w-4 h-4 text-purple-200"></i>
-              <span>จัดการฝ่าย & สี</span>
-            </button>
             <button id="btnAdminExit" type="button" class="px-3 py-2 rounded-xl bg-purple-950/70 hover:bg-rose-900/60 text-purple-200 hover:text-white text-xs font-medium border border-purple-700/50 hover:border-rose-500/50 transition flex items-center gap-1.5 cursor-pointer">
               <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
               <span>กลับสู่ปฏิทิน</span>
@@ -2080,7 +2076,31 @@
 
     function applySyncedData(response) {
       if (Array.isArray(response.departments) && response.departments.length > 0) {
-        state.departments = response.departments;
+        let savedPins = {};
+        try {
+          savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}');
+        } catch (e) { savedPins = {}; }
+
+        state.departments = response.departments.map(cloudDept => {
+          const localDept = (state.departments || []).find(d => d.id === cloudDept.id || d.name === cloudDept.name);
+          const cloudPin = (cloudDept.pin !== undefined && cloudDept.pin !== null && String(cloudDept.pin).trim() !== '') ? String(cloudDept.pin).trim() : '';
+          const localPin = (localDept && localDept.pin) ? String(localDept.pin).trim() : '';
+          const backupPin = savedPins[cloudDept.id] || savedPins[cloudDept.name] || '';
+          const finalPin = cloudPin || localPin || backupPin || '';
+
+          if (finalPin) {
+            savedPins[cloudDept.id] = finalPin;
+            savedPins[cloudDept.name] = finalPin;
+          }
+          return {
+            ...cloudDept,
+            pin: finalPin
+          };
+        });
+
+        try {
+          localStorage.setItem('school_cal_dept_pins', JSON.stringify(savedPins));
+        } catch (e) {}
       }
       if (Array.isArray(response.events)) {
         // ผสานวันหยุดระบบกับกิจกรรมจากชีต โดยกรองกิจกรรมที่เคยถูกลบออกเด็ดขาด
@@ -2161,13 +2181,24 @@
       if (storedDepts) {
         try {
           const parsed = JSON.parse(storedDepts);
-          // เติม default pin หากฝ่ายเดิมยังไม่มี pin
+          let savedPins = {};
+          try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) {}
           const defMap = {};
           DEFAULT_DEPARTMENTS.forEach(d => { if (d.pin) defMap[d.id] = d.pin; });
-          state.departments = parsed.map(d => ({
-            ...d,
-            pin: (d.pin !== undefined && d.pin !== '') ? String(d.pin) : (defMap[d.id] || '')
-          }));
+          state.departments = parsed.map(d => {
+            const rawPin = (d.pin !== undefined && d.pin !== null && String(d.pin).trim() !== '') ? String(d.pin).trim() : '';
+            const backupPin = savedPins[d.id] || savedPins[d.name] || defMap[d.id] || '';
+            const finalPin = rawPin || backupPin || '';
+            if (finalPin) {
+              savedPins[d.id] = finalPin;
+              savedPins[d.name] = finalPin;
+            }
+            return {
+              ...d,
+              pin: finalPin
+            };
+          });
+          try { localStorage.setItem('school_cal_dept_pins', JSON.stringify(savedPins)); } catch (e) {}
         } catch (e) {
           state.departments = DEFAULT_DEPARTMENTS;
         }
@@ -2253,6 +2284,18 @@
     }
 
     function saveStateLocal() {
+      let savedPins = {};
+      try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) {}
+      if (Array.isArray(state.departments)) {
+        state.departments.forEach(d => {
+          if (d.pin && String(d.pin).trim() !== '') {
+            savedPins[d.id] = String(d.pin).trim();
+            savedPins[d.name] = String(d.pin).trim();
+          }
+        });
+      }
+      try { localStorage.setItem('school_cal_dept_pins', JSON.stringify(savedPins)); } catch (e) {}
+
       localStorage.setItem('school_cal_departments', JSON.stringify(state.departments));
       localStorage.setItem('school_cal_events', JSON.stringify(state.events));
       localStorage.setItem('school_cal_users', JSON.stringify(state.users));
@@ -2967,7 +3010,7 @@
         if (btnLanding) btnLanding.classList.remove('hidden');
         if (viewDashBtn) viewDashBtn.classList.remove('hidden');
         if (myEventsBtn) myEventsBtn.classList.remove('hidden');
-        if (manageDeptBtn) manageDeptBtn.classList.remove('hidden');
+        if (manageDeptBtn) manageDeptBtn.classList.toggle('hidden', state.viewMode === 'dashboard');
         if (navDesc) navDesc.innerText = 'ระบบจัดการสำหรับผู้ดูแลระบบ (Admin Dashboard)';
         if (navBadge) navBadge.innerText = 'ผู้ดูแลระบบ';
       }
@@ -3006,6 +3049,12 @@
       if (viewWeek) viewWeek.classList.toggle('hidden', mode !== 'week');
       if (viewList) viewList.classList.toggle('hidden', mode !== 'list');
       if (viewDash) viewDash.classList.toggle('hidden', mode !== 'dashboard');
+
+      const manageDeptBtn = document.getElementById('btnManageDept');
+      if (manageDeptBtn) {
+        // เมื่ออยู่ในหน้าแดชบอร์ด ซ่อนปุ่มจัดการฝ่ายและสีใน Header เพื่อไม่ให้ซ้ำซ้อนกับแท็บหมวด 3 ในหน้าแดชบอร์ด
+        manageDeptBtn.classList.toggle('hidden', mode === 'dashboard' || state.currentPortal !== 'admin');
+      }
 
       renderUI();
     }
@@ -3506,6 +3555,9 @@
     // ==========================================
     // 10. DEPARTMENT MANAGEMENT (เพิ่ม/ลด/เปลี่ยนสี)
     // ==========================================
+    // ==========================================
+    // 10. DEPARTMENT MANAGEMENT (เพิ่ม/ลด/เปลี่ยนสี)
+    // ==========================================
     function renderDeptManagementList() {
       const containers = [
         document.getElementById('deptManagementList'),
@@ -3514,6 +3566,9 @@
 
       const countBadge = document.getElementById('dashDeptsCountBadge');
       if (countBadge) countBadge.innerText = `${state.departments.length} ฝ่าย`;
+
+      let savedPins = {};
+      try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { savedPins = {}; }
 
       containers.forEach(container => {
         if (!container) return;
@@ -3524,20 +3579,27 @@
           item.className = 'p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200 text-xs space-y-2.5 hover:border-purple-200 transition shadow-2xs';
 
           const isHoliday = dept.id === 'dept_holiday';
-          const currentPin = dept.pin || '';
+          const currentPin = (dept.pin && String(dept.pin).trim()) || savedPins[dept.id] || savedPins[dept.name] || '';
+          const hasPin = currentPin !== '';
 
           item.innerHTML = `
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2.5 flex-1 min-w-0">
                 <input type="color" value="${dept.color}" class="w-8 h-8 rounded-xl cursor-pointer border border-slate-300 p-0.5 shrink-0 bg-white shadow-2xs" data-dept-id="${dept.id}" title="เปลี่ยนสีฝ่าย">
                 <div class="min-w-0">
-                  <span class="font-bold text-slate-800 truncate block text-xs sm:text-sm">${dept.name}</span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="font-bold text-slate-800 truncate text-xs sm:text-sm">${dept.name}</span>
+                    ${!isHoliday ? (hasPin 
+                      ? `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200" title="ตั้งรหัส PIN แล้ว"><i data-lucide="check" class="w-3 h-3 text-emerald-600"></i> มีรหัสผ่าน</span>`
+                      : `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200" title="ยังไม่ได้ตั้งรหัสผ่าน"><i data-lucide="alert-circle" class="w-3 h-3 text-amber-600"></i> ยังไม่ตั้งรหัส</span>`
+                    ) : ''}
+                  </div>
                   <span class="text-[10px] text-slate-400 font-mono">${dept.color}</span>
                 </div>
               </div>
               <div class="shrink-0 flex items-center gap-1">
                 ${isHoliday ? '<span class="text-slate-400 text-[10px] bg-slate-100 px-2.5 py-1 rounded-lg font-medium border border-slate-200">(วันหยุดระบบ)</span>' : `
-                  <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1 text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition cursor-pointer font-medium text-xs border border-rose-200" data-del-dept="${dept.id}" title="ลบฝ่าย">
+                  <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1 text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition cursor-pointer font-medium text-xs border border-rose-200 active:scale-95" data-del-dept="${dept.id}" title="ลบฝ่าย">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span>ลบ</span>
                   </button>
                 `}
@@ -3550,15 +3612,16 @@
                 </span>
                 <div class="flex items-center gap-1.5">
                   <div class="relative flex items-center">
-                    <input type="password" value="${currentPin}" maxlength="10" placeholder="ตั้งรหัส"
-                      class="w-24 px-2 py-1 text-center font-mono font-bold rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
+                    <input type="password" value="${currentPin}" maxlength="10" placeholder="ตั้งรหัส 4 หลัก"
+                      class="w-28 px-2.5 py-1 text-center font-mono font-bold rounded-lg border ${hasPin ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-200 bg-white'} focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs"
                       data-pin-input="${dept.id}">
-                    <button type="button" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer" data-toggle-pin="${dept.id}" title="ดู/ซ่อนรหัส">
+                    <button type="button" class="text-slate-400 hover:text-slate-700 p-1 cursor-pointer transition" data-toggle-pin="${dept.id}" title="ดู/ซ่อนรหัสผ่าน">
                       <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                     </button>
                   </div>
-                  <button type="button" class="px-2.5 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-lg font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95" data-save-pin="${dept.id}">
-                    บันทึก
+                  <button type="button" class="px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-lg font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1 shrink-0" data-save-pin="${dept.id}">
+                    <i data-lucide="save" class="w-3 h-3"></i>
+                    <span>บันทึก</span>
                   </button>
                 </div>
               </div>
@@ -3570,6 +3633,8 @@
           if (colorInput) {
             colorInput.addEventListener('change', (e) => {
               dept.color = e.target.value;
+              const target = state.departments.find(d => d.id === dept.id || d.name === dept.name);
+              if (target) target.color = e.target.value;
               saveStateLocal();
               if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.saveDepartment(dept, state.adminPin);
@@ -3589,7 +3654,7 @@
             togglePinBtn.addEventListener('click', () => {
               if (pinInput.type === 'password') {
                 pinInput.type = 'text';
-                togglePinBtn.innerHTML = '<i data-lucide="eye-off" class="w-3.5 h-3.5"></i>';
+                togglePinBtn.innerHTML = '<i data-lucide="eye-off" class="w-3.5 h-3.5 text-purple-600"></i>';
               } else {
                 pinInput.type = 'password';
                 togglePinBtn.innerHTML = '<i data-lucide="eye" class="w-3.5 h-3.5"></i>';
@@ -3600,18 +3665,61 @@
 
           // Save PIN
           const savePinBtn = item.querySelector(`button[data-save-pin="${dept.id}"]`);
-          if (savePinBtn && pinInput) {
-            savePinBtn.addEventListener('click', () => {
-              const newPin = pinInput.value.trim();
-              dept.pin = newPin;
-              saveStateLocal();
-              if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.saveDepartment(dept, state.adminPin);
-              } else if (gasApiUrl) {
-                sendToCloudApi('saveDepartment', { deptData: dept, adminPin: state.adminPin });
+          const executeSavePin = () => {
+            if (!pinInput) return;
+            const newPin = pinInput.value.trim();
+            if (!newPin) {
+              alert(`กรุณาระบุรหัสผ่าน (PIN) สำหรับฝ่าย "${dept.name}" อย่างน้อย 4 ตัวอักษร`);
+              pinInput.focus();
+              return;
+            }
+
+            // บันทึกตรงใน state.departments
+            const target = state.departments.find(d => d.id === dept.id || d.name === dept.name);
+            if (target) {
+              target.pin = newPin;
+            }
+            dept.pin = newPin;
+
+            // บันทึกลง registry ถาวรใน localStorage
+            let currentPinsMap = {};
+            try { currentPinsMap = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { currentPinsMap = {}; }
+            currentPinsMap[dept.id] = newPin;
+            currentPinsMap[dept.name] = newPin;
+            if (target) {
+              currentPinsMap[target.id] = newPin;
+              currentPinsMap[target.name] = newPin;
+            }
+            try { localStorage.setItem('school_cal_dept_pins', JSON.stringify(currentPinsMap)); } catch (e) {}
+
+            saveStateLocal();
+
+            const deptPayload = {
+              id: dept.id,
+              name: dept.name,
+              color: dept.color,
+              pin: newPin
+            };
+
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+              google.script.run.saveDepartment(deptPayload, state.adminPin);
+            } else if (gasApiUrl) {
+              sendToCloudApi('saveDepartment', { deptData: deptPayload, adminPin: state.adminPin });
+            }
+
+            renderDeptManagementList();
+            showToast(`✓ บันทึกรหัสผ่านฝ่าย "${dept.name}" เรียบร้อยแล้ว (รหัส: ${newPin})`);
+          };
+
+          if (savePinBtn) {
+            savePinBtn.addEventListener('click', executeSavePin);
+          }
+          if (pinInput) {
+            pinInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                executeSavePin();
               }
-              renderDeptManagementList();
-              showToast(`บันทึกรหัสผ่านฝ่าย "${dept.name}" สำเร็จ`);
             });
           }
 
@@ -3621,6 +3729,14 @@
             delBtn.addEventListener('click', () => {
               if (confirm(`ต้องการลบ "${dept.name}" ใช่หรือไม่?`)) {
                 state.departments = state.departments.filter(d => d.id !== dept.id);
+
+                // ลบออกจาก registry ด้วย
+                let currentPinsMap = {};
+                try { currentPinsMap = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { currentPinsMap = {}; }
+                delete currentPinsMap[dept.id];
+                delete currentPinsMap[dept.name];
+                try { localStorage.setItem('school_cal_dept_pins', JSON.stringify(currentPinsMap)); } catch (e) {}
+
                 saveStateLocal();
                 if (typeof google !== 'undefined' && google.script && google.script.run) {
                   google.script.run.deleteDepartment(dept.id, state.adminPin);
@@ -3660,6 +3776,13 @@
       };
 
       state.departments.push(newDept);
+
+      let currentPinsMap = {};
+      try { currentPinsMap = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { currentPinsMap = {}; }
+      currentPinsMap[newDept.id] = pin;
+      currentPinsMap[newDept.name] = pin;
+      try { localStorage.setItem('school_cal_dept_pins', JSON.stringify(currentPinsMap)); } catch (e) {}
+
       saveStateLocal();
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.saveDepartment(newDept, state.adminPin);
@@ -3682,8 +3805,8 @@
         const nameInput = document.getElementById('newDeptName');
         const pinInput = document.getElementById('newDeptPin');
         const colorInput = document.getElementById('newDeptColor');
-        addNewDepartment(nameInput.value, pinInput ? pinInput.value : '', colorInput ? colorInput.value : '#7c3aed', () => {
-          nameInput.value = '';
+        addNewDepartment(nameInput ? nameInput.value : '', pinInput ? pinInput.value : '', colorInput ? colorInput.value : '#7c3aed', () => {
+          if (nameInput) nameInput.value = '';
           if (pinInput) pinInput.value = '';
         });
       };
@@ -5199,7 +5322,11 @@
 
       // ตรวจสอบความถูกต้องของรหัส PIN ประจำฝ่าย
       const targetDept = state.departments.find(d => d.name === deptName || d.id === deptName);
-      const expectedPin = targetDept ? String(targetDept.pin || '') : '';
+      let savedPins = {};
+      try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { savedPins = {}; }
+      const expectedPin = (targetDept && targetDept.pin && String(targetDept.pin).trim() !== '') 
+        ? String(targetDept.pin).trim() 
+        : (savedPins[deptName] || (targetDept ? savedPins[targetDept.id] : '') || '');
 
       // อนุญาตหาก PIN ตรงกับของฝ่าย หรือใช้ Admin PIN แทนได้
       const isValidDeptPin = expectedPin ? (enteredPin === expectedPin) : true;
