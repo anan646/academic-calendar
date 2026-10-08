@@ -284,20 +284,33 @@
     <div id="calendarAppContainer" class="space-y-6 hidden">
 
     <!-- CONTROLS & FILTER BAR -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3 sm:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4">
       
-      <!-- Month & Year Selector with Dual Calendars (CE / BE / AH) -->
-      <div class="flex items-center flex-wrap gap-2 sm:gap-2.5">
-        <!-- Today Button Only (ภาพแนบที่ 3: ให้มีแค่วันนี้ก็เพียงพอเนื่องจากมีปุ่มลัดเดือนและปีแล้ว) -->
-        <button id="btnToday" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-purple-50 text-purple-900 border border-purple-200/90 shadow-2xs transition cursor-pointer active:scale-95 flex items-center gap-1.5" title="กลับสู่วันนี้">
-          <i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-700"></i>
-          <span>วันนี้</span>
-        </button>
-      </div>
+      <!-- Left: Navigation to Today + Live Today Date + Month/Year Header -->
+      <div class="flex items-center flex-wrap gap-2.5 sm:gap-3.5">
+        
+        <!-- Live Today Date Group (ปุ่มวันนี้ + ป้ายแสดงวันที่วันปัจจุบันตามที่ผู้ใช้ร้องขอ) -->
+        <div class="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-purple-50/90 to-indigo-50/70 p-1 sm:p-1.5 rounded-2xl border border-purple-100/90 shadow-2xs">
+          <button id="btnToday" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-purple-100/70 text-purple-900 border border-purple-200/90 shadow-2xs transition cursor-pointer active:scale-95 flex items-center gap-1.5" title="กลับสู่วันนี้">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-700"></i>
+            <span>วันนี้</span>
+          </button>
+          
+          <div class="flex items-center gap-1.5 px-2.5 py-1 text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="วันปัจจุบัน"></span>
+            <span class="text-slate-500 text-[11px] font-semibold hidden sm:inline">วันนี้:</span>
+            <span id="todayRealDateDisplay" class="text-purple-950 font-black tracking-tight whitespace-nowrap">...</span>
+            <span class="text-violet-700 font-semibold text-[11px] hidden md:inline border-l border-purple-200/90 pl-1.5 flex items-center gap-1">
+              <i data-lucide="moon" class="w-3 h-3 text-violet-500"></i>
+              <span id="todayHijriDateDisplay">...</span>
+            </span>
+          </div>
+        </div>
 
-        <div class="flex flex-col ml-0 sm:ml-1">
+        <!-- Month & Year Information of Viewed Calendar -->
+        <div class="flex flex-col border-l border-slate-200/80 pl-2.5 sm:pl-3">
           <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <span id="currentMonthYearBE" class="text-base sm:text-xl font-bold text-slate-800">เดือน ปี พ.ศ.</span>
+            <span id="currentMonthYearBE" class="text-base sm:text-xl font-black text-slate-800 tracking-tight">เดือน ปี พ.ศ.</span>
             <span class="text-[11px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-md bg-purple-100/70 text-purple-800 font-semibold border border-purple-200" id="currentSemesterBadge">
               ปีการศึกษา ...
             </span>
@@ -307,6 +320,7 @@
             เดือนฮิจเราะห์ศักราช (ฮ.ศ.)
           </span>
         </div>
+
       </div>
 
       <!-- View & Filter Options + Quick Search + My Events -->
@@ -1768,6 +1782,10 @@
       { id: 'u_2', name: 'อ.ฟาติมะห์ สมาน', department: 'ฝ่ายกิจกรรมและพัฒนาผู้เรียน', contact: 'fatimah@school.ac.th', registeredAt: '2568-01-15', role: 'staff' },
       { id: 'u_3', name: 'นายอนุชา พงษ์ไพศาล', department: 'ฝ่ายบริหารทั่วไปและแผนงาน', contact: '089-123-4567', registeredAt: '2568-02-01', role: 'staff' },
       { id: 'u_4', name: 'นางสาวมาลี นพคุณ', department: 'ฝ่ายงบประมาณและการเงิน', contact: 'malee@school.ac.th', registeredAt: '2568-02-12', role: 'staff' }
+    ];
+
+    const THAI_DAYS = [
+      'วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'
     ];
 
     const THAI_MONTHS = [
@@ -4557,6 +4575,22 @@
       const month = state.currentDate.getMonth();
       const beYear = year + 543;
       
+      // 1. อัปเดตข้อมูลวันที่วันปัจจุบัน (Live Today Date ตามคำขอของผู้ใช้)
+      const today = new Date();
+      const thaiDayName = THAI_DAYS[today.getDay()] || '';
+      const thaiTodayFormatted = `${thaiDayName}ที่ ${today.getDate()} ${THAI_MONTHS[today.getMonth()]} พ.ศ. ${today.getFullYear() + 543}`;
+      const hToday = getHijriDate(today);
+      const hijriTodayFormatted = `${hToday.day} ${hToday.monthName} ฮ.ศ. ${hToday.year}`;
+
+      const todayDateEl = document.getElementById('todayRealDateDisplay');
+      if (todayDateEl) {
+        todayDateEl.innerText = thaiTodayFormatted;
+      }
+      const todayHijriEl = document.getElementById('todayHijriDateDisplay');
+      if (todayHijriEl) {
+        todayHijriEl.innerText = hijriTodayFormatted;
+      }
+
       document.getElementById('currentMonthYearBE').innerText = `${THAI_MONTHS[month]} พ.ศ. ${beYear} (ค.ศ. ${year})`;
 
       // Update Quick Short Month indicators
