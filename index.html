@@ -730,8 +730,8 @@
               <option value="all">ทุกภาคเรียน</option>
               <option value="1">ภาคเรียนที่ 1</option>
               <option value="2">ภาคเรียนที่ 2</option>
-              <option value="ฤดูร้อน">ภาคฤดูร้อน / ภาคที่ 3</option>
-              <option value="ปิดภาคเรียน">ปิดภาคเรียน</option>
+              <option value="3">ภาคเรียนที่ 3 (ฤดูร้อน)</option>
+              <option value="ทั้งปี">ทั้งปีการศึกษา</option>
             </select>
           </div>
         </div>
@@ -1032,7 +1032,7 @@
               <select id="eventFieldSemester" class="w-1/2 px-2 py-2 text-sm rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium">
                 <option value="1">เทอม 1</option>
                 <option value="2">เทอม 2</option>
-                <option value="ปิดภาคเรียน">ปิดภาคเรียน</option>
+                <option value="3">เทอม 3 (ฤดูร้อน)</option>
                 <option value="ทั้งปี">ทั้งปี</option>
               </select>
             </div>
@@ -3606,7 +3606,7 @@
         startDate: '2024-04-10',
         endDate: '2024-04-11',
         academicYear: '2566',
-        semester: 'ปิดภาคเรียน',
+        semester: '3',
         description: 'วันเฉลิมฉลองการสิ้นสุดเดือนรอมฎอน (1 เชาวาล ฮ.ศ. 1445)'
       },
       {
@@ -3850,8 +3850,8 @@
       // ปี 2567 (2024)
       { id: 'th_ny_2567', title: 'วันขึ้นปีใหม่', departmentId: 'dept_holiday', startDate: '2024-01-01', endDate: '2024-01-01', academicYear: '2566', semester: '2', description: 'วันหยุดราชการ' },
       { id: 'th_makha_2567', title: 'วันมาฆบูชา', departmentId: 'dept_holiday', startDate: '2024-02-24', endDate: '2024-02-26', academicYear: '2566', semester: '2', description: 'วันหยุดราชการ (รวมวันหยุดชดเชย)' },
-      { id: 'th_chakri_2567', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2024-04-06', endDate: '2024-04-08', academicYear: '2566', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการ (ชดเชย 8 เม.ย.)' },
-      { id: 'th_songkran_2567', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2024-04-13', endDate: '2024-04-16', academicYear: '2566', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'th_chakri_2567', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2024-04-06', endDate: '2024-04-08', academicYear: '2566', semester: '3', description: 'วันหยุดราชการ (ชดเชย 8 เม.ย.)' },
+      { id: 'th_songkran_2567', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2024-04-13', endDate: '2024-04-16', academicYear: '2566', semester: '3', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
       { id: 'th_coronation_2567', title: 'วันฉัตรมงคล', departmentId: 'dept_holiday', startDate: '2024-05-04', endDate: '2024-05-06', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ (ชดเชย 6 พ.ค.)' },
       { id: 'th_visakha_2567', title: 'วันวิสาขบูชา', departmentId: 'dept_holiday', startDate: '2024-05-22', endDate: '2024-05-22', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ' },
       { id: 'th_queen_2567', title: 'วันเฉลิมพระชนมพรรษาสมเด็จพระนางเจ้าฯ พระบรมราชินี', departmentId: 'dept_holiday', startDate: '2024-06-03', endDate: '2024-06-03', academicYear: '2567', semester: '1', description: 'วันหยุดราชการ' },
@@ -3867,8 +3867,8 @@
       // ปี 2568 (2025)
       { id: 'th_ny_2568', title: 'วันขึ้นปีใหม่', departmentId: 'dept_holiday', startDate: '2025-01-01', endDate: '2025-01-01', academicYear: '2567', semester: '2', description: 'วันหยุดราชการสากล' },
       { id: 'th_makha_2568', title: 'วันมาฆบูชา', departmentId: 'dept_holiday', startDate: '2025-02-12', endDate: '2025-02-12', academicYear: '2567', semester: '2', description: 'วันหยุดราชการ' },
-      { id: 'th_chakri_2568', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2025-04-06', endDate: '2025-04-07', academicYear: '2567', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการ (ชดเชย 7 เม.ย.)' },
-      { id: 'th_songkran_2568', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2025-04-13', endDate: '2025-04-15', academicYear: '2567', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'th_chakri_2568', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2025-04-06', endDate: '2025-04-07', academicYear: '2567', semester: '3', description: 'วันหยุดราชการ (ชดเชย 7 เม.ย.)' },
+      { id: 'th_songkran_2568', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2025-04-13', endDate: '2025-04-15', academicYear: '2567', semester: '3', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
       { id: 'th_labor_2568', title: 'วันแรงงานแห่งชาติ', departmentId: 'dept_holiday', startDate: '2025-05-01', endDate: '2025-05-01', academicYear: '2568', semester: '1', description: 'วันหยุดตามประเพณี' },
       { id: 'th_coronation_2568', title: 'วันฉัตรมงคล', departmentId: 'dept_holiday', startDate: '2025-05-05', endDate: '2025-05-05', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ' },
       { id: 'th_visakha_2568', title: 'วันวิสาขบูชา', departmentId: 'dept_holiday', startDate: '2025-05-11', endDate: '2025-05-12', academicYear: '2568', semester: '1', description: 'วันหยุดราชการ (ชดเชย 12 พ.ค.)' },
@@ -3886,8 +3886,8 @@
       // ปี 2569 (2026)
       { id: 'th_ny_2569', title: 'วันขึ้นปีใหม่', departmentId: 'dept_holiday', startDate: '2026-01-01', endDate: '2026-01-01', academicYear: '2568', semester: '2', description: 'วันหยุดราชการสากล' },
       { id: 'th_makha_2569', title: 'วันมาฆบูชา', departmentId: 'dept_holiday', startDate: '2026-03-03', endDate: '2026-03-03', academicYear: '2568', semester: '2', description: 'วันหยุดราชการ' },
-      { id: 'th_chakri_2569', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2026-04-06', endDate: '2026-04-06', academicYear: '2568', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการ' },
-      { id: 'th_songkran_2569', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2026-04-13', endDate: '2026-04-15', academicYear: '2568', semester: 'ปิดภาคเรียน', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
+      { id: 'th_chakri_2569', title: 'วันพระบาทสมเด็จพระพุทธยอดฟ้าจุฬาโลกมหาราชและวันที่ระลึกมหาจักรีบรมราชวงศ์', departmentId: 'dept_holiday', startDate: '2026-04-06', endDate: '2026-04-06', academicYear: '2568', semester: '3', description: 'วันหยุดราชการ' },
+      { id: 'th_songkran_2569', title: 'วันสงกรานต์', departmentId: 'dept_holiday', startDate: '2026-04-13', endDate: '2026-04-15', academicYear: '2568', semester: '3', description: 'วันหยุดราชการเทศกาลสงกรานต์' },
       { id: 'th_labor_2569', title: 'วันแรงงานแห่งชาติ', departmentId: 'dept_holiday', startDate: '2026-05-01', endDate: '2026-05-01', academicYear: '2569', semester: '1', description: 'วันหยุดตามประเพณี' },
       { id: 'th_coronation_2569', title: 'วันฉัตรมงคล', departmentId: 'dept_holiday', startDate: '2026-05-04', endDate: '2026-05-04', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ' },
       { id: 'th_visakha_2569', title: 'วันวิสาขบูชา', departmentId: 'dept_holiday', startDate: '2026-05-31', endDate: '2026-06-01', academicYear: '2569', semester: '1', description: 'วันหยุดราชการ (ชดเชย 1 มิ.ย.)' },
@@ -3945,7 +3945,7 @@
         startDate: '2025-04-25',
         endDate: '2025-04-28',
         academicYear: '2568',
-        semester: 'ปิดภาคเรียน',
+        semester: '3',
         location: 'ห้องประชุมวิทยบริการ',
         description: 'ทบทวนและจัดทำแผนยุทธศาสตร์สถานศึกษา'
       }
@@ -3986,7 +3986,7 @@
           startDate: sDate,
           endDate: eDate,
           academicYear: String(beYear),
-          semester: item.month >= 5 && item.month <= 10 ? '1' : (item.month >= 11 || item.month <= 2 ? '2' : 'ปิดภาคเรียน'),
+          semester: item.month >= 5 && item.month <= 10 ? '1' : (item.month >= 11 || item.month <= 2 ? '2' : '3'),
           description: item.desc
         });
       });
@@ -3999,7 +3999,7 @@
         const h = getHijriDate(curDate);
         const dateStr = formatDateYMD(curDate);
         const curMonth = curDate.getMonth() + 1;
-        const sem = curMonth >= 5 && curMonth <= 10 ? '1' : (curMonth >= 11 || curMonth <= 2 ? '2' : 'ปิดภาคเรียน');
+        const sem = curMonth >= 5 && curMonth <= 10 ? '1' : (curMonth >= 11 || curMonth <= 2 ? '2' : '3');
 
         // 1 มุฮัรรอม: วันขึ้นปีใหม่ฮิจเราะห์ศักราช
         if (h.month === 1 && h.day === 1) {
@@ -7477,7 +7477,14 @@
 
       const filtered = yearEvents.filter(evt => {
         if (deptVal !== 'all' && evt.departmentId !== deptVal) return false;
-        if (termVal !== 'all' && String(evt.semester) !== termVal) return false;
+        if (termVal !== 'all') {
+          const s = String(evt.semester || '');
+          if (termVal === '3') {
+            if (s !== '3' && s !== 'ฤดูร้อน') return false;
+          } else if (s !== termVal) {
+            return false;
+          }
+        }
         if (q) {
           const d = state.departments.find(dept => dept.id === evt.departmentId);
           const deptName = d ? d.name.toLowerCase() : '';
