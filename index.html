@@ -444,22 +444,61 @@
       </div>
     </div>
 
-    <!-- DEPARTMENT & BRANCH FILTER (ฟิลเตอร์เลือกฝ่าย/สาขาแบบดรอปดาวน์ ประหยัดพื้นที่และเลือกได้รวดเร็ว) -->
-    <div class="flex items-center gap-2 text-xs py-0.5">
-      <div class="flex items-center gap-2 bg-slate-50 hover:bg-white px-3 py-1.5 rounded-xl border border-slate-200 transition shadow-2xs">
+    <!-- DEPARTMENT & BRANCH MULTI-SELECT FILTER (ฟิลเตอร์เลือกหลายฝ่ายแบบจัดกลุ่ม ประหยัดพื้นที่ ไม่รก) -->
+    <div class="relative flex items-center gap-2 text-xs py-0.5">
+      <!-- Trigger Button -->
+      <button id="btnToggleDeptDropdown" type="button" class="flex items-center gap-2 bg-slate-50 hover:bg-white px-3 py-1.5 rounded-xl border border-slate-200 hover:border-purple-300 transition shadow-2xs cursor-pointer group text-left">
         <span class="text-slate-500 font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0">
-          <i data-lucide="filter" class="w-3.5 h-3.5 text-purple-600"></i>
+          <i data-lucide="filter" class="w-3.5 h-3.5 text-purple-600 group-hover:text-purple-700"></i>
           <span>เลือกฝ่าย / สาขาวิชา:</span>
         </span>
-        <select id="selectDeptFilter" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer pr-1 min-w-[200px] sm:min-w-[250px]">
-          <option value="all">ทุกฝ่าย / ทุกสาขาวิชา (ทั้งหมด)</option>
-          <!-- Populated dynamically via JS -->
-        </select>
-        <span id="selectDeptColorDot" class="w-2.5 h-2.5 rounded-full bg-purple-600 shrink-0 hidden"></span>
-      </div>
-      <button id="btnResetDeptFilter" type="button" class="hidden px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-purple-50 text-slate-600 text-[11px] font-semibold transition cursor-pointer" title="ล้างตัวกรองฝ่าย">
-        ล้างตัวกรอง
+        <div id="deptFilterSummaryBadge" class="flex items-center gap-1.5 min-w-[140px] sm:min-w-[180px]">
+          <span id="selectDeptColorDot" class="w-2.5 h-2.5 rounded-full bg-purple-600 shrink-0 hidden"></span>
+          <span id="deptFilterSummaryText" class="font-bold text-slate-800 text-xs truncate">ทุกฝ่าย / ทุกสาขาวิชา (ทั้งหมด)</span>
+        </div>
+        <i data-lucide="chevron-down" id="iconDeptDropdownArrow" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform"></i>
       </button>
+
+      <!-- Reset Filter Button -->
+      <button id="btnResetDeptFilter" type="button" class="hidden px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-purple-50 hover:border-purple-300 text-slate-600 text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 shadow-2xs" title="ล้างตัวกรองฝ่ายทั้งหมด">
+        <i data-lucide="rotate-ccw" class="w-3 h-3 text-slate-500"></i>
+        <span>ล้างตัวกรอง</span>
+      </button>
+
+      <!-- Multi-select Dropdown Popover Panel -->
+      <div id="deptDropdownPanel" class="hidden absolute top-full left-0 mt-1.5 w-[320px] sm:w-[380px] bg-white rounded-2xl shadow-xl border border-slate-200 z-50 p-3 space-y-2.5 text-xs">
+        <!-- Panel Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-slate-800 text-xs">เลือกฝ่าย / สาขาวิชา</span>
+            <span id="deptSelectedCountBadge" class="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-800">ทั้งหมด</span>
+          </div>
+          <div class="flex items-center gap-2 text-[11px]">
+            <button id="btnDeptSelectAll" type="button" class="font-bold text-purple-700 hover:text-purple-900 cursor-pointer">เลือกทั้งหมด</button>
+            <span class="text-slate-300">|</span>
+            <button id="btnDeptClearAll" type="button" class="font-semibold text-slate-500 hover:text-rose-600 cursor-pointer">ล้าง</button>
+          </div>
+        </div>
+
+        <!-- Quick Search inside dropdown -->
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+          <input id="inputDeptDropdownSearch" type="text" placeholder="ค้นหาชื่อฝ่ายหรือสาขา..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-purple-400">
+        </div>
+
+        <!-- Grouped Department Checkboxes Container -->
+        <div id="deptGroupedCheckboxList" class="max-h-[260px] overflow-y-auto space-y-2.5 pr-1 no-scrollbar">
+          <!-- Dynamically generated groups and checkboxes -->
+        </div>
+
+        <!-- Panel Footer -->
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400" id="deptFilterFooterHint">สามารถติ๊กเลือกหลายฝ่ายพร้อมกันได้</span>
+          <button id="btnDeptDropdownDone" type="button" class="px-3.5 py-1.5 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold transition cursor-pointer shadow-2xs">
+            ตกลง
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- CALENDAR MONTH VIEW -->
@@ -559,7 +598,7 @@
               <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800" id="dayBadgeLabel">
                 กิจกรรมประจำวัน
               </span>
-              <h3 class="font-extrabold text-slate-800 text-base sm:text-lg" id="dayViewFullDate">
+              <h3 class="font-extrabold text-slate-800 text-base sm:text-lg cursor-pointer hover:text-purple-700 transition flex items-center gap-1.5" id="dayViewFullDate" title="คลิกเพื่อเลือกวันที่โดยตรง">
                 วัน... ที่ ... พ.ศ. ...
               </h3>
             </div>
@@ -581,11 +620,32 @@
             <span>วันถัดไป</span>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           </button>
+          <div class="relative inline-block">
+            <input type="date" id="inputQuickDayPicker" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
+            <button id="btnQuickPickDay" type="button" class="px-2.5 py-1.5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-semibold flex items-center gap-1 transition shadow-2xs cursor-pointer" title="คลิกเลือกวันที่ในปฏิทิน">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-purple-700"></i>
+              <span class="hidden sm:inline">เลือกวัน</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Day Events Container -->
-      <div id="dayEventsContainer" class="space-y-3">
+      <!-- Weekly Day Strip Selector (แถบ 7 วันในสัปดาห์ พร้อมจุดระบุวันที่มีกิจกรรม) -->
+      <div id="dayWeekSelectorStrip" class="bg-white rounded-2xl shadow-xs border border-purple-100/90 p-2.5 sm:p-3">
+        <div class="flex items-center justify-between mb-2 px-1 text-xs">
+          <span class="text-slate-500 font-bold flex items-center gap-1">
+            <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-purple-600"></i>
+            <span>สัปดาห์นี้: คลิกเลือกวันเพื่อดูกิจกรรมประจำวัน</span>
+          </span>
+          <span class="text-[11px] text-slate-400" id="dayWeekRangeLabel"></span>
+        </div>
+        <div id="dayWeekStripContainer" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+          <!-- 7 interactive day buttons populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Day Events Container (เนื้อหากิจกรรมประจำวัน + ไทม์ไลน์ + กิจกรรมใกล้เคียง) -->
+      <div id="dayEventsContainer" class="space-y-4">
         <!-- Rendered dynamically via JS -->
       </div>
     </div>
@@ -4736,61 +4796,211 @@
     }
 
     function renderDeptFilters() {
-      const select = document.getElementById('selectDeptFilter');
+      const summaryText = document.getElementById('deptFilterSummaryText');
       const dot = document.getElementById('selectDeptColorDot');
       const btnReset = document.getElementById('btnResetDeptFilter');
-      if (!select) return;
+      const panel = document.getElementById('deptDropdownPanel');
+      const countBadge = document.getElementById('deptSelectedCountBadge');
+      const listContainer = document.getElementById('deptGroupedCheckboxList');
+      const searchInput = document.getElementById('inputDeptDropdownSearch');
+      if (!summaryText || !listContainer) return;
 
-      const currentVal = (Array.isArray(state.selectedDepts) && state.selectedDepts.length === 1)
-        ? state.selectedDepts[0]
-        : (state.selectedDept || 'all');
+      const selectedList = Array.isArray(state.selectedDepts) ? state.selectedDepts : [];
+      const isAll = selectedList.length === 0 || selectedList.length === state.departments.length;
 
-      select.innerHTML = '<option value="all">ทุกฝ่าย / ทุกสาขาวิชา (ทั้งหมด)</option>';
-
-      state.departments.forEach(dept => {
-        const opt = document.createElement('option');
-        opt.value = dept.id;
-        opt.textContent = (dept.id === 'dept_ftu') ? `🎓 ${dept.name}` : dept.name;
-        select.appendChild(opt);
-      });
-
-      select.value = currentVal;
-
-      // Update color indicator dot & reset button
-      if (currentVal && currentVal !== 'all') {
-        const found = state.departments.find(d => d.id === currentVal);
-        if (found) {
-          if (dot) {
-            dot.classList.remove('hidden');
-            dot.style.backgroundColor = found.color || '#7c3aed';
-          }
-        } else {
-          if (dot) dot.classList.add('hidden');
-        }
-        if (btnReset) btnReset.classList.remove('hidden');
-      } else {
+      // 1. Update Trigger Summary Text & Indicators
+      if (isAll) {
+        summaryText.innerText = 'ทุกฝ่าย / ทุกสาขาวิชา (ทั้งหมด)';
         if (dot) dot.classList.add('hidden');
         if (btnReset) btnReset.classList.add('hidden');
+        if (countBadge) countBadge.innerText = 'ทั้งหมด';
+      } else if (selectedList.length === 1) {
+        const found = state.departments.find(d => d.id === selectedList[0]);
+        summaryText.innerText = found ? (found.id === 'dept_ftu' ? `🎓 ${found.name}` : found.name) : 'เลือก 1 ฝ่าย';
+        if (dot && found) {
+          dot.classList.remove('hidden');
+          dot.style.backgroundColor = found.color || '#7c3aed';
+        }
+        if (btnReset) btnReset.classList.remove('hidden');
+        if (countBadge) countBadge.innerText = '1 ฝ่าย';
+      } else {
+        summaryText.innerText = `เลือกแล้ว ${selectedList.length} ฝ่าย`;
+        if (dot) dot.classList.add('hidden');
+        if (btnReset) btnReset.classList.remove('hidden');
+        if (countBadge) countBadge.innerText = `${selectedList.length} ฝ่าย`;
       }
 
-      select.onchange = (e) => {
-        const val = e.target.value;
-        if (val === 'all') {
+      // 2. Filter search query inside dropdown
+      const searchQ = (searchInput && searchInput.value ? String(searchInput.value) : '').trim().toLowerCase();
+
+      // 3. Group departments into categories:
+      // Group 1: วันสำคัญ & วันหยุด
+      // Group 2: ฝ่ายงานบริหารคณะ (วิชาการ, กิจการนักศึกษา, บริหารทั่วไป, แผนงาน/การเงิน ฯลฯ)
+      // Group 3: สาขาวิชา / หลักสูตร
+      const groups = [
+        {
+          id: 'grp_holidays',
+          title: '📌 วันสำคัญ & วันหยุด',
+          filter: d => d.id === 'dept_holiday' || d.name.includes('วันหยุด') || d.name.includes('สำคัญ')
+        },
+        {
+          id: 'grp_admin',
+          title: '🏢 ฝ่ายงานบริหาร',
+          filter: d => (d.name.includes('ฝ่าย') || ['dept_acad', 'dept_student', 'dept_admin', 'dept_finance'].includes(d.id)) && !(d.id === 'dept_holiday' || d.name.includes('วันหยุด'))
+        },
+        {
+          id: 'grp_programs',
+          title: '🎓 สาขาวิชา / หลักสูตร',
+          filter: d => !d.name.includes('ฝ่าย') && !(d.id === 'dept_holiday' || d.name.includes('วันหยุด'))
+        }
+      ];
+
+      listContainer.innerHTML = '';
+
+      // Count events per department
+      const deptEventCounts = {};
+      (state.events || []).forEach(e => {
+        if (!e.departmentId) return;
+        deptEventCounts[e.departmentId] = (deptEventCounts[e.departmentId] || 0) + 1;
+      });
+
+      let anyGroupRendered = false;
+
+      groups.forEach(grp => {
+        let deptsInGrp = state.departments.filter(grp.filter);
+        if (searchQ) {
+          deptsInGrp = deptsInGrp.filter(d => d.name.toLowerCase().includes(searchQ));
+        }
+        if (deptsInGrp.length === 0) return;
+
+        anyGroupRendered = true;
+
+        // Group Header
+        const grpHeader = document.createElement('div');
+        grpHeader.className = 'text-[11px] font-extrabold text-slate-500 uppercase tracking-wider px-2 pt-1 pb-0.5 flex items-center justify-between border-b border-slate-100';
+        grpHeader.innerHTML = `<span>${grp.title}</span><span class="text-[10px] text-slate-400 font-semibold">${deptsInGrp.length} รายการ</span>`;
+        listContainer.appendChild(grpHeader);
+
+        // Group Items
+        const grpItemsWrapper = document.createElement('div');
+        grpItemsWrapper.className = 'space-y-1 pt-1';
+
+        deptsInGrp.forEach(dept => {
+          const isChecked = selectedList.includes(dept.id);
+          const count = deptEventCounts[dept.id] || 0;
+          const baseColor = dept.color || '#7c3aed';
+
+          const itemRow = document.createElement('label');
+          itemRow.className = `flex items-center justify-between px-2.5 py-1.5 rounded-xl border transition cursor-pointer select-none ${
+            isChecked 
+              ? 'bg-purple-50/80 border-purple-300 font-bold text-slate-900 shadow-2xs' 
+              : 'bg-white hover:bg-slate-50 border-slate-200/80 text-slate-700'
+          }`;
+
+          itemRow.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+              <input type="checkbox" class="dept-checkbox w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-400 accent-purple-700 cursor-pointer" data-dept-id="${dept.id}" ${isChecked ? 'checked' : ''}>
+              <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" style="background-color: ${baseColor}"></span>
+              <span class="truncate text-xs">${dept.name}</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.2 rounded-full font-semibold shrink-0 ml-2 ${
+              count > 0 ? 'bg-slate-100 text-slate-600' : 'text-slate-300'
+            }">${count}</span>
+          `;
+
+          const chk = itemRow.querySelector('.dept-checkbox');
+          chk.onchange = (e) => {
+            e.stopPropagation();
+            if (chk.checked) {
+              if (!selectedList.includes(dept.id)) selectedList.push(dept.id);
+            } else {
+              const idx = selectedList.indexOf(dept.id);
+              if (idx >= 0) selectedList.splice(idx, 1);
+            }
+            // Update state
+            if (selectedList.length === 0 || selectedList.length === state.departments.length) {
+              state.selectedDepts = [];
+              state.selectedDept = 'all';
+            } else if (selectedList.length === 1) {
+              state.selectedDepts = [...selectedList];
+              state.selectedDept = selectedList[0];
+            } else {
+              state.selectedDepts = [...selectedList];
+              state.selectedDept = 'multi';
+            }
+            renderUI();
+          };
+
+          grpItemsWrapper.appendChild(itemRow);
+        });
+
+        listContainer.appendChild(grpItemsWrapper);
+      });
+
+      if (!anyGroupRendered) {
+        listContainer.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">ไม่พบฝ่ายหรือสาขาวิชาที่ค้นหา</div>';
+      }
+
+      // Quick "Select All"
+      const btnSelectAll = document.getElementById('btnDeptSelectAll');
+      if (btnSelectAll) {
+        btnSelectAll.onclick = () => {
           state.selectedDepts = [];
           state.selectedDept = 'all';
-        } else {
-          state.selectedDepts = [val];
-          state.selectedDept = val;
-        }
-        renderUI();
-      };
+          renderUI();
+        };
+      }
 
+      // Quick "Clear All"
+      const btnClearAll = document.getElementById('btnDeptClearAll');
+      if (btnClearAll) {
+        btnClearAll.onclick = () => {
+          state.selectedDepts = [];
+          state.selectedDept = 'all';
+          renderUI();
+        };
+      }
+
+      // Reset Button beside trigger
       if (btnReset) {
         btnReset.onclick = () => {
           state.selectedDepts = [];
           state.selectedDept = 'all';
           renderUI();
         };
+      }
+
+      // Trigger Toggle
+      const triggerBtn = document.getElementById('btnToggleDeptDropdown');
+      const arrowIcon = document.getElementById('iconDeptDropdownArrow');
+      if (triggerBtn && !triggerBtn._hasListener) {
+        triggerBtn._hasListener = true;
+        triggerBtn.onclick = (e) => {
+          e.stopPropagation();
+          const isHidden = panel.classList.contains('hidden');
+          panel.classList.toggle('hidden');
+          if (arrowIcon) arrowIcon.classList.toggle('rotate-180', isHidden);
+          if (isHidden && searchInput) {
+            setTimeout(() => searchInput.focus(), 50);
+          }
+        };
+      }
+
+      // Done button inside panel
+      const btnDone = document.getElementById('btnDeptDropdownDone');
+      if (btnDone && !btnDone._hasListener) {
+        btnDone._hasListener = true;
+        btnDone.onclick = (e) => {
+          e.stopPropagation();
+          panel.classList.add('hidden');
+          if (arrowIcon) arrowIcon.classList.remove('rotate-180');
+        };
+      }
+
+      // Search input live filter
+      if (searchInput && !searchInput._hasListener) {
+        searchInput._hasListener = true;
+        searchInput.oninput = () => renderDeptFilters();
       }
 
       lucide.createIcons();
@@ -5135,14 +5345,15 @@
         cell.appendChild(eventsContainer);
 
         // Click empty space in cell:
-        // On mobile or public: view day's events if any, or if staff/admin prompt add event
+        // On mobile or public: view day's events if any, or jump to Day View for that day
         cell.onclick = () => {
           if (state.currentPortal === 'public') {
             if (dayEvents.length > 0) {
               // Open first event modal on mobile/public when clicking the cell
               openViewEventModal(dayEvents[0], cellDate, hijriInfo);
             } else {
-              showToast('เข้าสู่ระบบในฐานะผู้ลงกิจกรรมเพื่อบันทึกงานใหม่');
+              state.currentDate = new Date(cellDate);
+              switchCalendarView('day');
             }
             return;
           }
@@ -5398,6 +5609,9 @@
       const fullDateEl = document.getElementById('dayViewFullDate');
       const hijriDateEl = document.getElementById('dayViewHijriDate');
       const badgeLabel = document.getElementById('dayBadgeLabel');
+      const weekStripContainer = document.getElementById('dayWeekStripContainer');
+      const weekRangeLabel = document.getElementById('dayWeekRangeLabel');
+      const inputQuickDay = document.getElementById('inputQuickDayPicker');
       if (!container) return;
 
       container.innerHTML = '';
@@ -5408,53 +5622,122 @@
       const today = new Date();
       const isToday = formatDateYMD(today) === dateStr;
 
+      // 1. Update Header Banner Info
       if (badgeLabel) {
         badgeLabel.innerText = isToday ? 'กิจกรรมวันนี้' : 'กิจกรรมประจำวัน';
         badgeLabel.className = isToday 
-          ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200'
-          : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800';
+          ? 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs'
+          : 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200';
       }
 
       if (fullDateEl) {
-        fullDateEl.innerText = formatThaiDateFull(dayDate);
+        const thaiDayName = THAI_DAYS[dayDate.getDay()] || '';
+        fullDateEl.innerHTML = `<span>${thaiDayName}ที่ ${formatThaiDateFull(dayDate)}</span> <i data-lucide="calendar" class="w-4 h-4 text-purple-400 ml-1 inline"></i>`;
       }
 
       if (hijriDateEl) {
         hijriDateEl.innerHTML = `<i data-lucide="moon" class="w-3.5 h-3.5 text-violet-500"></i> ตรงกับวันที่ ${hijri.day} ${hijri.monthName} ฮ.ศ. ${hijri.year}`;
       }
 
-      // กรองกิจกรรมที่ตรงกับวันปัจจุบัน (นับรวมช่วง startDate ถึง endDate)
-      const filteredEvents = getFilteredEvents(true);
-      const dayEvents = filteredEvents.filter(evt => {
+      if (inputQuickDay) {
+        inputQuickDay.value = dateStr;
+      }
+
+      const allFilteredEvents = getFilteredEvents(true);
+
+      // 2. Render 7-Day Weekly Strip with Activity Indicators
+      if (weekStripContainer) {
+        weekStripContainer.innerHTML = '';
+        const startOfWeek = new Date(dayDate);
+        startOfWeek.setDate(dayDate.getDate() - dayDate.getDay()); // Sunday as start
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+        if (weekRangeLabel) {
+          weekRangeLabel.innerText = `${startOfWeek.getDate()} ${THAI_MONTHS_SHORT[startOfWeek.getMonth()]} - ${endOfWeek.getDate()} ${THAI_MONTHS_SHORT[endOfWeek.getMonth()]} ${endOfWeek.getFullYear() + 543}`;
+        }
+
+        const dayNamesShort = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
+        const dayNamesFull = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(startOfWeek);
+          d.setDate(startOfWeek.getDate() + i);
+          const dStr = formatDateYMD(d);
+          const isSelected = (dStr === dateStr);
+          const isCurrentToday = (dStr === formatDateYMD(today));
+          const hInfo = getHijriDate(d);
+
+          // Find events on this day
+          const evtsOnThisDay = allFilteredEvents.filter(evt => {
+            const s = evt.startDate;
+            const e = evt.endDate || evt.startDate;
+            return dStr >= s && dStr <= e;
+          });
+
+          const dayPill = document.createElement('button');
+          dayPill.type = 'button';
+          dayPill.className = `p-2 rounded-2xl flex flex-col items-center justify-between transition-all cursor-pointer border text-center select-none ${
+            isSelected
+              ? 'bg-gradient-to-b from-purple-800 to-indigo-900 text-white border-purple-400 shadow-md ring-2 ring-purple-300/60 scale-[1.02]'
+              : isCurrentToday
+                ? 'bg-purple-50/90 hover:bg-purple-100 text-purple-900 border-purple-300 font-bold shadow-2xs'
+                : 'bg-slate-50/60 hover:bg-white text-slate-700 border-slate-200/80 hover:border-purple-200 shadow-2xs'
+          }`;
+
+          dayPill.innerHTML = `
+            <span class="text-[11px] font-semibold ${isSelected ? 'text-purple-200' : (i === 0 ? 'text-rose-500' : (i === 5 ? 'text-violet-800 font-bold' : 'text-slate-500'))}">
+              ${dayNamesShort[i]}
+            </span>
+            <span class="text-sm sm:text-base font-black my-0.5 ${isSelected ? 'text-white' : 'text-slate-800'}">
+              ${d.getDate()}
+            </span>
+            <span class="text-[9px] font-medium truncate max-w-full ${isSelected ? 'text-purple-200' : 'text-slate-400'}">
+              ${hInfo.day} ${hInfo.monthName.slice(0, 3)}
+            </span>
+            <div class="h-2 flex items-center justify-center gap-0.5 mt-1">
+              ${evtsOnThisDay.length > 0 ? `
+                <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-amber-300' : 'bg-purple-600'} animate-pulse shadow-2xs"></span>
+                ${evtsOnThisDay.length > 1 ? `<span class="text-[8px] font-extrabold ${isSelected ? 'text-amber-200' : 'text-purple-700'}">${evtsOnThisDay.length}</span>` : ''}
+              ` : `
+                <span class="w-1.5 h-1.5 rounded-full opacity-0"></span>
+              `}
+            </div>
+          `;
+
+          dayPill.onclick = () => {
+            state.currentDate = new Date(d);
+            renderUI();
+          };
+
+          weekStripContainer.appendChild(dayPill);
+        }
+      }
+
+      // 3. Filter events occurring on this specific day
+      const dayEvents = allFilteredEvents.filter(evt => {
         const s = evt.startDate;
         const e = evt.endDate || evt.startDate;
         return dateStr >= s && dateStr <= e;
       });
 
-      if (dayEvents.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl border border-slate-200/90 p-8 sm:p-10 text-center space-y-3 shadow-2xs">
-            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-400 mx-auto flex items-center justify-center border border-purple-100">
-              <i data-lucide="calendar-check-2" class="w-7 h-7 text-purple-500"></i>
-            </div>
-            <div>
-              <p class="font-extrabold text-slate-800 text-base">ไม่มีกิจกรรมในวันนี้</p>
-              <p class="text-xs text-slate-400 mt-1">${formatThaiDateFull(dayDate)}</p>
-            </div>
-            ${(state.currentPortal === 'staff' || state.currentPortal === 'admin') ? `
-              <div class="pt-2">
-                <button type="button" class="btn-quick-add-day px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 mx-auto cursor-pointer active:scale-95">
-                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> ลงกิจกรรมสำหรับวันนี้
-                </button>
-              </div>
-            ` : ''}
-          </div>
+      // SECTION 1: รายการกิจกรรมในวันดังกล่าว
+      const dayEventsSection = document.createElement('div');
+      dayEventsSection.className = 'space-y-3';
+
+      if (dayEvents.length > 0) {
+        const secHeader = document.createElement('div');
+        secHeader.className = 'flex items-center justify-between px-1';
+        secHeader.innerHTML = `
+          <h4 class="font-extrabold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+            <span>รายการกิจกรรมในวันนี้ (${dayEvents.length} รายการ)</span>
+          </h4>
+          <span class="text-xs text-slate-500 font-medium">วันที่ ${formatThaiDateFull(dayDate)}</span>
         `;
-        const btnQuickAdd = container.querySelector('.btn-quick-add-day');
-        if (btnQuickAdd) {
-          btnQuickAdd.onclick = () => openAddEventModal(dateStr);
-        }
-      } else {
+        dayEventsSection.appendChild(secHeader);
+
         dayEvents.forEach(evt => {
           const isFtu = evt.departmentId === 'dept_ftu' || evt.id.startsWith('ftu_');
           const isHoliday = !isFtu && (evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_'));
@@ -5509,11 +5792,16 @@
 
               <div class="flex items-center gap-4 text-xs text-slate-500 flex-wrap pt-1">
                 ${evt.time ? `
-                  <span class="flex items-center gap-1">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <span class="flex items-center gap-1 font-semibold text-purple-900 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-purple-600"></i>
                     <span>${evt.time} น.</span>
                   </span>
-                ` : ''}
+                ` : `
+                  <span class="flex items-center gap-1 text-slate-500">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>ตลอดวัน</span>
+                  </span>
+                `}
                 ${evt.location ? `
                   <span class="flex items-center gap-1">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
@@ -5541,8 +5829,178 @@
             openViewEventModal(evt, dayDate, hijri);
           };
 
-          container.appendChild(card);
+          dayEventsSection.appendChild(card);
         });
+      } else {
+        // ไม่มีกิจกรรมในวันดังกล่าว
+        const emptyCard = document.createElement('div');
+        emptyCard.className = 'bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 text-center space-y-3 shadow-2xs';
+        emptyCard.innerHTML = `
+          <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 mx-auto flex items-center justify-center border border-purple-100">
+            <i data-lucide="calendar-check-2" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="font-extrabold text-slate-800 text-sm sm:text-base">ไม่มีกิจกรรมที่กำหนดไว้ในวันนี้</p>
+            <p class="text-xs text-slate-400 mt-1">${formatThaiDateFull(dayDate)}</p>
+          </div>
+          ${(state.currentPortal === 'staff' || state.currentPortal === 'admin') ? `
+            <div class="pt-1">
+              <button type="button" class="btn-quick-add-day px-4 py-2 rounded-xl bg-purple-900 hover:bg-purple-950 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5 mx-auto cursor-pointer active:scale-95">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> ลงกิจกรรมสำหรับวันนี้
+              </button>
+            </div>
+          ` : ''}
+        `;
+        const btnQuickAdd = emptyCard.querySelector('.btn-quick-add-day');
+        if (btnQuickAdd) {
+          btnQuickAdd.onclick = () => openAddEventModal(dateStr);
+        }
+        dayEventsSection.appendChild(emptyCard);
+      }
+      container.appendChild(dayEventsSection);
+
+      // SECTION 2: ตารางเวลากำหนดการรายชั่วโมง (Hourly Timeline 08:00 - 18:00 น.)
+      const timelineWrapper = document.createElement('div');
+      timelineWrapper.className = 'bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden';
+      timelineWrapper.innerHTML = `
+        <div class="bg-purple-50/60 p-3.5 border-b border-purple-100 flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4 text-purple-700"></i>
+            <h4 class="font-extrabold text-slate-800 text-xs sm:text-sm">ตารางเวลากิจกรรมประจำวัน (08:00 - 18:00 น.)</h4>
+          </div>
+          <span class="text-[11px] text-purple-700 font-semibold bg-white px-2.5 py-0.5 rounded-full border border-purple-200">
+            ${dayEvents.length > 0 ? `${dayEvents.length} กิจกรรม` : 'ไม่มีกิจกรรมในตาราง'}
+          </span>
+        </div>
+        <div id="dayHourlyGrid" class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto no-scrollbar">
+          <!-- Hourly rows injected dynamically -->
+        </div>
+      `;
+
+      const hourlyGrid = timelineWrapper.querySelector('#dayHourlyGrid');
+      const hours = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+
+      hours.forEach(hourStr => {
+        const hourNum = parseInt(hourStr.split(':')[0], 10);
+        // Find events that match this hour
+        const matchedEvts = dayEvents.filter(e => {
+          if (!e.time) return false;
+          const eHour = parseInt(e.time.split(':')[0], 10);
+          return eHour === hourNum;
+        });
+
+        const row = document.createElement('div');
+        row.className = 'flex items-start min-h-[46px] p-2 sm:px-4 transition hover:bg-purple-50/30 group';
+        row.innerHTML = `
+          <div class="w-16 sm:w-20 shrink-0 text-slate-400 font-bold text-xs pt-0.5 flex items-center gap-1 group-hover:text-purple-700">
+            <span>${hourStr}</span>
+          </div>
+          <div class="flex-1 space-y-1.5 pl-2 border-l border-slate-100">
+            ${matchedEvts.length > 0 ? matchedEvts.map(evt => {
+              const dept = state.departments.find(d => d.id === evt.departmentId) || { color: '#7c3aed', name: 'ทั่วไป' };
+              return `
+                <div class="timeline-evt-pill p-2 rounded-xl text-xs font-semibold cursor-pointer border transition shadow-2xs flex items-center justify-between gap-2"
+                  style="background-color: ${dept.color}15; border-color: ${dept.color}40; color: ${dept.color};"
+                  data-evt-id="${evt.id}">
+                  <div class="flex items-center gap-1.5 min-w-0">
+                    <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${dept.color};"></span>
+                    <span class="truncate font-bold">${evt.title}</span>
+                    ${evt.time ? `<span class="text-[10px] text-slate-500 font-normal">(${evt.time} น.)</span>` : ''}
+                  </div>
+                  <span class="text-[10px] underline shrink-0 font-medium">ดูงาน</span>
+                </div>
+              `;
+            }).join('') : `
+              <div class="text-[11px] text-slate-300 font-light pt-0.5">-</div>
+            `}
+          </div>
+        `;
+
+        row.querySelectorAll('.timeline-evt-pill').forEach(pill => {
+          pill.onclick = () => {
+            const eId = pill.getAttribute('data-evt-id');
+            const found = dayEvents.find(e => e.id === eId);
+            if (found) openViewEventModal(found, dayDate, hijri);
+          };
+        });
+
+        hourlyGrid.appendChild(row);
+      });
+
+      container.appendChild(timelineWrapper);
+
+      // SECTION 3: กิจกรรมที่กำลังจะมาถึงเร็วๆ นี้ (Upcoming Activities Nearby)
+      // ช่วยให้ผู้ใช้เห็นกิจกรรมถัดไปทันที และสามารถคลิกกระโดดไปยังวันที่มีกิจกรรมได้ในคลิกเดียว
+      const upcomingNearby = allFilteredEvents
+        .filter(e => (e.endDate || e.startDate) >= dateStr)
+        .sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''))
+        .slice(0, 5);
+
+      if (upcomingNearby.length > 0) {
+        const upcomingSection = document.createElement('div');
+        upcomingSection.className = 'bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 space-y-3';
+        upcomingSection.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+              <h4 class="font-extrabold text-slate-800 text-xs sm:text-sm">กิจกรรมที่กำลังจะมาถึงเร็วๆ นี้ (Upcoming)</h4>
+            </div>
+            <span class="text-[11px] text-slate-400">คลิก "ไปยังวันนี้" เพื่อเปิดดูปฏิทินของวันนั้น</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1" id="upcomingNearbyGrid">
+          </div>
+        `;
+
+        const upGrid = upcomingSection.querySelector('#upcomingNearbyGrid');
+
+        upcomingNearby.forEach(evt => {
+          const isFtu = evt.departmentId === 'dept_ftu' || evt.id.startsWith('ftu_');
+          const isHoliday = !isFtu && (evt.departmentId === 'dept_holiday' || evt.id.startsWith('h_') || evt.id.startsWith('th_'));
+          const dept = state.departments.find(d => d.id === evt.departmentId) || { color: isHoliday ? '#e11d48' : '#7c3aed', name: isHoliday ? 'วันสำคัญ' : 'ทั่วไป' };
+          const sDate = parseDateYMD(evt.startDate);
+          const isSelected = (evt.startDate === dateStr);
+
+          const upCard = document.createElement('div');
+          upCard.className = `p-3 rounded-xl border transition flex items-center justify-between gap-2.5 ${
+            isSelected
+              ? 'bg-purple-50/70 border-purple-300 ring-1 ring-purple-300'
+              : 'bg-slate-50/50 hover:bg-purple-50/30 border-slate-200/80 hover:border-purple-200'
+          }`;
+
+          upCard.innerHTML = `
+            <div class="min-w-0 space-y-1 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[10px] font-bold px-2 py-0.2 rounded-md ${isHoliday ? 'bg-rose-100 text-rose-800' : 'bg-purple-100 text-purple-900'}">
+                  ${formatDateThai(evt.startDate)}
+                </span>
+                <span class="text-[10px] font-medium text-slate-500 truncate">${dept.name}</span>
+              </div>
+              <p class="font-bold text-xs text-slate-800 truncate">${evt.title}</p>
+            </div>
+            <button type="button" class="btn-jump-to-evt-day px-2.5 py-1.5 rounded-lg bg-white hover:bg-purple-900 hover:text-white text-purple-900 border border-purple-200 text-[11px] font-bold transition shrink-0 cursor-pointer shadow-2xs active:scale-95">
+              ${isSelected ? 'วันปัจจุบัน' : 'ไปยังวันนี้ →'}
+            </button>
+          `;
+
+          const jumpBtn = upCard.querySelector('.btn-jump-to-evt-day');
+          if (jumpBtn) {
+            jumpBtn.onclick = (e) => {
+              e.stopPropagation();
+              state.currentDate = new Date(sDate);
+              renderUI();
+              window.scrollTo({ top: 320, behavior: 'smooth' });
+            };
+          }
+
+          upCard.onclick = () => {
+            state.currentDate = new Date(sDate);
+            renderUI();
+          };
+
+          upGrid.appendChild(upCard);
+        });
+
+        container.appendChild(upcomingSection);
       }
 
       lucide.createIcons();
@@ -7491,6 +7949,48 @@
     if (btnAutoProbeFtu) {
       btnAutoProbeFtu.onclick = () => autoProbeAndSyncFtuCalendars(false);
     }
+
+    // Quick Day Picker from Day View
+    const inputQuickDay = document.getElementById('inputQuickDayPicker');
+    const btnQuickPickDay = document.getElementById('btnQuickPickDay');
+    const dayViewFullDateEl = document.getElementById('dayViewFullDate');
+    if (inputQuickDay) {
+      inputQuickDay.onchange = (e) => {
+        if (e.target.value) {
+          state.currentDate = parseDateYMD(e.target.value);
+          renderUI();
+        }
+      };
+      if (btnQuickPickDay) {
+        btnQuickPickDay.onclick = () => {
+          if (inputQuickDay.showPicker) {
+            inputQuickDay.showPicker();
+          } else {
+            inputQuickDay.click();
+          }
+        };
+      }
+      if (dayViewFullDateEl) {
+        dayViewFullDateEl.onclick = () => {
+          if (inputQuickDay.showPicker) {
+            inputQuickDay.showPicker();
+          } else {
+            inputQuickDay.click();
+          }
+        };
+      }
+    }
+
+    // Click outside listener to close Department Dropdown Panel
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('deptDropdownPanel');
+      const btn = document.getElementById('btnToggleDeptDropdown');
+      if (panel && !panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.add('hidden');
+        const arrow = document.getElementById('iconDeptDropdownArrow');
+        if (arrow) arrow.classList.remove('rotate-180');
+      }
+    });
 
     // Quick Search & My Events Event Listeners
     const inputSearch = document.getElementById('inputSearchEvent');
