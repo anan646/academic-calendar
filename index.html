@@ -9906,10 +9906,225 @@
     }
 
     // ==========================================
-    // 14.5 PIN & PASSCODE EXPORT HUB (PDF, JPG, EXCEL)
+    // 14.5 PIN & PASSCODE EXPORT HUB (PDF, JPG, EXCEL, PRINT)
     // ==========================================
     let currentPinExportTab = 'dept'; // 'dept' or 'admin'
 
+    // Central Data Provider for PIN Exports
+    function getPinExportData(type) {
+      const isDept = (type === 'dept');
+      if (isDept) {
+        let savedPins = {};
+        try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { savedPins = {}; }
+
+        // Fallback to DEFAULT_DEPARTMENTS if state.departments is empty or not yet loaded
+        let rawList = (Array.isArray(state.departments) && state.departments.length > 0) ? state.departments : DEFAULT_DEPARTMENTS;
+        let list = rawList.filter(d => d.id !== 'dept_holiday' && d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
+        if (list.length === 0) {
+          list = DEFAULT_DEPARTMENTS.filter(d => d.id !== 'dept_holiday');
+        }
+
+        const defaultPins = { 'dept_acad': '1111', 'dept_student': '2222', 'dept_admin': '3333', 'dept_finance': '4444' };
+
+        return list.map((dept, idx) => {
+          let pin = (dept.pin && String(dept.pin).trim()) || savedPins[dept.id] || savedPins[dept.name] || defaultPins[dept.id] || '';
+          const hasPin = (pin !== '');
+          return {
+            index: idx + 1,
+            id: dept.id,
+            name: dept.name || `ฝ่ายที่ ${idx + 1}`,
+            color: dept.color || '#7c3aed',
+            pin: hasPin ? pin : 'ยังไม่ได้ตั้ง',
+            hasPin: hasPin,
+            status: hasPin ? 'พร้อมใช้งาน' : 'รอตั้งรหัส'
+          };
+        });
+      } else {
+        let rawList = (Array.isArray(state.admins) && state.admins.length > 0) ? state.admins : DEFAULT_ADMINS;
+        if (!rawList || rawList.length === 0) {
+          rawList = [
+            {
+              id: 'admin_primary',
+              name: 'แอดมินหลัก (ผู้ดูแลระบบหลัก)',
+              department: 'คณะศึกษาศาสตร์',
+              role: 'primary',
+              pin: state.adminPin || localStorage.getItem('school_cal_admin_pin') || '1234',
+              createdAt: '2568-01-01'
+            }
+          ];
+        }
+
+        return rawList.map((admin, idx) => {
+          const isPrimary = admin.role === 'primary';
+          const pin = isPrimary ? (state.adminPin || localStorage.getItem('school_cal_admin_pin') || admin.pin || '1234') : (admin.pin || '-');
+          let dateStr = '2568-01-01';
+          if (admin.createdAt) {
+            dateStr = admin.createdAt.includes('T') ? new Date(admin.createdAt).toLocaleDateString('th-TH') : admin.createdAt;
+          }
+          return {
+            index: idx + 1,
+            id: admin.id,
+            name: admin.name || (isPrimary ? 'แอดมินหลัก' : `แอดมินรอง ${idx}`),
+            role: isPrimary ? 'แอดมินหลัก' : 'แอดมินรอง',
+            department: admin.department || 'ผู้ดูแลระบบส่วนกลาง',
+            pin: String(pin),
+            hasPin: (pin !== '-' && pin !== ''),
+            date: dateStr
+          };
+        });
+      }
+    }
+
+    // Build Standalone Printable DOM Element with Full Data & Inline Styles
+    function createPinExportDomElement(type, data) {
+      const isDept = (type === 'dept');
+      const now = new Date();
+      const thaiDateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' น.';
+      const title = isDept
+        ? 'เอกสารรหัสผ่านประจำฝ่ายสำหรับผู้ลงระบบและบันทึกกิจกรรม'
+        : 'เอกสารรหัสผ่านบัญชีผู้ดูแลระบบและแอดมินรอง (Admin Accounts)';
+      const subtitle = isDept
+        ? 'สำหรับบุคลากรประจำฝ่ายงาน/สาขาวิชา คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี'
+        : 'สำหรับผู้ดูแลระบบและแอดมินรอง คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี';
+      const badgeText = isDept ? 'เอกสารลับเฉพาะฝ่ายงาน' : 'เอกสารลับขั้นสูงสุด (Strictly Confidential)';
+      const badgeBg = isDept ? '#f3e8ff' : '#ffe4e6';
+      const badgeColor = isDept ? '#6b21a8' : '#9f1239';
+      const badgeBorder = isDept ? '#d8b4fe' : '#fecdd3';
+      const headerBg = isDept ? '#581c87' : '#1e1b4b';
+
+      let rowsHtml = '';
+      if (isDept) {
+        data.forEach((item, idx) => {
+          const bg = idx % 2 === 1 ? '#f8fafc' : '#ffffff';
+          rowsHtml += `
+            <tr style="background-color: ${bg}; border-bottom: 1px solid #cbd5e1;">
+              <td style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #64748b; font-size: 12px;">${item.index}</td>
+              <td style="padding: 10px 14px; border: 1px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 13px;">${item.name}</td>
+              <td style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center;">
+                <span style="display: inline-flex; align-items: center; gap: 5px; font-family: monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px; background: ${item.color}15; border: 1px solid ${item.color}40; color: ${item.color}; font-weight: bold;">
+                  <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${item.color};"></span>
+                  ${item.color}
+                </span>
+              </td>
+              <td style="padding: 10px 12px; border: 1px solid #cbd5e1; text-align: center; background-color: #faf5ff;">
+                <span style="display: inline-block; font-family: monospace; font-size: 15px; font-weight: 900; background: #ede9fe; color: #581c87; padding: 4px 16px; border-radius: 8px; border: 1px solid #ddd6fe; letter-spacing: 2px;">
+                  ${item.pin}
+                </span>
+              </td>
+              <td style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; font-size: 11px; color: ${item.hasPin ? '#047857' : '#b45309'};">
+                ${item.hasPin ? '✓ พร้อมใช้งาน' : '! รอตั้งรหัส'}
+              </td>
+            </tr>
+          `;
+        });
+      } else {
+        data.forEach((item, idx) => {
+          const bg = idx % 2 === 1 ? '#f8fafc' : '#ffffff';
+          const isPri = item.role === 'แอดมินหลัก';
+          rowsHtml += `
+            <tr style="background-color: ${bg}; border-bottom: 1px solid #cbd5e1;">
+              <td style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #64748b; font-size: 12px;">${item.index}</td>
+              <td style="padding: 10px 14px; border: 1px solid #cbd5e1; font-weight: bold; color: #0f172a; font-size: 13px;">
+                ${isPri ? '👑 ' : '🛡️ '}${item.name}
+              </td>
+              <td style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center;">
+                <span style="display: inline-block; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 6px; background: ${isPri ? '#f3e8ff' : '#e0e7ff'}; color: ${isPri ? '#6b21a8' : '#3730a3'}; border: 1px solid ${isPri ? '#d8b4fe' : '#c7d2fe'};">
+                  ${item.role}
+                </span>
+              </td>
+              <td style="padding: 10px 12px; border: 1px solid #cbd5e1; color: #334155; font-size: 12px;">${item.department}</td>
+              <td style="padding: 10px 12px; border: 1px solid #cbd5e1; text-align: center; background-color: #eef2ff;">
+                <span style="display: inline-block; font-family: monospace; font-size: 15px; font-weight: 900; background: #e0e7ff; color: #312e81; padding: 4px 16px; border-radius: 8px; border: 1px solid #c7d2fe; letter-spacing: 2px;">
+                  ${item.pin}
+                </span>
+              </td>
+              <td style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center; color: #64748b; font-size: 11px;">${item.date}</td>
+            </tr>
+          `;
+        });
+      }
+
+      const container = document.createElement('div');
+      container.style.position = 'fixed';
+      container.style.left = '0';
+      container.style.top = '0';
+      container.style.zIndex = '-9999';
+      container.style.width = '780px';
+      container.style.padding = '30px';
+      container.style.background = '#ffffff';
+      container.style.boxSizing = 'border-box';
+      container.style.fontFamily = "'Prompt', 'Sarabun', 'Plus Jakarta Sans', sans-serif";
+      container.style.color = '#1e293b';
+
+      container.innerHTML = `
+        <div style="border: 2px solid ${headerBg}; border-radius: 16px; padding: 24px; background: #ffffff;">
+          <!-- Document Header -->
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 2px solid ${headerBg}; padding-bottom: 16px; margin-bottom: 16px; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #065f46, #047857); display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid #fde047; box-shadow: 0 2px 4px rgba(0,0,0,0.1); shrink-0;">🎓</div>
+              <div>
+                <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: ${headerBg};">คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี</div>
+                <h2 style="margin: 3px 0 0 0; font-size: 17px; font-weight: bold; color: #0f172a; line-height: 1.3;">${title}</h2>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">${subtitle}</div>
+              </div>
+            </div>
+            <div style="text-align: right; shrink-0;">
+              <span style="display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 10px; font-weight: 800; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder};">
+                ${badgeText}
+              </span>
+              <div style="font-size: 10px; color: #94a3b8; font-family: monospace; margin-top: 4px;">${thaiDateStr}</div>
+            </div>
+          </div>
+
+          <!-- Security Notice -->
+          <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; font-size: 11px; color: #581c87; line-height: 1.5;">
+            <strong>ข้อปฏิบัติในการรักษาความปลอดภัย:</strong> ${isDept ? 'รหัสผ่าน (PIN) ในเอกสารนี้มีไว้สำหรับบุคลากรผู้มีหน้าที่บันทึกกิจกรรมของแต่ละฝ่ายเท่านั้น ห้ามเปิดเผยแก่บุคคลภายนอก และหากต้องการเปลี่ยนรหัสผ่านสามารถแจ้งผู้ดูแลระบบได้ตลอดเวลา' : 'รหัสผ่าน (PIN) บัญชีผู้ดูแลระบบนี้มีสิทธิ์สูงสุดในการจัดการระบบปฏิทิน กิจกรรม และโครงสร้างฝ่าย ห้ามเปิดเผยหรือส่งต่อให้บุคคลที่ไม่ได้รับมอบหมายโดยเด็ดขาด'}
+          </div>
+
+          <!-- Table -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px;">
+            <thead>
+              <tr style="background-color: ${headerBg}; color: #ffffff;">
+                <th style="padding: 10px 8px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">ลำดับ</th>
+                ${isDept ? `
+                  <th style="padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left;">ชื่อฝ่าย / สาขาวิชา</th>
+                  <th style="padding: 10px 8px; border: 1px solid #cbd5e1; width: 110px; text-align: center;">สีประจำฝ่าย</th>
+                  <th style="padding: 10px 12px; border: 1px solid #cbd5e1; width: 140px; text-align: center; background: #3b0764;">รหัสผ่าน (PIN)</th>
+                  <th style="padding: 10px 8px; border: 1px solid #cbd5e1; width: 100px; text-align: center;">สถานะ</th>
+                ` : `
+                  <th style="padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left;">ชื่อผู้ดูแลระบบ</th>
+                  <th style="padding: 10px 8px; border: 1px solid #cbd5e1; width: 110px; text-align: center;">ระดับสิทธิ์</th>
+                  <th style="padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left;">สังกัดฝ่าย</th>
+                  <th style="padding: 10px 12px; border: 1px solid #cbd5e1; width: 140px; text-align: center; background: #1e1b4b;">รหัสผ่าน (PIN)</th>
+                  <th style="padding: 10px 8px; border: 1px solid #cbd5e1; width: 95px; text-align: center;">วันที่สร้าง</th>
+                `}
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <!-- Signatures Footer -->
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; display: flex; justify-content: space-between; font-size: 11px; color: #475569;">
+            <div style="width: 45%;">
+              <div style="font-weight: bold; color: #1e293b; margin-bottom: 28px;">${isDept ? 'ผู้รับมอบหมาย / ผู้ลงกิจกรรม:' : 'ผู้รับมอบหมายสิทธิ์แอดมิน:'}</div>
+              <div>ลงชื่อ ..............................................................</div>
+              <div style="margin-top: 4px; color: #94a3b8;">( .............................................................. )</div>
+            </div>
+            <div style="width: 45%; text-align: right;">
+              <div style="font-weight: bold; color: #1e293b; margin-bottom: 28px;">ผู้อนุมัติ / ผู้ดูแลระบบหลัก (Admin):</div>
+              <div>ลงชื่อ ..............................................................</div>
+              <div style="margin-top: 4px; color: #94a3b8;">( ผู้ดูแลระบบ คณะศึกษาศาสตร์ )</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      return container;
+    }
+
+    // Modal Live Preview Synchronization
     function switchPinExportTab(tabKey) {
       currentPinExportTab = tabKey || 'dept';
 
@@ -9925,7 +10140,6 @@
       const signLeftTitle = document.getElementById('pinExportSignLeftTitle');
       const dateEl = document.getElementById('pinExportDocDate');
 
-      // Update date
       const now = new Date();
       const thaiDateStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' น.';
       if (dateEl) dateEl.innerText = `วันที่พิมพ์: ${thaiDateStr}`;
@@ -9992,36 +10206,29 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      let savedPins = {};
-      try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { savedPins = {}; }
-
-      const list = (state.departments || []).filter(d => d.id !== 'dept_holiday' && d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
-
-      if (list.length === 0) {
+      const data = getPinExportData('dept');
+      if (!data || data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลฝ่ายงาน</td></tr>`;
         return;
       }
 
-      list.forEach((dept, index) => {
-        const pin = (dept.pin && String(dept.pin).trim()) || savedPins[dept.id] || savedPins[dept.name] || '';
-        const hasPin = pin !== '';
-
+      data.forEach((item, index) => {
         const tr = document.createElement('tr');
         tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/60';
         tr.innerHTML = `
-          <td class="p-2.5 text-center font-bold text-slate-500 border-r border-slate-200">${index + 1}</td>
-          <td class="p-2.5 font-bold text-slate-900 border-r border-slate-200">${dept.name}</td>
+          <td class="p-2.5 text-center font-bold text-slate-500 border-r border-slate-200">${item.index}</td>
+          <td class="p-2.5 font-bold text-slate-900 border-r border-slate-200">${item.name}</td>
           <td class="p-2.5 text-center border-r border-slate-200">
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono border" style="background-color: ${dept.color}15; border-color: ${dept.color}40; color: ${dept.color};">
-              <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${dept.color}"></span>
-              ${dept.color}
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono border" style="background-color: ${item.color}15; border-color: ${item.color}40; color: ${item.color};">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${item.color}"></span>
+              ${item.color}
             </span>
           </td>
           <td class="p-2.5 text-center font-mono font-black text-sm text-purple-950 border-r border-slate-200 bg-purple-50/40">
-            ${hasPin ? `<span class="px-2.5 py-1 rounded bg-purple-100 border border-purple-200 tracking-widest">${pin}</span>` : '<span class="text-slate-400 font-normal text-xs">(ยังไม่ตั้งรหัส)</span>'}
+            <span class="px-2.5 py-1 rounded bg-purple-100 border border-purple-200 tracking-widest">${item.pin}</span>
           </td>
           <td class="p-2.5 text-center font-semibold">
-            ${hasPin ? '<span class="text-emerald-700 text-[11px]">✓ พร้อมใช้งาน</span>' : '<span class="text-amber-600 text-[11px]">! รอตั้งรหัส</span>'}
+            ${item.hasPin ? '<span class="text-emerald-700 text-[11px]">✓ พร้อมใช้งาน</span>' : '<span class="text-amber-600 text-[11px]">! รอตั้งรหัส</span>'}
           </td>
         `;
         tbody.appendChild(tr);
@@ -10033,33 +10240,32 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const list = Array.isArray(state.admins) && state.admins.length > 0 ? state.admins : [
-        { name: 'ผู้ดูแลระบบหลัก (Admin)', role: 'primary', department: 'คณะศึกษาศาสตร์', pin: state.adminPin || '5555', createdAt: new Date().toISOString() }
-      ];
+      const data = getPinExportData('admin');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลผู้ดูแลระบบ</td></tr>`;
+        return;
+      }
 
-      list.forEach((admin, index) => {
-        const isPrimary = admin.role === 'primary';
-        const pin = admin.pin || '-';
-        const dateStr = admin.createdAt ? new Date(admin.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
-
+      data.forEach((item, index) => {
+        const isPrimary = item.role === 'แอดมินหลัก';
         const tr = document.createElement('tr');
         tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/60';
         tr.innerHTML = `
-          <td class="p-2.5 text-center font-bold text-slate-500 border-r border-slate-200">${index + 1}</td>
+          <td class="p-2.5 text-center font-bold text-slate-500 border-r border-slate-200">${item.index}</td>
           <td class="p-2.5 font-bold text-slate-900 border-r border-slate-200">
             <span class="mr-1">${isPrimary ? '👑' : '🛡️'}</span>
-            <span>${admin.name}</span>
+            <span>${item.name}</span>
           </td>
           <td class="p-2.5 text-center border-r border-slate-200">
-            ${isPrimary 
-              ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-900 border border-purple-200">แอดมินหลัก</span>'
-              : '<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-100 text-indigo-900 border border-indigo-200">แอดมินรอง</span>'}
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isPrimary ? 'bg-purple-100 text-purple-900 border border-purple-200' : 'bg-indigo-100 text-indigo-900 border border-indigo-200'}">
+              ${item.role}
+            </span>
           </td>
-          <td class="p-2.5 text-slate-700 border-r border-slate-200">${admin.department || 'ผู้ดูแลระบบส่วนกลาง'}</td>
+          <td class="p-2.5 text-slate-700 border-r border-slate-200">${item.department}</td>
           <td class="p-2.5 text-center font-mono font-black text-sm text-indigo-950 border-r border-slate-200 bg-indigo-50/40">
-            <span class="px-2.5 py-1 rounded bg-indigo-100 border border-indigo-200 tracking-widest">${pin}</span>
+            <span class="px-2.5 py-1 rounded bg-indigo-100 border border-indigo-200 tracking-widest">${item.pin}</span>
           </td>
-          <td class="p-2.5 text-center text-slate-500 text-[11px]">${dateStr}</td>
+          <td class="p-2.5 text-center text-slate-500 text-[11px]">${item.date}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -10071,14 +10277,16 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Export PDF
+    // 1. Export PDF
     function exportPinsToPdf(tabKey) {
       const activeTab = tabKey || currentPinExportTab;
-      switchPinExportTab(activeTab);
-      const docSheet = document.getElementById('pinExportDocSheet');
-      if (!docSheet) return;
+      const isDept = (activeTab === 'dept');
+      const data = getPinExportData(activeTab);
 
-      const titleSlug = activeTab === 'dept' ? 'รหัสผู้ลงระบบ_ฝ่ายงาน' : 'รหัสผู้ดูแลระบบ_แอดมินรอง';
+      const container = createPinExportDomElement(activeTab, data);
+      document.body.appendChild(container);
+
+      const titleSlug = isDept ? 'รหัสผู้ลงระบบ_ฝ่ายงาน' : 'รหัสผู้ดูแลระบบ_แอดมินรอง';
       const year = state.academicYear || '2569';
       const filename = `รหัสผ่าน_${titleSlug}_คณะศึกษาศาสตร์_${year}.pdf`;
 
@@ -10091,157 +10299,150 @@
       };
 
       if (window.html2pdf) {
-        html2pdf().set(opt).from(docSheet).save().then(() => {
-          showFloatingNotification('ดาวน์โหลดไฟล์ PDF เรียบร้อยแล้ว');
+        html2pdf().set(opt).from(container).save().then(() => {
+          document.body.removeChild(container);
+          showToast(`✓ ส่งออก ${isDept ? 'รหัสผู้ลงระบบ' : 'รหัสแอดมินรอง'} เป็น PDF สำเร็จ (${data.length} รายการ)`);
+        }).catch(err => {
+          if (container.parentNode) document.body.removeChild(container);
+          alert('เกิดข้อผิดพลาดในการสร้าง PDF: ' + (err.message || err));
         });
       } else {
-        alert('กรุณารอโหลดระบบ PDF สักครู่ หรือใช้ปุ่มพิมพ์เอกสารแทน');
+        if (container.parentNode) document.body.removeChild(container);
+        alert('ระบบ PDF ยังไม่พร้อมใช้งาน');
       }
     }
 
-    // Export JPG
+    // 2. Export JPG Image
     function exportPinsToJpg(tabKey) {
       const activeTab = tabKey || currentPinExportTab;
-      switchPinExportTab(activeTab);
-      const docSheet = document.getElementById('pinExportDocSheet');
-      if (!docSheet) return;
+      const isDept = (activeTab === 'dept');
+      const data = getPinExportData(activeTab);
 
-      const titleSlug = activeTab === 'dept' ? 'รหัสผู้ลงระบบ_ฝ่ายงาน' : 'รหัสผู้ดูแลระบบ_แอดมินรอง';
+      const container = createPinExportDomElement(activeTab, data);
+      document.body.appendChild(container);
+
+      const titleSlug = isDept ? 'รหัสผู้ลงระบบ_ฝ่ายงาน' : 'รหัสผู้ดูแลระบบ_แอดมินรอง';
       const year = state.academicYear || '2569';
       const filename = `รหัสผ่าน_${titleSlug}_คณะศึกษาศาสตร์_${year}.jpg`;
 
       const h2c = window.html2canvas;
       if (!h2c) {
-        alert('ระบบประมวลผลรูปภาพยังไม่พร้อม กรุณาลองใหม่อีกครั้ง');
+        if (container.parentNode) document.body.removeChild(container);
+        alert('ระบบสร้างรูปภาพยังไม่พร้อม กรุณาลองใหม่อีกครั้ง');
         return;
       }
 
-      h2c(docSheet, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+      h2c(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+        if (container.parentNode) document.body.removeChild(container);
         const imgData = canvas.toDataURL('image/jpeg', 0.96);
         const link = document.createElement('a');
         link.download = filename;
         link.href = imgData;
         link.click();
-        showFloatingNotification('ดาวน์โหลดไฟล์รูปภาพ JPG เรียบร้อยแล้ว');
+        showToast(`✓ ส่งออก ${isDept ? 'รหัสผู้ลงระบบ' : 'รหัสแอดมินรอง'} เป็นรูปภาพ JPG สำเร็จ (${data.length} รายการ)`);
       }).catch(err => {
+        if (container.parentNode) document.body.removeChild(container);
         alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ JPG: ' + (err.message || err));
       });
     }
 
-    // Export Excel (.xlsx)
+    // 3. Export Excel (.xlsx)
     function exportPinsToExcel(tabKey) {
       const activeTab = tabKey || currentPinExportTab;
+      const isDept = (activeTab === 'dept');
+      const data = getPinExportData(activeTab);
       const year = state.academicYear || '2569';
 
       if (typeof XLSX === 'undefined') {
-        alert('ระบบ Excel ไม่พร้อมใช้งาน');
+        alert('ระบบ Excel ไม่พร้อมใช้งาน กรุณารีเฟรชหน้าเว็บ');
         return;
       }
 
-      if (activeTab === 'admin') {
-        const list = Array.isArray(state.admins) && state.admins.length > 0 ? state.admins : [
-          { name: 'ผู้ดูแลระบบหลัก (Admin)', role: 'primary', department: 'คณะศึกษาศาสตร์', pin: state.adminPin || '5555', createdAt: new Date().toISOString() }
-        ];
+      let rows = [];
+      let sheetName = '';
+      let filename = '';
 
-        const data = list.map((a, idx) => ({
-          'ลำดับ': idx + 1,
-          'ชื่อผู้ดูแลระบบ': a.name,
-          'ระดับสิทธิ์': a.role === 'primary' ? 'แอดมินหลัก' : 'แอดมินรอง',
-          'สังกัดฝ่าย': a.department || 'ผู้ดูแลระบบส่วนกลาง',
-          'รหัสผ่าน (PIN)': a.pin || '-',
-          'วันที่สร้าง': a.createdAt ? new Date(a.createdAt).toLocaleDateString('th-TH') : '-'
+      if (isDept) {
+        sheetName = 'รหัสผู้ลงระบบ';
+        filename = `รหัสผ่าน_ผู้ลงระบบ_คณะศึกษาศาสตร์_${year}.xlsx`;
+        rows = data.map(item => ({
+          'ลำดับ': item.index,
+          'ชื่อฝ่าย / สาขาวิชา': item.name,
+          'สีประจำฝ่าย': item.color,
+          'รหัสผ่านประจำฝ่าย (PIN)': String(item.pin),
+          'สถานะ': item.status
         }));
-
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'รหัสแอดมินรอง');
-        XLSX.writeFile(wb, `รหัสผ่าน_แอดมินรอง_คณะศึกษาศาสตร์_${year}.xlsx`);
-        showFloatingNotification('ส่งออกไฟล์ Excel สำเร็จ');
       } else {
-        let savedPins = {};
-        try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { savedPins = {}; }
-
-        const list = (state.departments || []).filter(d => d.id !== 'dept_holiday' && d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
-
-        const data = list.map((dept, idx) => {
-          const pin = (dept.pin && String(dept.pin).trim()) || savedPins[dept.id] || savedPins[dept.name] || '';
-          return {
-            'ลำดับ': idx + 1,
-            'ชื่อฝ่าย / สาขาวิชา': dept.name,
-            'สีประจำฝ่าย': dept.color,
-            'รหัสผ่าน (PIN)': pin || 'ยังไม่ได้ตั้ง',
-            'สถานะ': pin ? 'พร้อมใช้งาน' : 'รอตั้งรหัส'
-          };
-        });
-
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'รหัสผู้ลงระบบ');
-        XLSX.writeFile(wb, `รหัสผ่าน_ผู้ลงระบบ_คณะศึกษาศาสตร์_${year}.xlsx`);
-        showFloatingNotification('ส่งออกไฟล์ Excel สำเร็จ');
+        sheetName = 'รหัสแอดมินรอง';
+        filename = `รหัสผ่าน_แอดมินรอง_คณะศึกษาศาสตร์_${year}.xlsx`;
+        rows = data.map(item => ({
+          'ลำดับ': item.index,
+          'ชื่อผู้ดูแลระบบ': item.name,
+          'ระดับสิทธิ์': item.role,
+          'สังกัดฝ่าย': item.department,
+          'รหัสผ่าน (PIN)': String(item.pin),
+          'วันที่สร้าง': item.date
+        }));
       }
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws['!cols'] = isDept
+        ? [{ wch: 8 }, { wch: 35 }, { wch: 14 }, { wch: 25 }, { wch: 18 }]
+        : [{ wch: 8 }, { wch: 30 }, { wch: 16 }, { wch: 28 }, { wch: 22 }, { wch: 16 }];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.writeFile(wb, filename);
+      showToast(`✓ ส่งออก ${isDept ? 'รหัสผู้ลงระบบ' : 'รหัสแอดมินรอง'} เป็น Excel สำเร็จ (${rows.length} รายการ)`);
     }
 
-    // Print Document
-    function printPinsDocument() {
-      const docSheet = document.getElementById('pinExportDocSheet');
-      if (!docSheet) return;
+    // 4. Print Document
+    function printPinsDocument(type) {
+      const activeTab = type || currentPinExportTab;
+      const isDept = (activeTab === 'dept');
+      const data = getPinExportData(activeTab);
+      const container = createPinExportDomElement(activeTab, data);
 
-      const printWin = window.open('', '_blank', 'width=900,height=700');
+      const printWin = window.open('', '_blank', 'width=900,height=750');
       if (!printWin) {
         window.print();
         return;
       }
 
-      const docTitleText = document.getElementById('pinExportDocTitle') ? document.getElementById('pinExportDocTitle').innerText : 'รหัสผ่านระบบ';
-      printWin.document.write('<!DOCTYPE html><html><head><title>' + docTitleText + '</title>');
-      printWin.document.write('<' + 'script src="https://cdn.tailwindcss.com"><' + '/script>');
-      printWin.document.write('<style>@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { size: A4 portrait; margin: 10mm; } }</style>');
-      printWin.document.write('</head><body class="p-6 bg-white text-slate-800 font-sans">');
-      printWin.document.write(docSheet.outerHTML);
+      printWin.document.write('<!DOCTYPE html><html><head>');
+      printWin.document.write('<title>' + (isDept ? 'เอกสารรหัสผ่านประจำฝ่ายสำหรับผู้ลงระบบ' : 'เอกสารรหัสผ่านผู้ดูแลระบบและแอดมินรอง') + '</title>');
+      printWin.document.write('<style>@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } @page { size: A4 portrait; margin: 8mm; } }</style>');
+      printWin.document.write('</head><body style="margin:0; padding:15px; font-family: sans-serif; background:#ffffff; color:#1e293b;">');
+      printWin.document.write(container.innerHTML);
       printWin.document.write('<' + 'script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 800); };<' + '/script>');
       printWin.document.write('</body></html>');
       printWin.document.close();
     }
 
-    // Copy formatted text
-    function copyPinsSummaryText() {
-      const activeTab = currentPinExportTab;
+    // 5. Copy formatted summary text
+    function copyPinsSummaryText(type) {
+      const activeTab = type || currentPinExportTab;
+      const data = getPinExportData(activeTab);
       let text = '';
       const nowStr = new Date().toLocaleDateString('th-TH');
 
       if (activeTab === 'admin') {
         text += `🔐 รายการรหัสผ่านผู้ดูแลระบบและแอดมินรอง (คณะศึกษาศาสตร์ ม.ฟาฏอนี)\nวันที่: ${nowStr}\n${'='.repeat(45)}\n`;
-        const list = Array.isArray(state.admins) && state.admins.length > 0 ? state.admins : [
-          { name: 'ผู้ดูแลระบบหลัก (Admin)', role: 'primary', department: 'คณะศึกษาศาสตร์', pin: state.adminPin || '5555' }
-        ];
-        list.forEach((a, i) => {
-          text += `${i + 1}. [${a.role === 'primary' ? 'แอดมินหลัก' : 'แอดมินรอง'}] ${a.name} (${a.department || '-'}) -> PIN: ${a.pin || '-'}\n`;
+        data.forEach(item => {
+          text += `${item.index}. [${item.role}] ${item.name} (${item.department}) -> PIN: ${item.pin}\n`;
         });
       } else {
         text += `📁 รายการรหัสผ่านประจำฝ่ายสำหรับผู้ลงกิจกรรม (คณะศึกษาศาสตร์ ม.ฟาฏอนี)\nวันที่: ${nowStr}\n${'='.repeat(45)}\n`;
-        let savedPins = {};
-        try { savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}'); } catch (e) { savedPins = {}; }
-        const list = (state.departments || []).filter(d => d.id !== 'dept_holiday' && d.id !== 'dept_ftu');
-        list.forEach((d, i) => {
-          const pin = (d.pin && String(d.pin).trim()) || savedPins[d.id] || savedPins[d.name] || 'ยังไม่ตั้ง';
-          text += `${i + 1}. ${d.name} -> PIN: ${pin}\n`;
+        data.forEach(item => {
+          text += `${item.index}. ${item.name} -> PIN: ${item.pin}\n`;
         });
       }
 
       navigator.clipboard.writeText(text).then(() => {
-        showFloatingNotification('คัดลอกข้อความสรุปรหัสผ่านเรียบร้อยแล้ว');
+        showToast('✓ คัดลอกข้อความสรุปรหัสผ่านเรียบร้อยแล้ว');
       }).catch(() => {
-        alert('คัดลอกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        alert('คัดลอกไม่สำเร็จ');
       });
-    }
-
-    function showFloatingNotification(msg) {
-      if (typeof showToast === 'function') {
-        showToast(msg);
-        return;
-      }
-      alert(msg);
     }
 
     // Hook listeners for PIN Export Hub
@@ -10322,10 +10523,10 @@
     if (btnTrigExpXls) btnTrigExpXls.onclick = () => exportPinsToExcel(currentPinExportTab);
 
     const btnTrigExpPrint = document.getElementById('btnTriggerExportPrint');
-    if (btnTrigExpPrint) btnTrigExpPrint.onclick = () => printPinsDocument();
+    if (btnTrigExpPrint) btnTrigExpPrint.onclick = () => printPinsDocument(currentPinExportTab);
 
     const btnTrigExpCopy = document.getElementById('btnTriggerExportCopy');
-    if (btnTrigExpCopy) btnTrigExpCopy.onclick = () => copyPinsSummaryText();
+    if (btnTrigExpCopy) btnTrigExpCopy.onclick = () => copyPinsSummaryText(currentPinExportTab);
 
     const btnCloseExpHub = document.getElementById('btnCloseModalExportPinsHub');
     if (btnCloseExpHub) btnCloseExpHub.onclick = () => closeModal('modalExportPinsHub');
