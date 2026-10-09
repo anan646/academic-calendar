@@ -141,6 +141,13 @@
           <span>กลับหน้าหลัก</span>
         </button>
 
+        <!-- User Manual Button (สำหรับผู้ใช้ทั่วไปและผู้ลงกิจกรรม) -->
+        <button id="btnNavOpenUserManual" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-xs sm:text-sm font-medium rounded-lg backdrop-blur-sm transition text-white cursor-pointer" title="เปิดดูคู่มือการใช้งานระบบ">
+          <i data-lucide="book-open" class="w-4 h-4 text-amber-300"></i>
+          <span class="hidden sm:inline">คู่มือการใช้งาน</span>
+          <span class="sm:hidden">คู่มือ</span>
+        </button>
+
         <!-- Staff / Admin Action: Add Event -->
         <button id="btnOpenAddEvent" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white text-purple-900 text-xs sm:text-sm font-semibold rounded-lg shadow-sm hover:bg-purple-50 transition active:scale-95">
           <i data-lucide="plus-circle" class="w-4 h-4 text-purple-700"></i>
@@ -208,11 +215,15 @@
                 เข้าชมปฏิทินรายเดือน/รายปี ค้นหากำหนดการ วันสำคัญของชาติ และวันสำคัญทางศาสนาอิสลามได้ทันที (อ่านอย่างเดียว)
               </p>
             </div>
-            <div class="pt-5">
-              <button id="btnLandingGoCalendar" class="w-full py-2.5 sm:py-3 px-4 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+            <div class="pt-5 space-y-2">
+              <button id="btnLandingGoCalendar" class="w-full py-2.5 sm:py-3 px-4 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
                 <i data-lucide="calendar" class="w-4 h-4"></i>
                 <span>เข้าชมปฏิทินกิจกรรม</span>
                 <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+              </button>
+              <button id="btnLandingManualPublic" type="button" class="w-full py-1.5 px-3 text-xs text-purple-700 hover:text-purple-900 bg-purple-50/70 hover:bg-purple-100/70 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer border border-purple-200/60">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-purple-600"></i>
+                <span>📘 คู่มือสำหรับผู้ใช้ทั่วไป / นักศึกษา</span>
               </button>
             </div>
           </div>
@@ -233,11 +244,15 @@
                 ลงทะเบียนชื่อและฝ่ายเพื่อรับสิทธิ์บันทึกกิจกรรมประจำปีการศึกษา พร้อมระบบตรวจสอบกิจกรรมชนกัน
               </p>
             </div>
-            <div class="pt-5">
-              <button id="btnLandingGoStaffAuth" class="w-full py-2.5 sm:py-3 px-4 bg-violet-700 hover:bg-violet-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2">
+            <div class="pt-5 space-y-2">
+              <button id="btnLandingGoStaffAuth" class="w-full py-2.5 sm:py-3 px-4 bg-violet-700 hover:bg-violet-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
                 <i data-lucide="user-check" class="w-4 h-4"></i>
                 <span id="landingAuthBtnText">ลงทะเบียน / บันทึกกิจกรรม</span>
                 <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
+              </button>
+              <button id="btnLandingManualStaff" type="button" class="w-full py-1.5 px-3 text-xs text-violet-700 hover:text-violet-900 bg-violet-50/70 hover:bg-violet-100/70 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer border border-violet-200/60">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-violet-600"></i>
+                <span>📗 คู่มือสำหรับผู้ลงกิจกรรม / บุคลากร</span>
               </button>
             </div>
           </div>
@@ -246,6 +261,10 @@
 
         <!-- SMALL ADMIN & PWA INSTALL ACTIONS AT THE BOTTOM -->
         <div class="pt-5 flex items-center justify-center gap-2.5 flex-wrap">
+          <button id="btnLandingOpenUserManual" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700 hover:text-purple-900 bg-white hover:bg-purple-50 border border-slate-300 hover:border-purple-300 transition shadow-2xs cursor-pointer">
+            <i data-lucide="book-open" class="w-3.5 h-3.5 text-purple-600"></i>
+            <span>คู่มือการใช้งานระบบ (ทั้ง 2 กลุ่มผู้ใช้)</span>
+          </button>
           <button id="btnPWAInstall" class="hidden inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-purple-700 hover:text-white bg-purple-50 hover:bg-purple-700 border border-purple-200 transition shadow-2xs cursor-pointer">
             <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
             <span>ติดตั้งแอปบนมือถือ / คอมพิวเตอร์</span>
@@ -1824,6 +1843,205 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: USER MANUAL (คู่มือการใช้งานระบบ) -->
+  <!-- ========================================== -->
+  <div id="modalUserManual" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-purple-100 overflow-hidden flex flex-col max-h-[90vh] animate-scaleUp">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-purple-800 via-purple-900 to-indigo-950 px-6 py-4 sm:py-5 text-white flex items-center justify-between shrink-0 shadow-xs">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-amber-300 shadow-inner shrink-0 border border-white/20">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base sm:text-lg tracking-tight flex items-center gap-2">
+              คู่มือการใช้งานระบบปฏิทิน
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-purple-950 font-black">ฉบับสรุป</span>
+            </h3>
+            <p class="text-xs text-purple-200/90 mt-0.5">คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี</p>
+          </div>
+        </div>
+        <button id="btnCloseModalUserManual" type="button" class="text-white/70 hover:text-white p-1.5 rounded-xl hover:bg-white/15 transition cursor-pointer" title="ปิดหน้าต่าง">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Tab Switcher Header (สำหรับผู้ใช้ทั่วไป vs สำหรับผู้ลงกิจกรรม) -->
+      <div class="bg-purple-50/80 px-4 sm:px-6 py-2.5 border-b border-purple-100/80 flex items-center gap-2 shrink-0">
+        <button id="btnTabManualPublic" type="button" 
+          class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-xs bg-white text-purple-900 border border-purple-200">
+          <i data-lucide="users" class="w-4 h-4 text-purple-600"></i>
+          <span>สำหรับผู้ใช้ทั่วไป / นักศึกษา</span>
+        </button>
+        <button id="btnTabManualStaff" type="button" 
+          class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer text-slate-600 hover:text-purple-900 hover:bg-white/60">
+          <i data-lucide="edit-3" class="w-4 h-4 text-violet-600"></i>
+          <span>สำหรับผู้ลงกิจกรรม / บุคลากร</span>
+        </button>
+      </div>
+
+      <!-- Scrollable Tab Content Container -->
+      <div class="overflow-y-auto p-4 sm:p-6 space-y-6 flex-1 text-slate-700 text-xs sm:text-sm leading-relaxed custom-scrollbar">
+        
+        <!-- TAB 1: สำหรับผู้ใช้ทั่วไป / นักศึกษา -->
+        <div id="tabContentManualPublic" class="space-y-4">
+          <!-- Step 1 -->
+          <div class="bg-slate-50/80 hover:bg-purple-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center justify-center shrink-0">1</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">เลือกดูปฏิทินในมุมมองต่างๆ ที่สะดวก</h4>
+            </div>
+            <p class="text-slate-600 pl-8 text-xs">
+              ท่านสามารถสลับมุมมองปฏิทินได้จากแถบเมนูด้านบนตามความต้องการ:
+            </p>
+            <div class="pl-8 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span class="font-bold text-purple-700 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5"></i> รายเดือน (Month)
+                </span>
+                ดูภาพรวมทั้งเดือน แยกสีตามฝ่าย พร้อมแถบสีวันหยุดราชการและวันสำคัญอิสลาม
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span class="font-bold text-purple-700 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i> รายสัปดาห์ (Week)
+                </span>
+                ดูตารางเวลาและกำหนดการกิจกรรมแบบแบ่งตามช่วงเวลาของแต่ละสัปดาห์
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span class="font-bold text-purple-700 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="sun" class="w-3.5 h-3.5"></i> กิจกรรมประจำวัน (Day)
+                </span>
+                แถบสลับวัน 7 วันในสัปดาห์ พร้อมตารางเวลารายชั่วโมง (08:00 - 18:00 น.)
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span class="font-bold text-purple-700 flex items-center gap-1.5 mb-1">
+                  <i data-lucide="list" class="w-3.5 h-3.5"></i> รายการ (List)
+                </span>
+                ดูรายชื่อกิจกรรมทั้งหมดเรียงตามลำดับวันและเวลาอย่างต่อเนื่อง
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="bg-slate-50/80 hover:bg-purple-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">ค้นหากิจกรรม & กรองดูหลายฝ่ายพร้อมกัน</h4>
+            </div>
+            <p class="text-slate-600 pl-8 text-xs">
+              พิมพ์คำค้นหาในช่องค้นหา หรือคลิกปุ่ม <strong>"เลือกหลายฝ่าย"</strong> เพื่อเลือกดูเฉพาะสาขาวิชาหรือฝ่ายที่สนใจได้พร้อมๆ กัน โดยจัดกลุ่มอย่างเป็นระเบียบ
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="bg-slate-50/80 hover:bg-purple-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center justify-center shrink-0">3</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">ปฏิทินวิชาการ ม.ฟาฏอนี (คู่ขนาน พ.ศ./ฮ.ศ.)</h4>
+            </div>
+            <p class="text-slate-600 pl-8 text-xs">
+              คลิกปุ่ม <strong>"ปฏิทิน ม.ฟาฏอนี"</strong> บนแถบเมนู หรือปุ่มลอยมุมขวาล่าง เพื่อเปิดดูตารางวิชาการ วันเปิด-ปิดภาคเรียน และวันสอบของมหาวิทยาลัยฟาฏอนี
+            </p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="bg-slate-50/80 hover:bg-purple-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center justify-center shrink-0">4</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">การส่งออกไฟล์ & การติดตั้งแอปบนอุปกรณ์ (PWA)</h4>
+            </div>
+            <p class="text-slate-600 pl-8 text-xs">
+              สามารถดาวน์โหลดปฏิทินเป็นไฟล์ <strong>PDF, Excel, Word</strong> หรือกดเพิ่มกิจกรรมลงใน Google Calendar และคลิก <strong>"ติดตั้งแอปบนมือถือ/คอมพิวเตอร์"</strong> เพื่อเปิดใช้งานได้สะดวกตลอดเวลา
+            </p>
+          </div>
+        </div>
+
+        <!-- TAB 2: สำหรับผู้ลงกิจกรรม / บุคลากร -->
+        <div id="tabContentManualStaff" class="space-y-4 hidden">
+          <!-- Step 1: Login -->
+          <div class="bg-slate-50/80 hover:bg-violet-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2.5">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-violet-700 text-white text-xs font-bold flex items-center justify-center shrink-0">1</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">การเข้าสู่ระบบเพื่อลงกิจกรรม</h4>
+            </div>
+            <div class="pl-8 space-y-2 text-xs">
+              <p class="text-slate-600">
+                1. คลิกปุ่ม <strong>"เข้าสู่ระบบ / สมัคร"</strong> หรือ <strong>"ลงกิจกรรมใหม่"</strong><br>
+                2. เลือก <strong>ฝ่ายหรือสาขาวิชา</strong> ที่ท่านสังกัด<br>
+                3. กรอกชื่อ-สกุล และเบอร์โทร/ช่องทางติดต่อของผู้ลงกิจกรรม
+              </p>
+              
+              <!-- PIN Notice Box (No actual pin written! Specifically states 'รหัสตามที่แอดมินระบุ') -->
+              <div class="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-900 font-medium space-y-1">
+                <div class="flex items-center gap-2 font-bold text-amber-950">
+                  <i data-lucide="key" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                  <span>การระบุรหัสผ่านประจำฝ่าย (PIN):</span>
+                </div>
+                <p class="text-xs text-amber-900 leading-relaxed pl-6">
+                  กรุณากรอก <span class="bg-amber-200 text-amber-950 font-black px-1.5 py-0.5 rounded border border-amber-300">รหัสตามที่แอดมินระบุ</span> ให้ถูกต้อง
+                </p>
+                <p class="text-[11px] text-amber-800 pl-6">
+                  * หมายเหตุ: ในคู่มือนี้ไม่มีการระบุรหัสผ่านเพื่อความปลอดภัยของระบบ หากท่านยังไม่ทราบรหัสผ่าน หรือจำรหัสไม่ได้ กรุณาติดต่อผู้ดูแลระบบประจำฝ่าย (Admin) หรือหัวหน้าฝ่ายเพื่อขอรับรหัส
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Add Event -->
+          <div class="bg-slate-50/80 hover:bg-violet-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-violet-700 text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">การบันทึกกิจกรรมใหม่ & ระบบตรวจกิจกรรมชนกัน</h4>
+            </div>
+            <div class="pl-8 space-y-1.5 text-xs text-slate-600">
+              <p>• คลิกปุ่ม <strong>"ลงกิจกรรมใหม่"</strong></p>
+              <p>• กรอกชื่อกิจกรรม, วันที่เริ่มต้น - สิ้นสุด, เวลาจัดงาน, สถานที่ และรายละเอียดกิจกรรม</p>
+              <p>• <strong>ระบบตรวจสอบกิจกรรมชนกันอัตโนมัติ:</strong> หากช่วงวันและเวลาดังกล่าวมีกิจกรรมของฝ่ายอื่นจัดอยู่แล้ว ระบบจะแสดงการแจ้งเตือนทันที เพื่อให้ท่านสามารถประสานงานล่วงหน้าและหลีกเลี่ยงความซ้ำซ้อน</p>
+            </div>
+          </div>
+
+          <!-- Step 3: Manage Events -->
+          <div class="bg-slate-50/80 hover:bg-violet-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-violet-700 text-white text-xs font-bold flex items-center justify-center shrink-0">3</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">การแก้ไข/ลบกิจกรรม & ตัวกรอง "กิจกรรมของฉัน"</h4>
+            </div>
+            <div class="pl-8 space-y-1.5 text-xs text-slate-600">
+              <p>• ท่านสามารถคลิกที่แถบกิจกรรมเพื่อดูรายละเอียด และเลือก <strong>"แก้ไขกิจกรรม"</strong> หรือลบกิจกรรมที่ฝ่ายของท่านสร้างได้</p>
+              <p>• คลิกปุ่ม <strong>"เฉพาะกิจกรรมของฉัน"</strong> เพื่อกรองดูรายการเฉพาะที่ท่านเป็นผู้บันทึก ช่วยให้ตรวจสอบได้รวดเร็วยิ่งขึ้น</p>
+            </div>
+          </div>
+
+          <!-- Step 4: Security & Logout -->
+          <div class="bg-slate-50/80 hover:bg-violet-50/40 p-4 rounded-2xl border border-slate-200/80 transition space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-violet-700 text-white text-xs font-bold flex items-center justify-center shrink-0">4</span>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">การออกจากระบบ และความปลอดภัย</h4>
+            </div>
+            <div class="pl-8 space-y-1.5 text-xs text-slate-600">
+              <p>• เมื่อใช้งานเสร็จสิ้น สามารถคลิกที่ชื่อโปรไฟล์เพื่อออกจากระบบ หรือสลับผู้ใช้งานได้ตลอดเวลา</p>
+              <p>• หากต้องการเปลี่ยนรหัสผ่านประจำฝ่าย กรุณาติดต่อผู้ดูแลระบบหลัก (Admin) เพื่อปรับปรุงข้อมูลในระบบ</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex items-center justify-between shrink-0">
+        <span class="text-[11px] text-slate-500 flex items-center gap-1.5">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-purple-600"></i>
+          หากพบปัญหาการใช้งาน กรุณาติดต่อแอดมินผู้ดูแลระบบ
+        </span>
+        <button id="btnFooterCloseUserManual" type="button" 
+          class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl text-xs transition shadow-2xs cursor-pointer">
+          เข้าใจแล้ว / ปิดหน้าต่าง
+        </button>
+      </div>
     </div>
   </div>
 
@@ -9371,6 +9589,89 @@
     const btnLandingViewAll = document.getElementById('btnLandingViewAllList');
     if (btnLandingViewAll) {
       btnLandingViewAll.onclick = () => showCalendarPage('list', 'public');
+    }
+
+    // ==========================================
+    // USER MANUAL MODAL CONTROLS & LISTENERS
+    // ==========================================
+    function switchManualTab(tabKey) {
+      const btnPublic = document.getElementById('btnTabManualPublic');
+      const btnStaff = document.getElementById('btnTabManualStaff');
+      const contentPublic = document.getElementById('tabContentManualPublic');
+      const contentStaff = document.getElementById('tabContentManualStaff');
+
+      if (tabKey === 'staff') {
+        if (contentPublic) contentPublic.classList.add('hidden');
+        if (contentStaff) contentStaff.classList.remove('hidden');
+
+        if (btnStaff) {
+          btnStaff.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-xs bg-white text-purple-900 border border-purple-200';
+        }
+        if (btnPublic) {
+          btnPublic.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer text-slate-600 hover:text-purple-900 hover:bg-white/60';
+        }
+      } else {
+        if (contentStaff) contentStaff.classList.add('hidden');
+        if (contentPublic) contentPublic.classList.remove('hidden');
+
+        if (btnPublic) {
+          btnPublic.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-xs bg-white text-purple-900 border border-purple-200';
+        }
+        if (btnStaff) {
+          btnStaff.className = 'flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer text-slate-600 hover:text-purple-900 hover:bg-white/60';
+        }
+      }
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    function openUserManualModal(defaultTab = 'public') {
+      switchManualTab(defaultTab);
+      openModal('modalUserManual');
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    const btnNavManual = document.getElementById('btnNavOpenUserManual');
+    if (btnNavManual) {
+      btnNavManual.onclick = () => openUserManualModal(state.currentPortal === 'staff' ? 'staff' : 'public');
+    }
+
+    const btnLandingManual = document.getElementById('btnLandingOpenUserManual');
+    if (btnLandingManual) {
+      btnLandingManual.onclick = () => openUserManualModal('public');
+    }
+
+    const btnLandingManPub = document.getElementById('btnLandingManualPublic');
+    if (btnLandingManPub) {
+      btnLandingManPub.onclick = () => openUserManualModal('public');
+    }
+
+    const btnLandingManStaff = document.getElementById('btnLandingManualStaff');
+    if (btnLandingManStaff) {
+      btnLandingManStaff.onclick = () => openUserManualModal('staff');
+    }
+
+    const btnTabPub = document.getElementById('btnTabManualPublic');
+    if (btnTabPub) {
+      btnTabPub.onclick = () => switchManualTab('public');
+    }
+
+    const btnTabStf = document.getElementById('btnTabManualStaff');
+    if (btnTabStf) {
+      btnTabStf.onclick = () => switchManualTab('staff');
+    }
+
+    const btnCloseManual = document.getElementById('btnCloseModalUserManual');
+    if (btnCloseManual) {
+      btnCloseManual.onclick = () => closeModal('modalUserManual');
+    }
+
+    const btnFooterCloseManual = document.getElementById('btnFooterCloseUserManual');
+    if (btnFooterCloseManual) {
+      btnFooterCloseManual.onclick = () => closeModal('modalUserManual');
     }
 
     // ==========================================
