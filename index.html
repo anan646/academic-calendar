@@ -222,10 +222,16 @@
                 <span>เข้าชมปฏิทินกิจกรรม</span>
                 <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
               </button>
-              <button id="btnLandingManualPublic" type="button" class="w-full py-1.5 px-3 text-xs text-purple-700 hover:text-purple-900 bg-purple-50/70 hover:bg-purple-100/70 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer border border-purple-200/60">
-                <i data-lucide="book-open" class="w-3.5 h-3.5 text-purple-600"></i>
-                <span>📘 คู่มือสำหรับผู้ใช้ทั่วไป / นักศึกษา</span>
-              </button>
+              <div class="flex items-center gap-2">
+                <button id="btnLandingManualPublic" type="button" class="flex-1 py-1.5 px-3 text-xs text-purple-700 hover:text-purple-900 bg-purple-50/70 hover:bg-purple-100/70 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer border border-purple-200/60">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5 text-purple-600"></i>
+                  <span>📘 คู่มือผู้ใช้ทั่วไป / นักศึกษา</span>
+                </button>
+                <button id="btnLandingExportManualPubPdf" type="button" class="py-1.5 px-2.5 text-xs text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 rounded-xl font-bold flex items-center justify-center gap-1 transition cursor-pointer border border-rose-200 shadow-2xs shrink-0" title="ดาวน์โหลดคู่มือผู้ใช้ทั่วไปเป็นไฟล์ PDF">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>PDF</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -251,10 +257,16 @@
                 <span id="landingAuthBtnText">ลงทะเบียน / บันทึกกิจกรรม</span>
                 <i data-lucide="arrow-right" class="w-4 h-4 ml-auto"></i>
               </button>
-              <button id="btnLandingManualStaff" type="button" class="w-full py-1.5 px-3 text-xs text-violet-700 hover:text-violet-900 bg-violet-50/70 hover:bg-violet-100/70 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer border border-violet-200/60">
-                <i data-lucide="book-open" class="w-3.5 h-3.5 text-violet-600"></i>
-                <span>📗 คู่มือสำหรับผู้ลงกิจกรรม / บุคลากร</span>
-              </button>
+              <div class="flex items-center gap-2">
+                <button id="btnLandingManualStaff" type="button" class="flex-1 py-1.5 px-3 text-xs text-violet-700 hover:text-violet-900 bg-violet-50/70 hover:bg-violet-100/70 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer border border-violet-200/60">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5 text-violet-600"></i>
+                  <span>📗 คู่มือผู้ลงกิจกรรม / บุคลากร</span>
+                </button>
+                <button id="btnLandingExportManualStaffPdf" type="button" class="py-1.5 px-2.5 text-xs text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 rounded-xl font-bold flex items-center justify-center gap-1 transition cursor-pointer border border-rose-200 shadow-2xs shrink-0" title="ดาวน์โหลดคู่มือผู้ลงกิจกรรมเป็นไฟล์ PDF">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>PDF</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1940,6 +1952,61 @@
           <i data-lucide="edit-3" class="w-4 h-4 text-violet-600"></i>
           <span>สำหรับผู้ลงกิจกรรม / บุคลากร</span>
         </button>
+      </div>
+
+      <!-- Export Actions Toolbar for Manual -->
+      <div class="bg-gradient-to-r from-purple-50/90 via-white to-purple-50/90 px-4 sm:px-6 py-2.5 border-b border-purple-100 flex items-center justify-between gap-2 flex-wrap shrink-0">
+        <div class="flex items-center gap-2 text-slate-700">
+          <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          </span>
+          <span class="font-bold text-xs text-slate-800" id="manualExportTargetLabel">ส่งออกคู่มือ: สำหรับผู้ใช้ทั่วไป</span>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
+          <button id="btnExportManualPdf" type="button" 
+            class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95" title="ดาวน์โหลดคู่มือฉบับนี้เป็นไฟล์ PDF">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>ดาวน์โหลด PDF</span>
+          </button>
+          
+          <button id="btnExportManualJpg" type="button" 
+            class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95" title="ดาวน์โหลดคู่มือฉบับนี้เป็นรูปภาพ JPG">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+            <span>รูปภาพ JPG</span>
+          </button>
+
+          <button id="btnPrintManual" type="button" 
+            class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs transition shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95" title="สั่งพิมพ์คู่มือหรือบันทึกผ่านเบราว์เซอร์">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span>พิมพ์</span>
+          </button>
+
+          <!-- Dropdown Options for All -->
+          <div class="relative" id="containerExportManualMore">
+            <button id="btnOpenExportManualMore" type="button" 
+              class="px-2.5 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold text-xs transition shadow-2xs flex items-center gap-1 cursor-pointer" title="ตัวเลือกส่งออกเพิ่มเติม">
+              <span>ฉบับเต็ม</span>
+              <i data-lucide="chevron-down" class="w-3 h-3"></i>
+            </button>
+            <div id="menuExportManualMore" class="hidden absolute right-0 mt-1.5 w-60 bg-white rounded-2xl shadow-xl border border-purple-100 py-1.5 z-40 text-xs">
+              <button type="button" class="w-full px-3.5 py-2.5 text-left hover:bg-purple-50 text-slate-700 hover:text-purple-900 flex items-center gap-2 cursor-pointer font-medium" id="btnExportManualAllPdf">
+                <i data-lucide="files" class="w-4 h-4 text-rose-500"></i>
+                <div>
+                  <div class="font-bold">คู่มือฉบับเต็มรวม 2 ส่วน (PDF)</div>
+                  <div class="text-[10px] text-slate-400">สำหรับแจกจ่ายภาพรวมทั้งระบบ</div>
+                </div>
+              </button>
+              <button type="button" class="w-full px-3.5 py-2.5 text-left hover:bg-purple-50 text-slate-700 hover:text-purple-900 flex items-center gap-2 cursor-pointer font-medium border-t border-slate-100" id="btnExportManualAllJpg">
+                <i data-lucide="image" class="w-4 h-4 text-emerald-600"></i>
+                <div>
+                  <div class="font-bold">คู่มือฉบับเต็มรวม 2 ส่วน (JPG)</div>
+                  <div class="text-[10px] text-slate-400">ไฟล์รูปภาพคุณภาพสูง</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Scrollable Tab Content Container -->
@@ -10018,11 +10085,21 @@
     // ==========================================
     // USER MANUAL MODAL CONTROLS & LISTENERS
     // ==========================================
+    let currentManualTab = 'public'; // 'public' or 'staff'
+
     function switchManualTab(tabKey) {
+      currentManualTab = tabKey || 'public';
       const btnPublic = document.getElementById('btnTabManualPublic');
       const btnStaff = document.getElementById('btnTabManualStaff');
       const contentPublic = document.getElementById('tabContentManualPublic');
       const contentStaff = document.getElementById('tabContentManualStaff');
+      const label = document.getElementById('manualExportTargetLabel');
+
+      if (label) {
+        label.innerText = (currentManualTab === 'staff') 
+          ? 'ส่งออกคู่มือ: สำหรับผู้ลงกิจกรรม / บุคลากร' 
+          : 'ส่งออกคู่มือ: สำหรับผู้ใช้ทั่วไป / นักศึกษา';
+      }
 
       if (tabKey === 'staff') {
         if (contentPublic) contentPublic.classList.add('hidden');
@@ -10091,6 +10168,414 @@
     const btnFooterCloseManual = document.getElementById('btnFooterCloseUserManual');
     if (btnFooterCloseManual) {
       btnFooterCloseManual.onclick = () => closeModal('modalUserManual');
+    }
+
+    // ==========================================
+    // 14.4 USER MANUAL EXPORT ENGINE (PDF, JPG, PRINT)
+    // ==========================================
+    function createManualExportDomElement(manualType) {
+      const type = manualType || currentManualTab || 'public';
+      const isPublic = (type === 'public');
+      const isStaff = (type === 'staff');
+      const isAll = (type === 'all');
+      const year = state.academicYear || '2569';
+
+      const now = new Date();
+      const thaiDateFull = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' น.';
+
+      let typeTitle = 'คู่มือการใช้งานระบบปฏิทินกิจกรรมและการปฏิบัติงาน';
+      let typeBadge = 'ฉบับทางการ';
+      let typeSub = 'คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี';
+
+      if (isPublic) {
+        typeTitle = 'คู่มือการใช้งานระบบปฏิทิน: สำหรับผู้ใช้ทั่วไปและนักศึกษา';
+        typeBadge = '📘 ฉบับผู้ใช้ทั่วไป';
+        typeSub = 'คู่มือแนะนำการสืบค้นกิจกรรม ปฏิทินวิชาการ และการใช้งานมุมมองต่างๆ';
+      } else if (isStaff) {
+        typeTitle = 'คู่มือการใช้งานระบบปฏิทิน: สำหรับผู้ลงกิจกรรมและบุคลากร';
+        typeBadge = '📗 ฉบับผู้ลงกิจกรรม';
+        typeSub = 'คู่มือขั้นตอนการบันทึกกิจกรรมประจำฝ่าย และระบบตรวจสอบกิจกรรมชนกัน';
+      } else if (isAll) {
+        typeTitle = 'คู่มือการใช้งานระบบปฏิทิน: ฉบับสมบูรณ์ (ผู้ใช้ทั่วไป & ผู้ลงกิจกรรม)';
+        typeBadge = '📚 ฉบับสมบูรณ์';
+        typeSub = 'เอกสารคู่มือครอบคลุมทั้งการสืบค้นปฏิทินและขั้นตอนการบันทึกกิจกรรม';
+      }
+
+      const container = document.createElement('div');
+      container.style.cssText = 'position: absolute; left: -9999px; top: -9999px; width: 800px; background: #ffffff; color: #1e293b; font-family: "Prompt", "Sarabun", "Segoe UI", Tahoma, sans-serif; padding: 28px 32px; box-sizing: border-box; line-height: 1.5; font-size: 13px;';
+
+      const publicSectionHtml = `
+        <div style="margin-bottom: 22px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e9d5ff;">
+            <div style="background: #7c3aed; color: #ffffff; width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px;">1</div>
+            <h2 style="margin: 0; font-size: 15px; font-weight: 800; color: #581c87;">ส่วนที่ 1: สำหรับผู้ใช้ทั่วไป / นักศึกษา</h2>
+          </div>
+
+          <!-- Step 1 -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #6d28d9; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">1</span>
+              <span>เลือกดูปฏิทินในมุมมองต่างๆ ที่สะดวก (4 มุมมอง)</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              ท่านสามารถสลับมุมมองปฏิทินได้จากแถบเมนูด้านบนตามความต้องการ:
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; padding-left: 24px; font-size: 11px;">
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 9px;">
+                <strong style="color: #6d28d9;">• รายเดือน (Month):</strong> ดูภาพรวมทั้งเดือน แยกสีตามฝ่าย พร้อมแถบสีวันหยุดราชการและวันสำคัญอิสลาม
+              </div>
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 9px;">
+                <strong style="color: #6d28d9;">• รายสัปดาห์ (Week):</strong> ดูตารางเวลาและกำหนดการกิจกรรมแบ่งตามช่วงเวลาของแต่ละสัปดาห์
+              </div>
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 9px;">
+                <strong style="color: #6d28d9;">• กิจกรรมประจำวัน (Day):</strong> สลับวัน 7 วันในสัปดาห์ พร้อมตารางเวลารายชั่วโมง (08:00 - 18:00 น.)
+              </div>
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 9px;">
+                <strong style="color: #6d28d9;">• รายการ (List):</strong> ดูรายชื่อกิจกรรมทั้งหมดเรียงตามลำดับวันและเวลาอย่างต่อเนื่อง
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #6d28d9; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">2</span>
+              <span>ค้นหากิจกรรม & กรองดูหลายฝ่ายพร้อมกัน (จัดกลุ่มประหยัดพื้นที่)</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              พิมพ์คำค้นหาในช่องค้นหา หรือคลิกปุ่ม <strong>"เลือกหลายฝ่าย"</strong> เพื่อเลือกดูเฉพาะสาขาวิชาหรือฝ่ายที่สนใจได้พร้อมกัน โดยระบบจัดกลุ่มตัวกรองอย่างเป็นระเบียบ ไม่รกหน้าจอ
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #6d28d9; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">3</span>
+              <span>ปฏิทินวิชาการ ม.ฟาฏอนี (คู่ขนาน พ.ศ./ฮ.ศ.)</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              คลิกปุ่ม <strong>"ปฏิทิน ม.ฟาฏอนี"</strong> บนแถบเมนูเพื่อเปิดดูตารางวิชาการ วันเปิด-ปิดภาคเรียน กำหนดการลงทะเบียน และวันสอบของมหาวิทยาลัยฟาฏอนีครบทั้ง 129 รายการ
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #6d28d9; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">4</span>
+              <span>การส่งออกไฟล์ & การติดตั้งแอปบนอุปกรณ์ (PWA)</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              สามารถดาวน์โหลดปฏิทินกิจกรรมเป็นไฟล์ <strong>PDF, Excel (.xlsx), Word (.doc)</strong> หรือกดเพิ่มกิจกรรมลงใน Google Calendar และคลิก <strong>"ติดตั้งแอป"</strong> เพื่อเปิดใช้งานแบบเต็มหน้าจอได้ทุกอุปกรณ์
+            </div>
+          </div>
+        </div>
+      `;
+
+      const staffSectionHtml = `
+        <div style="margin-bottom: 22px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #ddd6fe;">
+            <div style="background: #6d28d9; color: #ffffff; width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px;">2</div>
+            <h2 style="margin: 0; font-size: 15px; font-weight: 800; color: #4c1d95;">ส่วนที่ 2: สำหรับผู้ลงกิจกรรม / บุคลากรประจำฝ่าย</h2>
+          </div>
+
+          <!-- Step 1: Login & Safe PIN Notice -->
+          <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #7c3aed; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">1</span>
+              <span>การเข้าสู่ระบบเพื่อลงกิจกรรม & การระบุรหัสผ่านประจำฝ่าย (PIN)</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              1. คลิกปุ่ม <strong>"ลงทะเบียน / บันทึกกิจกรรม"</strong> หรือ <strong>"ลงกิจกรรมใหม่"</strong><br>
+              2. เลือก <strong>ฝ่ายงานหรือสาขาวิชา</strong> ที่ท่านสังกัด<br>
+              3. ระบุชื่อ-สกุล และเบอร์โทร/ช่องทางติดต่อของผู้ลงกิจกรรม
+            </div>
+            
+            <!-- Safe PIN Notice (No passwords revealed!) -->
+            <div style="margin-top: 8px; margin-left: 24px; background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 10px; padding: 9px 12px; color: #78350f;">
+              <div style="font-weight: 800; font-size: 11.5px; color: #92400e; display: flex; align-items: center; gap: 5px;">
+                <span>🔑 การระบุรหัสผ่านประจำฝ่าย (PIN):</span>
+              </div>
+              <div style="margin-top: 3px; font-size: 11.5px; font-weight: 600;">
+                กรุณากรอก <span style="background: #fde68a; color: #78350f; padding: 2px 7px; border-radius: 5px; font-weight: 900; border: 1px solid #fcd34d;">รหัสตามที่แอดมินระบุ</span> ให้ถูกต้อง
+              </div>
+              <div style="margin-top: 3px; font-size: 10.5px; color: #b45309; line-height: 1.4;">
+                * หมายเหตุ: ในคู่มือนี้ไม่มีการระบุรหัสผ่านเพื่อความปลอดภัยของระบบ หากท่านยังไม่ทราบรหัสผ่าน หรือจำรหัสไม่ได้ กรุณาติดต่อผู้ดูแลระบบประจำฝ่าย (Admin) หรือหัวหน้าฝ่ายเพื่อขอรับรหัส
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Add Event & Clash Detection -->
+          <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #7c3aed; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">2</span>
+              <span>การบันทึกกิจกรรมใหม่ & ระบบตรวจกิจกรรมชนกันอัตโนมัติ</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              • คลิกปุ่ม <strong>"ลงกิจกรรมใหม่"</strong> พร้อมกรอกชื่อกิจกรรม, วันที่เริ่มต้น - สิ้นสุด, เวลา, สถานที่ และรายละเอียด<br>
+              • <strong>ระบบตรวจสอบกิจกรรมชนกันอัตโนมัติ:</strong> หากช่วงวันและเวลามีกิจกรรมของฝ่ายอื่นจัดอยู่แล้ว ระบบจะแจ้งเตือนความซ้ำซ้อนทันที เพื่อให้สามารถประสานงานล่วงหน้าและหลีกเลี่ยงความทับซ้อนได้อย่างมีประสิทธิภาพ
+            </div>
+          </div>
+
+          <!-- Step 3: Manage Event & My Events Filter -->
+          <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #7c3aed; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">3</span>
+              <span>การแก้ไข/ลบกิจกรรม & ตัวกรอง "เฉพาะกิจกรรมของฉัน"</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              • คลิกที่แถบกิจกรรมเพื่อดูรายละเอียด และเลือก <strong>"แก้ไขกิจกรรม"</strong> หรือลบกิจกรรมที่ฝ่ายของท่านสร้างได้<br>
+              • คลิกปุ่ม <strong>"เฉพาะกิจกรรมของฉัน"</strong> เพื่อกรองดูรายการเฉพาะที่ท่านเป็นผู้บันทึก ช่วยให้ตรวจสอบงานของตนเองได้อย่างรวดเร็ว
+            </div>
+          </div>
+
+          <!-- Step 4: Security & Logout -->
+          <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 12px 14px;">
+            <div style="font-weight: 800; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+              <span style="background: #7c3aed; color: #ffffff; width: 18px; height: 18px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">4</span>
+              <span>การออกจากระบบ และความปลอดภัยข้ามทุกอุปกรณ์</span>
+            </div>
+            <div style="color: #475569; font-size: 11.5px; margin-top: 5px; padding-left: 24px;">
+              • เมื่อใช้งานเสร็จสิ้น สามารถคลิกที่ชื่อโปรไฟล์เพื่อออกจากระบบ หรือสลับผู้ใช้งานได้ตลอดเวลา<br>
+              • ข้อมูลกิจกรรมและการแก้ไขจะถูกซิงค์ผ่าน Cloud ไปยังทุกอุปกรณ์ (มือถือ, แท็บเล็ต, คอมพิวเตอร์) ทันทีแบบ Real-time
+            </div>
+          </div>
+        </div>
+      `;
+
+      let bodyContentHtml = '';
+      if (isPublic) {
+        bodyContentHtml = publicSectionHtml;
+      } else if (isStaff) {
+        bodyContentHtml = staffSectionHtml;
+      } else {
+        bodyContentHtml = publicSectionHtml + staffSectionHtml;
+      }
+
+      container.innerHTML = `
+        <div style="border: 2px solid #e9d5ff; border-radius: 18px; padding: 22px 24px; background: #ffffff;">
+          <!-- Document Header -->
+          <div style="background: linear-gradient(135deg, #4c1d95 0%, #31104b 100%); color: #ffffff; padding: 18px 22px; border-radius: 14px; margin-bottom: 18px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="font-size: 16px; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px;">
+                  <span>📖 ${typeTitle}</span>
+                </div>
+                <div style="font-size: 12.5px; color: #e9d5ff; margin-top: 4px; font-weight: 600;">
+                  คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี (Faculty of Education, Fatoni University)
+                </div>
+                <div style="font-size: 11px; color: #c4b5fd; margin-top: 2px;">
+                  ${typeSub}
+                </div>
+              </div>
+              <div style="text-align: right; font-size: 10px; color: #e9d5ff; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); shrink: 0;">
+                <div style="font-weight: bold; color: #fbbf24;">${typeBadge}</div>
+                <div style="margin-top: 2px;">ปีการศึกษา ${year}</div>
+                <div style="margin-top: 2px; color: #cbd5e1;">พิมพ์เมื่อ: ${thaiDateFull}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Body -->
+          ${bodyContentHtml}
+
+          <!-- Document Footer -->
+          <div style="border-top: 1.5px dashed #cbd5e1; padding-top: 12px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b;">
+            <div>
+              <strong>ติดต่อสอบถาม / ฝ่ายสนับสนุน:</strong> ผู้ดูแลระบบหลัก (Admin) คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี
+            </div>
+            <div style="text-align: right; font-style: italic;">
+              เอกสารคู่มือการใช้งานระบบอย่างเป็นทางการ • หน้า 1/1
+            </div>
+          </div>
+        </div>
+      `;
+
+      return container;
+    }
+
+    // 1. Export Manual PDF
+    function exportUserManualToPdf(manualType) {
+      const type = manualType || currentManualTab || 'public';
+      const container = createManualExportDomElement(type);
+      document.body.appendChild(container);
+
+      const typeSlug = (type === 'staff') ? 'ผู้ลงกิจกรรม' : ((type === 'all') ? 'ฉบับสมบูรณ์' : 'ผู้ใช้ทั่วไป');
+      const year = state.academicYear || '2569';
+      const filename = `คู่มือการใช้งาน_${typeSlug}_คณะศึกษาศาสตร์_${year}.pdf`;
+
+      const opt = {
+        margin: [6, 6, 6, 6],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      if (!window.html2pdf) {
+        if (container.parentNode) document.body.removeChild(container);
+        printUserManual(type);
+        return;
+      }
+
+      showToast(`กำลังสร้างไฟล์ PDF คู่มือ (${typeSlug})...`);
+
+      setTimeout(() => {
+        html2pdf().set(opt).from(container).save().then(() => {
+          if (container.parentNode) document.body.removeChild(container);
+          showToast(`✓ ส่งออกคู่มือ (${typeSlug}) เป็นไฟล์ PDF สำเร็จเรียบร้อย`);
+        }).catch(err => {
+          console.error('Manual PDF error:', err);
+          if (container.parentNode) document.body.removeChild(container);
+          if (confirm('การสร้าง PDF ขัดข้อง ต้องการสั่งพิมพ์หรือบันทึกเป็น PDF ผ่านเบราว์เซอร์แทนหรือไม่?')) {
+            printUserManual(type);
+          }
+        });
+      }, 150);
+    }
+
+    // 2. Export Manual JPG Image
+    function exportUserManualToJpg(manualType) {
+      const type = manualType || currentManualTab || 'public';
+      const container = createManualExportDomElement(type);
+      document.body.appendChild(container);
+
+      const typeSlug = (type === 'staff') ? 'ผู้ลงกิจกรรม' : ((type === 'all') ? 'ฉบับสมบูรณ์' : 'ผู้ใช้ทั่วไป');
+      const year = state.academicYear || '2569';
+      const filename = `คู่มือการใช้งาน_${typeSlug}_คณะศึกษาศาสตร์_${year}.jpg`;
+
+      const h2c = window.html2canvas;
+      if (!h2c) {
+        if (container.parentNode) document.body.removeChild(container);
+        alert('ระบบสร้างรูปภาพยังไม่พร้อม กรุณาลองใหม่อีกครั้ง');
+        return;
+      }
+
+      showToast(`กำลังสร้างรูปภาพ JPG คู่มือ (${typeSlug})...`);
+
+      setTimeout(() => {
+        h2c(container, { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0 }).then(canvas => {
+          if (container.parentNode) document.body.removeChild(container);
+          const imgData = canvas.toDataURL('image/jpeg', 0.96);
+          const link = document.createElement('a');
+          link.download = filename;
+          link.href = imgData;
+          link.click();
+          showToast(`✓ ส่งออกคู่มือ (${typeSlug}) เป็นรูปภาพ JPG สำเร็จ`);
+        }).catch(err => {
+          console.error('Manual JPG error:', err);
+          if (container.parentNode) document.body.removeChild(container);
+          alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ JPG: ' + (err.message || err));
+        });
+      }, 150);
+    }
+
+    // 3. Print Manual Document
+    function printUserManual(manualType) {
+      const type = manualType || currentManualTab || 'public';
+      const container = createManualExportDomElement(type);
+      
+      const printIframe = document.createElement('iframe');
+      printIframe.style.position = 'fixed';
+      printIframe.style.right = '0';
+      printIframe.style.bottom = '0';
+      printIframe.style.width = '0';
+      printIframe.style.height = '0';
+      printIframe.style.border = '0';
+      document.body.appendChild(printIframe);
+
+      const doc = printIframe.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>คู่มือการใช้งานระบบปฏิทิน</title>
+          <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            @page { size: A4 portrait; margin: 10mm; }
+            body { margin: 0; padding: 0; background: #ffffff; }
+            @media print {
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          ${container.innerHTML}
+        </body>
+        </html>
+      `);
+      doc.close();
+
+      setTimeout(() => {
+        printIframe.contentWindow.focus();
+        printIframe.contentWindow.print();
+        setTimeout(() => {
+          if (printIframe.parentNode) document.body.removeChild(printIframe);
+        }, 1000);
+      }, 500);
+    }
+
+    // Connect Manual Export Listeners
+    const btnExpManPdf = document.getElementById('btnExportManualPdf');
+    if (btnExpManPdf) btnExpManPdf.onclick = () => exportUserManualToPdf(currentManualTab);
+
+    const btnExpManJpg = document.getElementById('btnExportManualJpg');
+    if (btnExpManJpg) btnExpManJpg.onclick = () => exportUserManualToJpg(currentManualTab);
+
+    const btnPrintMan = document.getElementById('btnPrintManual');
+    if (btnPrintMan) btnPrintMan.onclick = () => printUserManual(currentManualTab);
+
+    const btnExpManAllPdf = document.getElementById('btnExportManualAllPdf');
+    if (btnExpManAllPdf) {
+      btnExpManAllPdf.onclick = () => {
+        const menu = document.getElementById('menuExportManualMore');
+        if (menu) menu.classList.add('hidden');
+        exportUserManualToPdf('all');
+      };
+    }
+
+    const btnExpManAllJpg = document.getElementById('btnExportManualAllJpg');
+    if (btnExpManAllJpg) {
+      btnExpManAllJpg.onclick = () => {
+        const menu = document.getElementById('menuExportManualMore');
+        if (menu) menu.classList.add('hidden');
+        exportUserManualToJpg('all');
+      };
+    }
+
+    const btnOpenExpManMore = document.getElementById('btnOpenExportManualMore');
+    if (btnOpenExpManMore) {
+      btnOpenExpManMore.onclick = (e) => {
+        e.stopPropagation();
+        const menu = document.getElementById('menuExportManualMore');
+        if (menu) menu.classList.toggle('hidden');
+      };
+    }
+
+    document.addEventListener('click', (e) => {
+      const moreBtn = document.getElementById('btnOpenExportManualMore');
+      const moreMenu = document.getElementById('menuExportManualMore');
+      if (moreMenu && !moreMenu.classList.contains('hidden')) {
+        if (!moreMenu.contains(e.target) && !moreBtn?.contains(e.target)) {
+          moreMenu.classList.add('hidden');
+        }
+      }
+    });
+
+    const btnLandExpPubPdf = document.getElementById('btnLandingExportManualPubPdf');
+    if (btnLandExpPubPdf) {
+      btnLandExpPubPdf.onclick = (e) => {
+        e.stopPropagation();
+        exportUserManualToPdf('public');
+      };
+    }
+
+    const btnLandExpStaffPdf = document.getElementById('btnLandingExportManualStaffPdf');
+    if (btnLandExpStaffPdf) {
+      btnLandExpStaffPdf.onclick = (e) => {
+        e.stopPropagation();
+        exportUserManualToPdf('staff');
+      };
     }
 
     // ==========================================
