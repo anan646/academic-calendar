@@ -4811,6 +4811,42 @@
     let isSyncing = false;
     let autoSyncInterval = null;
 
+    // ระบบคิวออฟไลน์ (Offline Sync Queue) เพื่อไม่ให้ข้อมูลสูญหายเมื่อเน็ตหลุด
+    let syncQueue = [];
+    try {
+      syncQueue = JSON.parse(localStorage.getItem('school_cal_sync_queue') || '[]');
+      if (!Array.isArray(syncQueue)) syncQueue = [];
+    } catch (e) {
+      syncQueue = [];
+    }
+
+    function persistSyncQueue() {
+      try {
+        localStorage.setItem('school_cal_sync_queue', JSON.stringify(syncQueue));
+      } catch (e) {}
+    }
+
+    // ระบบ Broadcast Channel เพื่อซิงค์ข้ามแท็บในอุปกรณ์เดียวกันแบบทันทีทันใด
+    let syncBroadcastChannel = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        syncBroadcastChannel = new BroadcastChannel('school_cal_sync_channel');
+        syncBroadcastChannel.onmessage = (event) => {
+          if (event.data && event.data.type === 'SYNC_REFRESH') {
+            syncFromCloudApi(true);
+          }
+        };
+      }
+    } catch (e) {}
+
+    function broadcastSyncEvent(type, data) {
+      try {
+        if (syncBroadcastChannel) {
+          syncBroadcastChannel.postMessage({ type: type || 'SYNC_REFRESH', data: data });
+        }
+      } catch (e) {}
+    }
+
     function initData() {
       // 1. โหลดข้อมูลในเครื่องทันทีก่อน เพื่อให้หน้าเว็บแสดงผลทันทีไม่มีดีเลย์
       loadLocalData();
@@ -4820,7 +4856,10 @@
         autoProbeAndSyncFtuCalendars(true);
       } catch (e) {}
 
-      // 2. หากรันอยู่ในสภาพแวดล้อม Google Apps Script โดยตรง
+      // 2. เคลียร์คิวค้างส่ง (ถ้ามี)
+      processSyncQueue();
+
+      // 3. หากรันอยู่ในสภาพแวดล้อม Google Apps Script โดยตรง
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         syncFromGasNative();
         // เริ่มต้น Real-time Polling ทุก 15 วินาที
@@ -4833,6 +4872,38 @@
       }
     }
 
+    let isProcessingQueue = false;
+    async function processSyncQueue() {
+      if (isProcessingQueue || syncQueue.length === 0 || !navigator.onLine || !gasApiUrl) return;
+      isProcessingQueue = true;
+
+      while (syncQueue.length > 0) {
+        const item = syncQueue[0];
+        try {
+          const postUrl = `${gasApiUrl}${gasApiUrl.includes('?') ? '&' : '?'}action=${encodeURIComponent(item.actionName)}`;
+          const res = await fetch(postUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: item.actionName, ...item.payload })
+          });
+          if (res.ok) {
+            syncQueue.shift();
+            persistSyncQueue();
+          } else {
+            break;
+          }
+        } catch (err) {
+          console.warn('Sync queue retry failed, will retry later:', err);
+          break;
+        }
+      }
+
+      isProcessingQueue = false;
+      if (syncQueue.length === 0) {
+        syncFromCloudApi(true);
+      }
+    }
+
     function syncFromGasNative(isSilent) {
       if (typeof google === 'undefined' || !google.script || !google.script.run) return;
       if (!isSilent) setSyncLoading(true);
@@ -4840,7 +4911,7 @@
       google.script.run
         .withSuccessHandler(function(response) {
           if (!isSilent) setSyncLoading(false);
-          if (response && response.events) {
+          if (response) {
             applySyncedData(response);
           }
         })
@@ -4869,7 +4940,7 @@
             setSyncLoading(false);
             showToast('อัปเดตข้อมูลสดเรียบร้อยแล้ว');
           }
-          if (response && response.success && response.events) {
+          if (response && response.success) {
             applySyncedData(response);
           }
         })
@@ -4884,14 +4955,18 @@
     }
 
     function applySyncedData(response) {
+      if (!response) return;
+
+      // 1. ซิงค์ฝ่ายและรหัสผ่าน PIN ประจำฝ่าย (Departments & PINs)
       if (Array.isArray(response.departments) && response.departments.length > 0) {
         let savedPins = {};
         try {
           savedPins = JSON.parse(localStorage.getItem('school_cal_dept_pins') || '{}');
         } catch (e) { savedPins = {}; }
 
-
-        state.departments = response.departments.map(cloudDept => {
+        const cloudDepts = response.departments.filter(d => d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
+        
+        state.departments = cloudDepts.map(cloudDept => {
           const localDept = (state.departments || []).find(d => d.id === cloudDept.id || d.name === cloudDept.name);
           const cloudPin = (cloudDept.pin !== undefined && cloudDept.pin !== null && String(cloudDept.pin).trim() !== '') ? String(cloudDept.pin).trim() : '';
           const localPin = (localDept && localDept.pin) ? String(localDept.pin).trim() : '';
@@ -4911,9 +4986,19 @@
         try {
           localStorage.setItem('school_cal_dept_pins', JSON.stringify(savedPins));
         } catch (e) {}
+
+        // แบ็กฟิลล์: หากมีรหัสผ่านฝ่ายในเครื่องที่คลาวด์ยังไม่มี ให้ซิงค์กลับขึ้นคลาวด์ทันที
+        cloudDepts.forEach(cd => {
+          const cloudPin = cd.pin ? String(cd.pin).trim() : '';
+          const localPin = savedPins[cd.id] || savedPins[cd.name] || '';
+          if (!cloudPin && localPin) {
+            sendToCloudApi('saveDepartment', { deptData: { ...cd, pin: localPin }, adminPin: state.adminPin });
+          }
+        });
       }
+
+      // 2. ซิงค์กิจกรรม (Events)
       if (Array.isArray(response.events)) {
-        // ผสานวันหยุดระบบกับกิจกรรมจากชีต โดยกรองกิจกรรมที่เคยถูกลบออกเด็ดขาด และแยกปฏิทิน ม.ฟาฏอนี ออกเด็ดขาด
         const deletedSet = new Set(state.deletedEventIds || []);
         const eventMap = new Map();
         DEFAULT_HOLIDAYS_AND_EVENTS.forEach(e => {
@@ -4926,21 +5011,55 @@
         });
         state.events = Array.from(eventMap.values()).filter(e => !e.id.startsWith('ftu_') && e.departmentId !== 'dept_ftu');
       }
-      if (Array.isArray(response.departments) && response.departments.length > 0) {
-        state.departments = state.departments.filter(d => d.id !== 'dept_ftu' && d.name !== 'ปฏิทิน ม.ฟาฏอนี');
+
+      // 3. ซิงค์ผู้ดูแลระบบ (Admins & Sub-Admins & Admin PIN)
+      if (Array.isArray(response.admins) && response.admins.length > 0) {
+        const cloudAdminIds = new Set(response.admins.map(a => a.id));
+        const unsyncedSubAdmins = (state.admins || []).filter(a => a.id && !cloudAdminIds.has(a.id) && a.role === 'sub_admin');
+
+        state.admins = response.admins;
+        const primaryAdmin = state.admins.find(a => a.role === 'primary');
+        if (primaryAdmin && primaryAdmin.pin) {
+          state.adminPin = String(primaryAdmin.pin).trim();
+        }
+
+        // หากมีแอดมินรองในเครื่องที่ยังไม่ได้ซิงค์ขึ้นคลาวด์ ให้ส่งขึ้นคลาวด์
+        if (unsyncedSubAdmins.length > 0) {
+          unsyncedSubAdmins.forEach(sub => {
+            sendToCloudApi('saveAdmin', { adminData: sub, adminPin: state.adminPin });
+          });
+        }
+
+        if (typeof renderAdminListTable === 'function') {
+          renderAdminListTable();
+        }
       }
-      ensureHolidaysForYear(state.currentDate.getFullYear());
+
+      // 4. ซิงค์ผู้ใช้งานระบบ (Users)
       if (Array.isArray(response.users) && response.users.length > 0) {
         state.users = response.users;
       }
+
+      ensureHolidaysForYear(state.currentDate.getFullYear());
       saveStateLocal();
       renderUI();
     }
 
     function sendToCloudApi(actionName, payload, successCallback) {
       if (!gasApiUrl) return;
-      
-      fetch(gasApiUrl, {
+
+      const postUrl = `${gasApiUrl}${gasApiUrl.includes('?') ? '&' : '?'}action=${encodeURIComponent(actionName)}`;
+
+      // ถ้าไม่มีอินเทอร์เน็ตในขณะนี้ เก็บเข้าคิวออฟไลน์ไว้ก่อน
+      if (!navigator.onLine) {
+        syncQueue.push({ actionName, payload, timestamp: Date.now() });
+        persistSyncQueue();
+        showToast('บันทึกในเครื่องแล้ว (จะซิงค์ขึ้นคลาวด์อัตโนมัติเมื่อออนไลน์)');
+        if (successCallback) successCallback({ success: true, queued: true });
+        return;
+      }
+
+      fetch(postUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: actionName, ...payload })
@@ -4948,10 +5067,17 @@
       .then(res => res.json())
       .then(res => {
         if (successCallback) successCallback(res);
-        // รีเฟรชข้อมูลหลังบันทึก
-        setTimeout(() => syncFromCloudApi(true), 500);
+        // กระจายสัญญาณให้อุปกรณ์/แท็บอื่นในเบราว์เซอร์รับทราบ
+        broadcastSyncEvent('SYNC_REFRESH');
+        // ดึงข้อมูลสดที่คลาวด์ประมวลผลเสร็จแล้วกลับมาอัปเดตหน้าจอ
+        setTimeout(() => syncFromCloudApi(true), 600);
       })
-      .catch(err => console.error('Cloud save error:', err));
+      .catch(err => {
+        console.error('Cloud save error, queuing for retry:', err);
+        syncQueue.push({ actionName, payload, timestamp: Date.now() });
+        persistSyncQueue();
+        if (successCallback) successCallback({ success: false, queued: true });
+      });
     }
 
     function setSyncLoading(isLoading) {
@@ -4967,14 +5093,33 @@
 
     function startAutoSync(syncFn) {
       if (autoSyncInterval) clearInterval(autoSyncInterval);
-      // Auto-poll ทุก 15 วินาที เพื่อความเรียลไทม์
+      // Auto-poll ทุก 15 วินาที เพื่อความเรียลไทม์ข้ามทุกอุปกรณ์
       autoSyncInterval = setInterval(() => {
-        // ทำงานเฉพาะเมื่อหน้าจอยังเปิดอยู่ (Visibility check)
         if (!document.hidden) {
+          processSyncQueue();
           syncFn();
         }
       }, 15000);
     }
+
+    // Event Listeners สำหรับการซิงค์ข้ามอุปกรณ์และเมื่อกลับมาเปิดหน้าจอ
+    window.addEventListener('online', () => {
+      showToast('เชื่อมต่ออินเทอร์เน็ตแล้ว กำลังซิงค์ข้อมูลล่าสุด...');
+      processSyncQueue();
+      syncFromCloudApi(false);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        processSyncQueue();
+        syncFromCloudApi(true);
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      processSyncQueue();
+      syncFromCloudApi(true);
+    });
 
     function loadLocalData() {
       const storedDepts = localStorage.getItem('school_cal_departments');
@@ -8144,6 +8289,14 @@
         state.adminPin = newPin;
       }
       saveStateLocal();
+
+      // ซิงค์รหัสผ่านใหม่ไปยัง Google Sheets ทันที
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.changeAdminPin(admin.id, newPin, state.adminPin);
+      } else if (gasApiUrl) {
+        sendToCloudApi('changeAdminPin', { adminId: admin.id, newPin: newPin, adminPin: state.adminPin });
+      }
+
       closeModal('modalChangeAdminPin');
       showToast(`เปลี่ยนรหัสผ่านของ "${admin.name}" เรียบร้อยแล้ว`);
       renderAdminListTable();
@@ -8222,6 +8375,14 @@
 
       state.admins.push(newSubAdmin);
       saveStateLocal();
+
+      // ซิงค์แอดมินรองใหม่ไปยัง Google Sheets ทันที
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.saveAdmin(newSubAdmin, state.adminPin);
+      } else if (gasApiUrl) {
+        sendToCloudApi('saveAdmin', { adminData: newSubAdmin, adminPin: state.adminPin });
+      }
+
       closeModal('modalAddSubAdmin');
       showToast(`เพิ่มแอดมินรอง "${name}" สำเร็จแล้ว`);
       renderAdminListTable();
@@ -9306,6 +9467,14 @@
               if (confirm(`คุณต้องการลบแอดมินรอง "${admin.name}" ออกจากระบบใช่หรือไม่?`)) {
                 state.admins = state.admins.filter(a => a.id !== admin.id);
                 saveStateLocal();
+
+                // ซิงค์การลบแอดมินรองไปยัง Google Sheets ทันที
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                  google.script.run.deleteAdmin(admin.id, state.adminPin);
+                } else if (gasApiUrl) {
+                  sendToCloudApi('deleteAdmin', { adminId: admin.id, adminPin: state.adminPin });
+                }
+
                 renderAdminListTable();
                 showToast(`ลบแอดมินรอง "${admin.name}" สำเร็จ`);
               }

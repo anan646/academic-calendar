@@ -17,29 +17,65 @@ function getSpreadsheet() {
 }
 
 function doGet(e) {
-  // รองรับ JSON API เมื่อถูกเรียกจากภายนอก (เช่น เว็บหรือ PWA ที่โฮสต์บน Vercel / GitHub Pages / สมาร์ทโฟน)
+  // รองรับ JSON API ทั้งแบบ GET ธรรมดา และเมื่อ Redirect มาจาก POST
   if (e && e.parameter && e.parameter.action) {
-    return handleApiGet(e);
+    return handleApiRequest(e, 'GET');
   }
 
-  return HtmlService.createTemplateFromFile('index')
-    .evaluate()
-    .setTitle('ระบบปฏิทินกิจกรรมประจำปีการศึกษา (พ.ศ. / ฮ.ศ.)')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  // หากเรียกเข้ามาโดยไม่มี action ให้ตอบกลับสถานะ JSON API พร้อมใช้งานเสมอ (ป้องกันไม่ให้พังจากการหา index.html ไม่เจอ)
+  return ContentService.createTextOutput(JSON.stringify({
+    success: true,
+    status: 'online',
+    message: 'Google Apps Script Academic Calendar API is active and ready.',
+    timestamp: new Date().toISOString()
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
-  return handleApiPost(e);
+  return handleApiRequest(e, 'POST');
 }
 
-function handleApiGet(e) {
-  var action = e.parameter.action;
-  var callback = e.parameter.callback;
+/**
+ * ตัวประมวลผลคำสั่ง API รวม (Unified API Dispatcher)
+ * รองรับทั้ง GET และ POST เพื่อความเสถียรสูงสุดบนทุกอุปกรณ์และเบราว์เซอร์
+ */
+function handleApiRequest(e, method) {
   var result = { success: false, message: 'Invalid action' };
+  var callback = (e && e.parameter && e.parameter.callback) || null;
 
   try {
     getOrCreateSheets();
+
+    // รวบรวมข้อมูล Parameter จากทั้ง Query String และ POST Body
+    var params = {};
+    if (e && e.parameter) {
+      for (var key in e.parameter) {
+        params[key] = e.parameter[key];
+      }
+    }
+
+    if (e && e.postData && e.postData.contents) {
+      try {
+        var parsed = JSON.parse(e.postData.contents);
+        for (var pKey in parsed) {
+          params[pKey] = parsed[pKey];
+        }
+      } catch (errJson) {
+        // อาจเป็น plain form data
+      }
+    }
+
+    var action = params.action;
+
+    // ถอดรหัส JSON ย่อยหากส่งมาในรูป string (กรณีส่งผ่าน URL Query params)
+    ['eventData', 'deptData', 'userData', 'adminData', 'eventsList'].forEach(function(field) {
+      if (typeof params[field] === 'string' && params[field].trim().startsWith('{')) {
+        try { params[field] = JSON.parse(params[field]); } catch (errParse) {}
+      } else if (typeof params[field] === 'string' && params[field].trim().startsWith('[')) {
+        try { params[field] = JSON.parse(params[field]); } catch (errParse) {}
+      }
+    });
+
     if (action === 'getInitialData') {
       result = getInitialData();
     } else if (action === 'getEvents') {
@@ -48,14 +84,38 @@ function handleApiGet(e) {
       result = { success: true, departments: getDepartments() };
     } else if (action === 'getUsers') {
       result = { success: true, users: getUsers() };
+    } else if (action === 'getAdmins') {
+      result = { success: true, admins: getAdmins() };
+    } else if (action === 'saveEvent') {
+      result = saveEvent(params.eventData || params);
+    } else if (action === 'batchSaveEvents') {
+      result = batchSaveEvents(params.eventsList || []);
+    } else if (action === 'deleteEvent') {
+      result = deleteEvent(params.id, params.adminPin);
+    } else if (action === 'saveDepartment') {
+      result = saveDepartment(params.deptData || params, params.adminPin);
+    } else if (action === 'deleteDepartment') {
+      result = deleteDepartment(params.id, params.adminPin);
+    } else if (action === 'registerUser') {
+      result = registerUser(params.userData || params);
+    } else if (action === 'deleteUser') {
+      result = deleteUser(params.userId, params.adminPin);
+    } else if (action === 'saveAdmin') {
+      result = saveAdmin(params.adminData || params, params.adminPin);
+    } else if (action === 'deleteAdmin') {
+      result = deleteAdmin(params.adminId, params.adminPin);
+    } else if (action === 'changeAdminPin') {
+      result = changeAdminPin(params.adminId, params.newPin, params.adminPin);
+    } else {
+      result = { success: false, message: 'Unrecognized action: ' + action };
     }
   } catch (err) {
-    result = { success: false, error: err.message };
+    result = { success: false, error: err.message || String(err) };
   }
 
   var outputText = JSON.stringify(result);
   if (callback) {
-    // JSONP Support
+    // JSONP Support สำหรับเบราว์เซอร์เก่าหรือเครือข่ายที่มี CORS ข้อจำกัด
     return ContentService.createTextOutput(callback + '(' + outputText + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
@@ -64,48 +124,12 @@ function handleApiGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function handleApiPost(e) {
-  var result = { success: false, message: 'Invalid request' };
-  try {
-    getOrCreateSheets();
-    var postData = {};
-    if (e && e.postData && e.postData.contents) {
-      postData = JSON.parse(e.postData.contents);
-    } else if (e && e.parameter) {
-      postData = e.parameter;
-    }
-
-    var action = postData.action || (e && e.parameter && e.parameter.action);
-
-    if (action === 'saveEvent') {
-      result = saveEvent(postData.eventData || postData);
-    } else if (action === 'batchSaveEvents') {
-      result = batchSaveEvents(postData.eventsList || []);
-    } else if (action === 'deleteEvent') {
-      result = deleteEvent(postData.id, postData.adminPin);
-    } else if (action === 'registerUser') {
-      result = registerUser(postData.userData || postData);
-    } else if (action === 'deleteUser') {
-      result = deleteUser(postData.userId, postData.adminPin);
-    } else if (action === 'saveDepartment') {
-      result = saveDepartment(postData.deptData || postData, postData.adminPin);
-    } else if (action === 'deleteDepartment') {
-      result = deleteDepartment(postData.id, postData.adminPin);
-    }
-  } catch (err) {
-    result = { success: false, error: err.message };
-  }
-
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
 /**
- * เตรียมชีตและข้อมูลเริ่มต้นอัตโนมัติหากยังไม่มีชีต
+ * เตรียมชีตและโครงสร้างข้อมูลเริ่มต้นอัตโนมัติหากยังไม่มีชีต
  */
 function getOrCreateSheets() {
   var ss = getSpreadsheet();
@@ -120,6 +144,13 @@ function getOrCreateSheets() {
     deptSheet.appendRow(['dept_admin', 'ฝ่ายบริหารทั่วไปและแผนงาน', '#ea580c', '3333', new Date().toISOString()]);
     deptSheet.appendRow(['dept_finance', 'ฝ่ายงบประมาณและการเงิน', '#9333ea', '4444', new Date().toISOString()]);
     deptSheet.appendRow(['dept_holiday', 'วันหยุด/เทศกาล', '#dc2626', '', new Date().toISOString()]);
+  } else {
+    // ตรวจสอบว่ามีคอลัมน์ pin ใน header หรือไม่
+    var dHeaders = deptSheet.getRange(1, 1, 1, Math.max(1, deptSheet.getLastColumn())).getValues()[0] || [];
+    var hasPin = dHeaders.some(function(h) { return String(h).toLowerCase() === 'pin'; });
+    if (!hasPin) {
+      deptSheet.getRange(1, dHeaders.length + 1).setValue('pin');
+    }
   }
 
   // 2. ชีตกิจกรรม (Events)
@@ -128,7 +159,6 @@ function getOrCreateSheets() {
     eventSheet = ss.insertSheet('Events');
     eventSheet.appendRow(['id', 'title', 'departmentId', 'startDate', 'endDate', 'academicYear', 'semester', 'location', 'description', 'createdBy', 'creatorName', 'creatorDept', 'createdAt', 'updatedAt']);
     
-    // ใส่กิจกรรมตั้งต้น (วันหยุด พ.ศ. / ฮ.ศ.)
     var defaults = getDefaultEvents();
     for (var i = 0; i < defaults.length; i++) {
       var d = defaults[i];
@@ -153,8 +183,25 @@ function getOrCreateSheets() {
   if (!settingSheet) {
     settingSheet = ss.insertSheet('Settings');
     settingSheet.appendRow(['key', 'value']);
-    settingSheet.appendRow(['admin_pin', '1234']); // รหัสผ่านแอดมินเริ่มต้น
+    settingSheet.appendRow(['admin_pin', '1234']);
     settingSheet.appendRow(['current_academic_year', '2568']);
+  }
+
+  // 5. ชีตผู้ดูแลระบบ (Admins - แอดมินหลัก & แอดมินรอง)
+  var adminSheet = ss.getSheetByName('Admins');
+  if (!adminSheet) {
+    adminSheet = ss.insertSheet('Admins');
+    adminSheet.appendRow(['id', 'name', 'department', 'contact', 'role', 'pin', 'createdAt', 'updatedAt']);
+    adminSheet.appendRow([
+      'admin_primary',
+      'แอดมินหลัก (ผู้ดูแลระบบหลัก)',
+      'ผู้ดูแลระบบส่วนกลาง',
+      'admin@school.ac.th',
+      'primary',
+      '1234',
+      '2568-01-01',
+      new Date().toISOString()
+    ]);
   }
 
   return ss;
@@ -171,6 +218,7 @@ function getInitialData() {
       departments: getDepartments(),
       events: getEvents(),
       users: getUsers(),
+      admins: getAdmins(),
       settings: getSettings()
     };
   } catch (err) {
@@ -180,6 +228,7 @@ function getInitialData() {
       departments: getDefaultDepartments(),
       events: getDefaultEvents(),
       users: [],
+      admins: getDefaultAdmins(),
       settings: { adminPinSet: true, currentAcademicYear: '2568' }
     };
   }
@@ -193,6 +242,20 @@ function getDefaultDepartments() {
     { id: 'dept_student', name: 'ฝ่ายกิจการนักเรียน', color: '#16a34a', pin: '2222' },
     { id: 'dept_admin', name: 'ฝ่ายบริหารทั่วไปและแผนงาน', color: '#ea580c', pin: '3333' },
     { id: 'dept_finance', name: 'ฝ่ายงบประมาณและการเงิน', color: '#9333ea', pin: '4444' }
+  ];
+}
+
+function getDefaultAdmins() {
+  return [
+    {
+      id: 'admin_primary',
+      name: 'แอดมินหลัก (ผู้ดูแลระบบหลัก)',
+      department: 'ผู้ดูแลระบบส่วนกลาง',
+      contact: 'admin@school.ac.th',
+      role: 'primary',
+      pin: '1234',
+      createdAt: '2568-01-01'
+    }
   ];
 }
 
@@ -259,7 +322,7 @@ function getDefaultEvents() {
       academicYear: '2568',
       semester: '1',
       location: '-',
-      description: '1 มุฮัรรอม ฮ.ศ. 1447',
+      description: 'วันขึ้น 1 มุฮัรร็อม 1447 ศักราชใหม่แห่งโลกอิสลาม',
       creatorName: 'ระบบ',
       creatorDept: 'ส่วนกลาง'
     }
@@ -310,7 +373,7 @@ function registerUser(userData) {
     id,
     userData.name || 'ไม่ระบุชื่อ',
     userData.department || 'ไม่ระบุหน่วยงาน',
-    userData.email || '',
+    userData.email || userData.contact || '',
     userData.phone || '',
     role,
     now
@@ -318,14 +381,8 @@ function registerUser(userData) {
 
   return {
     success: true,
-    user: {
-      id: id,
-      name: userData.name,
-      department: userData.department,
-      email: userData.email,
-      phone: userData.phone,
-      role: role
-    }
+    id: id,
+    message: 'ลงทะเบียนผู้ใช้งานเรียบร้อยแล้ว'
   };
 }
 
@@ -338,14 +395,14 @@ function deleteUser(userId, adminPin) {
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(userId)) {
       sheet.deleteRow(i + 1);
-      return { success: true };
+      return { success: true, message: 'ลบผู้ใช้เรียบร้อยแล้ว' };
     }
   }
   return { success: false, message: 'ไม่พบผู้ใช้ที่ต้องการลบ' };
 }
 
 // ------------------------------
-// API: Departments
+// API: Departments (ฝ่ายงานและรหัส PIN)
 // ------------------------------
 function getDepartments() {
   var ss = getSpreadsheet();
@@ -355,7 +412,6 @@ function getDepartments() {
   var data = sheet.getDataRange().getValues();
   if (data.length <= 1) return getDefaultDepartments();
 
-  // หา index ของคอลัมน์ pin ถ้ามี
   var headers = data[0] || [];
   var pinColIdx = -1;
   for (var h = 0; h < headers.length; h++) {
@@ -377,8 +433,8 @@ function getDepartments() {
     if (row[0]) {
       var dId = String(row[0]);
       var dPin = '';
-      if (pinColIdx > -1 && row[pinColIdx] !== undefined && row[pinColIdx] !== '') {
-        dPin = String(row[pinColIdx]);
+      if (pinColIdx > -1 && row[pinColIdx] !== undefined && row[pinColIdx] !== null && String(row[pinColIdx]).trim() !== '') {
+        dPin = String(row[pinColIdx]).trim();
       } else if (defaultPinMap[dId]) {
         dPin = defaultPinMap[dId];
       }
@@ -397,10 +453,14 @@ function getDepartments() {
 function saveDepartment(deptData, adminPin) {
   var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Departments');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Departments');
+  }
+
   var data = sheet.getDataRange().getValues();
   var id = deptData.id || ('dept_' + new Date().getTime());
 
-  // ตรวจสอบคอลัมน์ pin ใน header
   var headers = data[0] || [];
   var pinColIdx = -1;
   for (var h = 0; h < headers.length; h++) {
@@ -410,7 +470,6 @@ function saveDepartment(deptData, adminPin) {
     }
   }
 
-  // หากยังไม่มีคอลัมน์ pin ให้เพิ่มใน header
   if (pinColIdx === -1) {
     pinColIdx = headers.length;
     sheet.getRange(1, pinColIdx + 1).setValue('pin');
@@ -429,12 +488,11 @@ function saveDepartment(deptData, adminPin) {
   if (rowIndex > -1) {
     if (deptData.name) sheet.getRange(rowIndex, 2).setValue(deptData.name);
     if (deptData.color) sheet.getRange(rowIndex, 3).setValue(deptData.color);
-    if (deptData.pin !== undefined) {
-      sheet.getRange(rowIndex, pinColIdx + 1).setValue(String(deptData.pin || ''));
+    if (deptData.pin !== undefined && deptData.pin !== null) {
+      sheet.getRange(rowIndex, pinColIdx + 1).setValue(String(deptData.pin));
     }
   } else {
-    var newRow = [id, deptData.name, deptData.color];
-    // เติมค่าว่างจนถึงคอลัมน์ pin
+    var newRow = [id, deptData.name, deptData.color || '#7c3aed'];
     while (newRow.length < pinColIdx) {
       newRow.push('');
     }
@@ -450,11 +508,13 @@ function saveDepartment(deptData, adminPin) {
 function deleteDepartment(deptId, adminPin) {
   var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Departments');
-  var data = sheet.getDataRange().getValues();
+  if (!sheet) return { success: false, message: 'ไม่พบชีต Departments' };
 
+  var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(deptId)) {
       sheet.deleteRow(i + 1);
+      SpreadsheetApp.flush();
       return { success: true };
     }
   }
@@ -462,7 +522,149 @@ function deleteDepartment(deptId, adminPin) {
 }
 
 // ------------------------------
-// API: Events
+// API: Admins (แอดมินหลัก & แอดมินรอง)
+// ------------------------------
+function getAdmins() {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Admins');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Admins');
+  }
+
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return getDefaultAdmins();
+
+  var results = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (row[0]) {
+      results.push({
+        id: String(row[0]),
+        name: String(row[1] || 'ผู้ดูแลระบบ'),
+        department: String(row[2] || 'ผู้ดูแลระบบส่วนกลาง'),
+        contact: String(row[3] || ''),
+        role: String(row[4] || 'sub_admin'),
+        pin: String(row[5] || '1234'),
+        createdAt: formatDateString(row[6]) || '2568-01-01'
+      });
+    }
+  }
+
+  // หากไม่มี Primary Admin ในรายการ ให้เพิ่มเริ่มต้นเข้าไป
+  var hasPrimary = results.some(function(a) { return a.role === 'primary'; });
+  if (!hasPrimary) {
+    results.unshift(getDefaultAdmins()[0]);
+  }
+
+  return results;
+}
+
+function saveAdmin(adminData, adminPin) {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Admins');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Admins');
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var id = adminData.id || ('admin_' + new Date().getTime());
+  var role = adminData.role || 'sub_admin';
+  var now = new Date().toISOString();
+
+  var rowIndex = -1;
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === String(id).trim()) {
+      rowIndex = i + 1;
+      break;
+    }
+  }
+
+  if (rowIndex > -1) {
+    if (adminData.name) sheet.getRange(rowIndex, 2).setValue(adminData.name);
+    if (adminData.department) sheet.getRange(rowIndex, 3).setValue(adminData.department);
+    if (adminData.contact) sheet.getRange(rowIndex, 4).setValue(adminData.contact);
+    if (adminData.role) sheet.getRange(rowIndex, 5).setValue(adminData.role);
+    if (adminData.pin) sheet.getRange(rowIndex, 6).setValue(String(adminData.pin));
+    sheet.getRange(rowIndex, 8).setValue(now);
+  } else {
+    sheet.appendRow([
+      id,
+      adminData.name || 'แอดมินรอง',
+      adminData.department || 'ผู้ดูแลระบบส่วนกลาง',
+      adminData.contact || '',
+      role,
+      String(adminData.pin || '1234'),
+      formatDateString(adminData.createdAt) || formatDateString(new Date()),
+      now
+    ]);
+  }
+
+  // หากเป็นแอดมินหลัก ให้อัปเดตรหัสใน Settings ด้วย
+  if (role === 'primary' && adminData.pin) {
+    updateSettingValue('admin_pin', String(adminData.pin));
+  }
+
+  SpreadsheetApp.flush();
+  return { success: true, id: id };
+}
+
+function deleteAdmin(adminId, adminPin) {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Admins');
+  if (!sheet) return { success: false, message: 'ไม่พบชีต Admins' };
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === String(adminId).trim()) {
+      if (String(data[i][4]) === 'primary') {
+        return { success: false, message: 'ไม่สามารถลบบัญชีแอดมินหลักได้' };
+      }
+      sheet.deleteRow(i + 1);
+      SpreadsheetApp.flush();
+      return { success: true };
+    }
+  }
+  return { success: false, message: 'ไม่พบบัญชีแอดมินที่ต้องการลบ' };
+}
+
+function changeAdminPin(adminId, newPin, currentPin) {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Admins');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Admins');
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var now = new Date().toISOString();
+  var found = false;
+
+  for (var i = 1; i < data.length; i++) {
+    var rowId = String(data[i][0]).trim();
+    if (rowId === String(adminId).trim() || (!adminId && String(data[i][4]) === 'primary')) {
+      sheet.getRange(i + 1, 6).setValue(String(newPin));
+      sheet.getRange(i + 1, 8).setValue(now);
+      if (String(data[i][4]) === 'primary') {
+        updateSettingValue('admin_pin', String(newPin));
+      }
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    // ถ้าไม่พบคอนเฟิร์ม ให้ปรับปรุงใน Settings
+    updateSettingValue('admin_pin', String(newPin));
+  }
+
+  SpreadsheetApp.flush();
+  return { success: true, message: 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว' };
+}
+
+// ------------------------------
+// API: Events (กิจกรรม)
 // ------------------------------
 function getEvents() {
   var ss = getSpreadsheet();
@@ -486,7 +688,7 @@ function getEvents() {
         semester: String(row[6] || ''),
         location: String(row[7] || ''),
         description: String(row[8] || ''),
-        createdBy: String(row[9] || ''),
+        createdBy: String(row[9] || 'ระบบ'),
         creatorName: String(row[10] || ''),
         creatorDept: String(row[11] || '')
       });
@@ -498,6 +700,11 @@ function getEvents() {
 function saveEvent(eventData) {
   var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Events');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Events');
+  }
+
   var data = sheet.getDataRange().getValues();
   var id = eventData.id || ('evt_' + new Date().getTime());
 
@@ -541,26 +748,26 @@ function saveEvent(eventData) {
     ]);
   }
 
+  SpreadsheetApp.flush();
   return { success: true, id: id };
 }
 
 function deleteEvent(eventId, adminPin) {
   var ss = getSpreadsheet();
   var sheet = ss.getSheetByName('Events');
-  var data = sheet.getDataRange().getValues();
+  if (!sheet) return { success: false, message: 'ไม่พบชีต Events' };
 
+  var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]) === String(eventId)) {
       sheet.deleteRow(i + 1);
+      SpreadsheetApp.flush();
       return { success: true };
     }
   }
   return { success: false, message: 'ไม่พบกิจกรรมที่ต้องการลบ' };
 }
 
-/**
- * บันทึกกิจกรรมแบบกลุ่ม (Batch) เช่น ปฏิทิน ม.ฟาฏอนี
- */
 function batchSaveEvents(eventsList) {
   if (!Array.isArray(eventsList) || eventsList.length === 0) {
     return { success: false, message: 'ไม่มีรายการกิจกรรม' };
@@ -643,9 +850,29 @@ function verifyAdminPin(pin) {
   return pin === '1234';
 }
 
+function updateSettingValue(key, value) {
+  var ss = getSpreadsheet();
+  var sheet = ss.getSheetByName('Settings');
+  if (!sheet) {
+    getOrCreateSheets();
+    sheet = ss.getSheetByName('Settings');
+  }
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === String(key).trim()) {
+      sheet.getRange(i + 1, 2).setValue(value);
+      SpreadsheetApp.flush();
+      return;
+    }
+  }
+  sheet.appendRow([key, value]);
+  SpreadsheetApp.flush();
+}
+
 function getSettings() {
   var ss = getSpreadsheet();
-  var settings = { currentAcademicYear: '2568' };
+  var settings = { currentAcademicYear: '2568', adminPin: '1234' };
   var sheet = ss.getSheetByName('Settings');
   if (!sheet) return settings;
 
@@ -653,6 +880,8 @@ function getSettings() {
   for (var i = 1; i < data.length; i++) {
     if (data[i][0] === 'current_academic_year') {
       settings.currentAcademicYear = String(data[i][1]);
+    } else if (data[i][0] === 'admin_pin') {
+      settings.adminPin = String(data[i][1]);
     }
   }
   return settings;
