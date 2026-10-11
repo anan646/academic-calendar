@@ -10202,7 +10202,14 @@
       }
 
       const container = document.createElement('div');
-      container.style.cssText = 'position: absolute; left: -9999px; top: -9999px; width: 800px; background: #ffffff; color: #1e293b; font-family: "Prompt", "Sarabun", "Segoe UI", Tahoma, sans-serif; padding: 28px 32px; box-sizing: border-box; line-height: 1.5; font-size: 13px;';
+      container.id = 'manualExportRenderElement';
+      container.style.width = '780px';
+      container.style.maxWidth = '780px';
+      container.style.padding = '24px';
+      container.style.background = '#ffffff';
+      container.style.boxSizing = 'border-box';
+      container.style.fontFamily = "'Prompt', 'Sarabun', 'Plus Jakarta Sans', sans-serif";
+      container.style.color = '#1e293b';
 
       const publicSectionHtml = `
         <div style="margin-bottom: 22px;">
@@ -10348,7 +10355,7 @@
       } else if (isStaff) {
         bodyContentHtml = staffSectionHtml;
       } else {
-        bodyContentHtml = publicSectionHtml + staffSectionHtml;
+        bodyContentHtml = publicSectionHtml + '<div style="page-break-before: always; margin-top: 18px; border-top: 2px dashed #cbd5e1; padding-top: 16px;"></div>' + staffSectionHtml;
       }
 
       container.innerHTML = `
@@ -10384,7 +10391,7 @@
               <strong>ติดต่อสอบถาม / ฝ่ายสนับสนุน:</strong> ผู้ดูแลระบบหลัก (Admin) คณะศึกษาศาสตร์ มหาวิทยาลัยฟาฏอนี
             </div>
             <div style="text-align: right; font-style: italic;">
-              เอกสารคู่มือการใช้งานระบบอย่างเป็นทางการ • หน้า 1/1
+              เอกสารคู่มือการใช้งานระบบอย่างเป็นทางการ • ${isAll ? '2 หน้า' : '1 หน้า'}
             </div>
           </div>
         </div>
@@ -10408,7 +10415,8 @@
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
       };
 
       if (!window.html2pdf) {
@@ -10430,7 +10438,7 @@
             printUserManual(type);
           }
         });
-      }, 150);
+      }, 250);
     }
 
     // 2. Export Manual JPG Image
@@ -10466,7 +10474,7 @@
           if (container.parentNode) document.body.removeChild(container);
           alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ JPG: ' + (err.message || err));
         });
-      }, 150);
+      }, 250);
     }
 
     // 3. Print Manual Document
