@@ -4806,8 +4806,13 @@
     // ==========================================
     // 4. STORAGE & CLOUD REAL-TIME SYNC
     // ==========================================
-    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzUxpWd50A7Hc9TERrqX-MxeezIkzvjxt0f6ROkjl8KDSJY6HHs5Uud9_I4RLkCQnr76A/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyJp7Fo6MzlznnJ1J9IeG69y2foDJfp5gYuvla5Bifs4xyQOHhrjiIGK2TUXVIsKVobWA/exec';
     let gasApiUrl = localStorage.getItem('school_cal_gas_url') || DEFAULT_GAS_URL;
+    // อัปเกรด URL เก่าให้เป็น URL ล่าสุดของระบบอัตโนมัติ
+    if (!gasApiUrl || gasApiUrl.includes('AKfycbzUxpWd50A7Hc9TERrqX-MxeezIkzvjxt0f6ROkjl8KDSJY6HHs5Uud9_I4RLkCQnr76A')) {
+      gasApiUrl = DEFAULT_GAS_URL;
+      localStorage.setItem('school_cal_gas_url', DEFAULT_GAS_URL);
+    }
     let isSyncing = false;
     let autoSyncInterval = null;
 
